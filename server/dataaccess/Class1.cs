@@ -1,4 +1,4 @@
-﻿namespace efscaffold;
+﻿namespace dataaccess;
 
 public class Class1
 {

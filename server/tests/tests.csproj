@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+        <ProjectReference Include="..\dataaccess\dataaccess.csproj" />
     </ItemGroup>
 
     <ItemGroup>
