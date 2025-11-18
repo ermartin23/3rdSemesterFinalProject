@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api", "server\api\api.cspro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "efscaffold", "server\efscaffold\efscaffold.csproj", "{4BD66A65-D8BA-4654-A7FE-6CFB72415A1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "server\tests\tests.csproj", "{B4D585D9-E797-410C-A410-095F78FABA0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{4BD66A65-D8BA-4654-A7FE-6CFB72415A1C}.Release|x64.Build.0 = Release|Any CPU
 		{4BD66A65-D8BA-4654-A7FE-6CFB72415A1C}.Release|x86.ActiveCfg = Release|Any CPU
 		{4BD66A65-D8BA-4654-A7FE-6CFB72415A1C}.Release|x86.Build.0 = Release|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Debug|x64.Build.0 = Debug|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Debug|x86.Build.0 = Debug|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Release|x64.ActiveCfg = Release|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Release|x64.Build.0 = Release|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Release|x86.ActiveCfg = Release|Any CPU
+		{B4D585D9-E797-410C-A410-095F78FABA0D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,5 +64,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C09F0AFC-6845-47F3-8720-9B5004763F15} = {DAD03CFC-D5FA-AC94-41C7-9ABAB326F09E}
 		{4BD66A65-D8BA-4654-A7FE-6CFB72415A1C} = {DAD03CFC-D5FA-AC94-41C7-9ABAB326F09E}
+		{B4D585D9-E797-410C-A410-095F78FABA0D} = {DAD03CFC-D5FA-AC94-41C7-9ABAB326F09E}
 	EndGlobalSection
 EndGlobal
