@@ -1,0 +1,124 @@
+Index: server/DataAccess/Models/Player.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using System;\r\n\r\nnamespace DataAccess.Models;\r\n\r\npublic class Player\r\n{\r\n    public Guid Id { get; set; } = Guid.NewGuid();\r\n\r\n    public string Name { get; set; } = string.Empty;\r\n\r\n    public string Phone { get; set; } = string.Empty;\r\n\r\n    public string Email { get; set; } = string.Empty;\r\n\r\n    public bool IsActive { get; set; } = false;\r\n\r\n    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;\r\n\r\n    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;\r\n}
+===================================================================
+diff --git a/server/DataAccess/Models/Player.cs b/server/DataAccess/Models/Player.cs
+--- a/server/DataAccess/Models/Player.cs	(revision f53629848913a5b794a833c8031e3409b8beae1b)
++++ b/server/DataAccess/Models/Player.cs	(date 1763536505498)
+@@ -1,20 +1,21 @@
+ using System;
+ 
+-namespace DataAccess.Models;
+-
+-public class Player
+-{
+-    public Guid Id { get; set; } = Guid.NewGuid();
++namespace DataAccess.Models
++{
++    public class Player
++    {
++        public Guid Id { get; set; } = Guid.NewGuid();
+ 
+-    public string Name { get; set; } = string.Empty;
++        public string Name { get; set; } = string.Empty;
+ 
+-    public string Phone { get; set; } = string.Empty;
++        public string Phone { get; set; } = string.Empty;
+ 
+-    public string Email { get; set; } = string.Empty;
++        public string Email { get; set; } = string.Empty;
+ 
+-    public bool IsActive { get; set; } = false;
++        public bool IsActive { get; set; } = false;
+ 
+-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
++        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+ 
+-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
++        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
++    }
+ }
+\ No newline at end of file
+Index: server/DataAccess/Pricing/ChosenNumbersPackages.cs
+===================================================================
+diff --git a/server/DataAccess/Pricing/ChosenNumbersPackages.cs b/server/DataAccess/Pricing/ChosenNumbersPackages.cs
+--- a/server/DataAccess/Pricing/ChosenNumbersPackages.cs	(revision f53629848913a5b794a833c8031e3409b8beae1b)
++++ b/server/DataAccess/Pricing/ChosenNumbersPackages.cs	(date 1763537247125)
+@@ -1,0 +1,24 @@
++using System;
++using System.Collections.Generic;
++
++namespace DataAccess.Pricing
++{
++    public static class ChosenNumbersPackages
++    {
++        private static readonly Dictionary<int, decimal> PriceByChosenNumbers = new()
++        {
++            { 5, 20m },
++            { 10, 35m },
++            { 15, 45m }
++        };
++
++        public static decimal GetPrice(int chosenNumbers)
++        {
++            if (PriceByChosenNumbers.TryGetValue(chosenNumbers, out var price))
++                return price;
++
++            throw new ArgumentOutOfRangeException(nameof(chosenNumbers),
++                $"No price configured for {chosenNumbers} chosen numbers");
++        }
++    }
++}
+Index: server/DataAccess/Models/Transaction.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using System;\r\n\r\nnamespace Server.DataAccess.Models; \r\n\r\n\r\npublic class Transaction\r\n{\r\n    public Guid Id { get; set; }  // GUID id of the transaction\r\n\r\n    public Guid PlayerId { get; set; }  // References the Player who owns this transaction\r\n\r\n    public decimal Amount { get; set; }  // Amount of money in the transaction\r\n\r\n    public string MobilePayTransactionNumber { get; set; } = string.Empty;  // MobilePay reference number\r\n\r\n    public string Status { get; set; } = \"Pending\";  // Pending, Completed, Failed, Refunded...\r\n\r\n    \r\n    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;  // When the transaction was created\r\n    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;  // When the transaction was last updated\r\n}
+===================================================================
+diff --git a/server/DataAccess/Models/Transaction.cs b/server/DataAccess/Models/Transaction.cs
+--- a/server/DataAccess/Models/Transaction.cs	(revision f53629848913a5b794a833c8031e3409b8beae1b)
++++ b/server/DataAccess/Models/Transaction.cs	(date 1763503831668)
+@@ -1,6 +1,7 @@
+ using System;
+ 
+-namespace Server.DataAccess.Models; 
++namespace DataAccess.Models;
++
+ 
+ 
+ public class Transaction
+Index: server/DataAccess/Models/Play.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using System;\r\nusing System.Collections.Generic;\r\n\r\nnamespace Server.DataAccess.Models\r\n{\r\n    public class Play\r\n    {\r\n        public Guid Id { get; set; } = Guid.NewGuid();\r\n\r\n        public Guid PlayerId { get; set; }\r\n\r\n        public int ChosenNumbersCount { get; set; }\r\n\r\n        public decimal PriceDKK => Core.Game.ChosenNumbersPackages.GetPrice(ChosenNumbersCount);\r\n\r\n        public List<int> ChosenNumbers { get; set; } = [];\r\n\r\n        public Guid? TransactionId { get; set; }\r\n\r\n        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;\r\n\r\n        public DateTime? PaidAt { get; set; }\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/server/DataAccess/Models/Play.cs b/server/DataAccess/Models/Play.cs
+--- a/server/DataAccess/Models/Play.cs	(revision f53629848913a5b794a833c8031e3409b8beae1b)
++++ b/server/DataAccess/Models/Play.cs	(date 1763550655148)
+@@ -1,7 +1,9 @@
+ using System;
+ using System.Collections.Generic;
++using DataAccess.Pricing;  
+ 
+-namespace Server.DataAccess.Models
++
++namespace DataAccess.Models
+ {
+     public class Play
+     {
+@@ -11,7 +13,7 @@
+ 
+         public int ChosenNumbersCount { get; set; }
+ 
+-        public decimal PriceDKK => Core.Game.ChosenNumbersPackages.GetPrice(ChosenNumbersCount);
++        public decimal PriceDKK => ChosenNumbersPackages.GetPrice(ChosenNumbersCount);
+ 
+         public List<int> ChosenNumbers { get; set; } = [];
+ 
+@@ -21,4 +23,4 @@
+ 
+         public DateTime? PaidAt { get; set; }
+     }
+-}
++}
+\ No newline at end of file
