@@ -502,6 +502,7 @@ obj/
 appsettings.Development.json
 appsettings.Local.json
 appsettings.*.local.json
+.env
 
 # Node / frontend  #
 node_modules/
