@@ -10,9 +10,7 @@ jobs:
   backend:
     name: Build and test API
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: 3rdSemesterFinalProject
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,13 +21,13 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ProjectSolution.sln
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build ProjectSolution.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --no-build --configuration Release
+        run: dotnet test ProjectSolution.sln --configuration Release --no-build
 
   frontend:
     name: Build React client
