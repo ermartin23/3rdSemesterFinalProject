@@ -21,16 +21,13 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore
-        working-directory: ./server
         run: dotnet restore ProjectSolution.sln
 
       - name: Build
-        working-directory: ./server
-        run: dotnet build ProjectSolution.sln --no-restore
+        run: dotnet build ProjectSolution.sln --configuration Release --no-restore
 
       - name: Test
-        working-directory: ./server
-        run: dotnet test ProjectSolution.sln --no-build --verbosity normal
+        run: dotnet test ProjectSolution.sln --configuration Release --no-build
 
   frontend:
     name: Build React client
