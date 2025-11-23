@@ -1,20 +1,13 @@
 using System;
-using System.Collections.Generic;
 
-namespace DataAccess.Models;
-
-public class Game
+namespace DataAccess.Models
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    public DateTime GameDate { get; set; } = DateTime.UtcNow;
-
-    // Game status: Open, Closed, Finished
-    public string Status { get; set; } = "Open";
-
-    // Numbers drawn during the game
-    public List<int> DrawnNumbers { get; set; } = [];
-
-    // Boards participating
-    public List<Board> Boards { get; set; } = [];
+    public class Game
+    {
+        public string GameId { get; set; } = Guid.NewGuid().ToString();
+        public DateTime WeekIdentity { get; set; }
+        public int[] WinningNumbers { get; set; } = new int[3];
+        public TimeOnly CutoffTime { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }

@@ -1,19 +1,20 @@
 using System;
-using DataAccess.Pricing;
-using DataAccess.Models;
 
-namespace DataAccess.Models;
-
-public class Board
+namespace DataAccess.Models
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    public Guid PlayerId { get; set; }
-    public Player Player { get; set; }
-
-    public int ChosenNumbersCount { get; set; }
-
-    public decimal PriceDKK => ChosenNumbersPackages.GetPrice(ChosenNumbersCount);
-    public Guid TransactionId { get; set; }
-    public Transaction Transaction { get; set; }
+    public class Board
+    {
+        public string BoardId { get; set; } = Guid.NewGuid().ToString();
+        
+        public string PlayerId { get; set; } = string.Empty;
+        
+        public string GameId { get; set; } = string.Empty;
+        
+        public int ChosenNumbers { get; set; }
+        
+        public bool IsWinningBoard { get; set; }
+        public decimal Price { get; set; }
+        public Player? Player { get; set; }
+        public Game? Game { get; set; }
+    }
 }
