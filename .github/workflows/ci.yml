@@ -2,17 +2,15 @@
 
 on:
   push:
-    branches: [ "master", "develop" ]
+    branches: [ "dev", "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "dev", "master" ]
 
 jobs:
   backend:
     name: Build and test API
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,20 +21,21 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore
-        run: dotnet restore
+        working-directory: ./server
+        run: dotnet restore ProjectSolution.sln
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        working-directory: ./server
+        run: dotnet build ProjectSolution.sln --no-restore
 
       - name: Test
-        run: dotnet test --no-build --configuration Release
+        working-directory: ./server
+        run: dotnet test ProjectSolution.sln --no-build --verbosity normal
 
   frontend:
     name: Build React client
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,18 +46,21 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
+        working-directory: ./client
         run: npm ci
 
       - name: Build
+        working-directory: ./client
         run: npm run build
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [backend, frontend]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy placeholder
         run: echo "Deployment goes here"
