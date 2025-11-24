@@ -19,6 +19,16 @@ create table DeadPigeonsDB.Game(
                                    createdAt timestamp not null
 );
 
+
+create table DeadPigeonsDB.RepeatingBoard(
+                                             repeatingBoardId text not null primary key,
+                                             playerId text not null,
+                                             isRepeating boolean default false,
+
+                                             foreign key (playerId)
+                                                 references DeadPigeonsDB.Player(playerId)
+);
+
 create table DeadPigeonsDB.Board(
                                     boardId text not null primary key,
                                     playerId text not null,
@@ -26,11 +36,14 @@ create table DeadPigeonsDB.Board(
                                     chosenNumbers int check ( chosenNumbers between 1 and 16),
                                     isWinningBoard boolean not null,
                                     price decimal(10,2) not null check ( price >= 0 ),
+                                    repeatingBoardId text null,
 
                                     foreign key (playerId)
                                         references DeadPigeonsDB.Player(playerId),
                                     foreign key (gameId)
-                                        references DeadPigeonsDB.Game(gameId)
+                                        references DeadPigeonsDB.Game(gameId),
+                                    foreign key (repeatingBoardId)
+                                        references DeadPigeonsDB.RepeatingBoard(repeatingBoardId)
 );
 
 create type transaction_status as ENUM ('pending', 'approved', 'declined');
@@ -45,4 +58,4 @@ create table DeadPigeonsDB.Transaction(
 
                                           foreign key (playerId)
                                               references DeadPigeonsDB.Player(playerId)
-)
+);
