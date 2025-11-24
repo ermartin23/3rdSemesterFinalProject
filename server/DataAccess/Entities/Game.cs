@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace dataaccess.Entities;
+
+public partial class Game
+{
+    public string Gameid { get; set; } = null!;
+
+    public DateTime Weekidentity { get; set; }
+
+    public List<int>? Winningnumbers { get; set; }
+
+    public TimeOnly Cutofftime { get; set; }
+
+    public DateTime Createdat { get; set; }
+
+    public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
+}
