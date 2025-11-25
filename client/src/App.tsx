@@ -1,5 +1,5 @@
 import "./App.css";
-import {createBrowserRouter, type RouteObject, RouterProvider} from "react-router";
+import {createBrowserRouter, type RouteObject, RouterProvider} from "react-router-dom";
 
 const myRoutes: RouteObject[]
 = [
@@ -13,12 +13,23 @@ const myRoutes: RouteObject[]
     }
 ]
 
-function Home()
-{
+function Home() {
     return (
-        <div>home</div>
+        <>
+            <div>home!</div>
+            <button onClick={() => {
+                fetch(''/*baseUrl*/)
+                    .then(response => {
+                        console.log(response)
+                    }).catch(e => {
+                    console.log(e)
+                })
+            }}>click me!
+            </button>
+        </>
     )
 }
+
 
 
 function App() {
