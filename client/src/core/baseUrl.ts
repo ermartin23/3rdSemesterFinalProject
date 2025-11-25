@@ -1,4 +1,4 @@
-﻿import {AuthClient} from "./generated-client.ts";
+﻿//import {AuthClient} from "./generated-client.ts";
 
 // @ts-ignore
 const isProduction = import.meta.env.PROD;
@@ -8,4 +8,4 @@ const dev = "http://localhost:5173";
 
 export const baseUrl = isProduction ? prod : dev;
 
-export const authClient = new AuthClient(baseUrl)
+//export const authClient = new AuthClient(baseUrl)

@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
+    <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
       <ProjectReference Include="..\dataaccess\dataaccess.csproj" />
   </ItemGroup>
