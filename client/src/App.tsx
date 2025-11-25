@@ -16,7 +16,7 @@ const myRoutes: RouteObject[]
 function Home() {
     return (
         <>
-            <div>home</div>
+            <div>home!</div>
             <button onClick={() => {
                 fetch(''/*baseUrl*/)
                     .then(response => {
