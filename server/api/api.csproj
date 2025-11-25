@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\dataaccess-temp\dataaccess-temp.csproj" />
+    <ProjectReference Include="..\dataaccess\dataaccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>
