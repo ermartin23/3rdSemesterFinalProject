@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllers();
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
-Console.WriteLine(JsonSerializer.Serialize(appOptions));
+Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
 builder.Services.AddDbContext<MyDbContext>(conf =>
 {
     conf.UseNpgsql(appOptions.DbConnectionString);
@@ -22,9 +22,16 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
 // Add Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
 
 // Build the app
 var app = builder.Build();
+
+app.UseCors(config => config
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(x => true));
 
 app.MapGet("/", (
     [FromServices]IOptionsMonitor<AppOptions> optionsMonitor,
