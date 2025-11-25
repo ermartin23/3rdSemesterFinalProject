@@ -9,23 +9,31 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Swagger / OpenAPI
 // Add services to the container
 builder.Services.AddControllers();
+builder.Services.AddOpenApiDocument();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
 Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
+//builder.Services.AddScoped<"Add IService and Service here (Alex uses ITodoService, TodoService) 1:37:21">();
 builder.Services.AddDbContext<MyDbContext>(conf =>
 {
     conf.UseNpgsql(appOptions.DbConnectionString);
 });
 
 
-// Add Swagger / OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
 
 // Build the app
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.UseCors(config => config
     .AllowAnyOrigin()
@@ -61,5 +69,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+
+app.UseOpenApi();
+app.UseSwaggerUi();
 
 app.Run();
