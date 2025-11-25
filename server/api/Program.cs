@@ -72,5 +72,6 @@ app.MapControllers();
 
 app.UseOpenApi();
 app.UseSwaggerUi();
+await app.GenerateApiClientsFromOpenApi("/../../client/src/core/generated-client.ts");
 
 app.Run();
