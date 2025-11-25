@@ -1,8 +1,8 @@
 using System.Text.Json;
 using api;
-using Microsoft.EntityFrameworkCore;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
