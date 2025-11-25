@@ -1,5 +1,11 @@
-﻿const isProduction = import.meta.env.PROD;
+﻿import {AuthClient} from "./generated-client.ts";
 
-const prod = "https://3rdsemesterfinalproject.fly.dev";
-const dev = "https://localhost:5284";
-export const baseUrl = isProduction ? prod : dev;
+// @ts-ignore
+const isProduction = import.meta.env.PROD;
+
+const prod = "https://deadpigeons.fly.dev";
+const dev = "http://localhost:5173";
+
+export const finalUrl = isProduction ? prod : dev;
+
+export const todoClient = new AuthClient(finalUrl)
