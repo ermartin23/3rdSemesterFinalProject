@@ -482,4 +482,38 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-package-lock.json
+
+# This is the files that we added after dotnet gitignore template 
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+# Rider/JetBrains  #
+
+.idea/
+*.iml
+*.workspace.xml
+*.dotSettings.user
+
+# ASP.NET Settings #
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+appsettings.json
+.env
+
+# Node / frontend  #
+node_modules/
+dist/
+build/
+.env.local
+
+
+# OS-specific     #
+.DS_Store
+Thumbs.db
+
+
