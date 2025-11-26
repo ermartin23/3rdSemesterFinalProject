@@ -173,11 +173,15 @@ function PlayersTab() {
         <h2 className="text-xl font-bold text-red-600">Player Management</h2>
 
         <button
-          className="btn bg-red-600 text-white hover:bg-red-700"
           onClick={() => setShowAddModal(true)}
+          className="btn bg-red-600 text-white hover:bg-red-700
+             px-6 py-3 text-lg rounded-lg"
         >
           + Add Player
         </button>
+
+
+
       </div>
 
       {/* List */}
@@ -239,11 +243,11 @@ function PlayersTab() {
             <Toggle name="active" label="Active Player" />
 
             <button
-              type="submit"
-              className="btn bg-red-600 text-white hover:bg-red-700 w-full mt-2"
-            >
-              Add Player
+              className="btn bg-red-600 text-white hover:bg-red-700
+             px-6 py-3 text-lg rounded-lg">
+              + Add Player
             </button>
+
           </form>
         </Modal>
       )}

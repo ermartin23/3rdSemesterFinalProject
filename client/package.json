@@ -16,6 +16,7 @@
     "postinstall": "husky install"
   },
   "dependencies": {
+    "canvas-confetti": "^1.9.4",
     "daisyui": "^5.5.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
