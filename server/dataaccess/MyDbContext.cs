@@ -24,15 +24,15 @@ public partial class MyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum("transaction_status", new[] { "pending", "approved", "declined" });
-
         modelBuilder.Entity<Board>(entity =>
         {
             entity.HasKey(e => e.Boardid).HasName("board_pkey");
 
             entity.ToTable("board", "deadpigeonsdb");
 
-            entity.Property(e => e.Boardid).HasColumnName("boardid");
+            entity.Property(e => e.Boardid)
+                .ValueGeneratedNever()
+                .HasColumnName("boardid");
             entity.Property(e => e.Chosennumbers).HasColumnName("chosennumbers");
             entity.Property(e => e.Gameid).HasColumnName("gameid");
             entity.Property(e => e.Iswinningboard).HasColumnName("iswinningboard");
@@ -63,7 +63,9 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("game", "deadpigeonsdb");
 
-            entity.Property(e => e.Gameid).HasColumnName("gameid");
+            entity.Property(e => e.Gameid)
+                .ValueGeneratedNever()
+                .HasColumnName("gameid");
             entity.Property(e => e.Createdat)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("createdat");
@@ -80,7 +82,9 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("player", "deadpigeonsdb");
 
-            entity.Property(e => e.Playerid).HasColumnName("playerid");
+            entity.Property(e => e.Playerid)
+                .ValueGeneratedNever()
+                .HasColumnName("playerid");
             entity.Property(e => e.Active).HasColumnName("active");
             entity.Property(e => e.Createdat)
                 .HasColumnType("timestamp without time zone")
@@ -99,7 +103,9 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("repeatingboard", "deadpigeonsdb");
 
-            entity.Property(e => e.Repeatingboardid).HasColumnName("repeatingboardid");
+            entity.Property(e => e.Repeatingboardid)
+                .ValueGeneratedNever()
+                .HasColumnName("repeatingboardid");
             entity.Property(e => e.Isrepeating)
                 .HasDefaultValue(false)
                 .HasColumnName("isrepeating");
@@ -117,13 +123,19 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("transaction", "deadpigeonsdb");
 
-            entity.Property(e => e.Transactionid).HasColumnName("transactionid");
+            entity.Property(e => e.Transactionid)
+                .ValueGeneratedNever()
+                .HasColumnName("transactionid");
             entity.Property(e => e.Amount).HasColumnName("amount");
             entity.Property(e => e.Createdat)
+                .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("createdat");
             entity.Property(e => e.Mobilepaytransactionnumber).HasColumnName("mobilepaytransactionnumber");
             entity.Property(e => e.Playerid).HasColumnName("playerid");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'::text")
+                .HasColumnName("status");
 
             entity.HasOne(d => d.Player).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.Playerid)
