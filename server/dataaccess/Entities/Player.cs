@@ -5,7 +5,7 @@ namespace dataaccess.Entities;
 
 public partial class Player
 {
-    public string Playerid { get; set; } = null!;
+    public Guid Playerid { get; set; }
 
     public string Name { get; set; } = null!;
 

@@ -2,7 +2,7 @@
 create schema if not exists DeadPigeonsDB;
 
 create table DeadPigeonsDB.Player(
-                                     playerId text not null primary key,
+                                     playerId uuid not null primary key,
                                      name text not null,
                                      phone text not null,
                                      email text not null,
@@ -12,7 +12,7 @@ create table DeadPigeonsDB.Player(
 );
 
 create table DeadPigeonsDB.Game(
-                                   gameId text not null primary key,
+                                   gameId uuid not null primary key,
                                    weekIdentity timestamp not null,
                                    winningNumbers int[3],
                                    cutoffTime time not null,
@@ -21,22 +21,22 @@ create table DeadPigeonsDB.Game(
 
 
 create table DeadPigeonsDB.RepeatingBoard(
-                                             repeatingBoardId text not null primary key,
-                                             playerId text not null,
-                                             isRepeating boolean default false,
+                                             repeatingBoardId uuid not null primary key,
+                                             playerId uuid not null,
+                                             isRepeating boolean not null default false,
 
                                              foreign key (playerId)
                                                  references DeadPigeonsDB.Player(playerId)
 );
 
 create table DeadPigeonsDB.Board(
-                                    boardId text not null primary key,
-                                    playerId text not null,
-                                    gameId text not null,
+                                    boardId uuid not null primary key,
+                                    playerId uuid not null,
+                                    gameId uuid not null,
                                     chosenNumbers int check ( chosenNumbers between 1 and 16),
                                     isWinningBoard boolean not null,
                                     price decimal(10,2) not null check ( price >= 0 ),
-                                    repeatingBoardId text null,
+                                    repeatingBoardId uuid null,
 
                                     foreign key (playerId)
                                         references DeadPigeonsDB.Player(playerId),
@@ -46,15 +46,17 @@ create table DeadPigeonsDB.Board(
                                         references DeadPigeonsDB.RepeatingBoard(repeatingBoardId)
 );
 
-create type transaction_status as ENUM ('pending', 'approved', 'declined');
+
 
 create table DeadPigeonsDB.Transaction(
-                                          transactionId text not null primary key,
-                                          playerId text not null,
+                                          transactionId uuid not null primary key,
+                                          playerId uuid not null,
                                           amount int not null,
                                           mobilepayTransactionNumber text not null,
-                                          status transaction_status not null default 'pending',
-                                          createdAt timestamp not null,
+                                          status text not null 
+                                              default 'pending'
+                                              check (status in ('pending','approved','declined')),
+                                          createdAt timestamp not null default now(),
 
                                           foreign key (playerId)
                                               references DeadPigeonsDB.Player(playerId)

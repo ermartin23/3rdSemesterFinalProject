@@ -5,11 +5,11 @@ namespace dataaccess.Entities;
 
 public partial class Repeatingboard
 {
-    public string Repeatingboardid { get; set; } = null!;
+    public Guid Repeatingboardid { get; set; }
 
-    public string Playerid { get; set; } = null!;
+    public Guid Playerid { get; set; }
 
-    public bool? Isrepeating { get; set; }
+    public bool Isrepeating { get; set; }
 
     public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
 

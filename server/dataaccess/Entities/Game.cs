@@ -5,7 +5,7 @@ namespace dataaccess.Entities;
 
 public partial class Game
 {
-    public string Gameid { get; set; } = null!;
+    public Guid Gameid { get; set; }
 
     public DateTime Weekidentity { get; set; }
 
