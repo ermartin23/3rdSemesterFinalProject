@@ -48,7 +48,7 @@ app.MapGet("/", (
     
     var myPlayer = new Player()
     {
-        Playerid = Guid.NewGuid().ToString(),
+        Playerid = Guid.NewGuid(),
         Name = "Jeremy Morris",
         Phone = "+45 78 78 97 69",
         Email = "jeremy@morris.com",
