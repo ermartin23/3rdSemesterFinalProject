@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api;
 
-public class TransactionController
+public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
     
