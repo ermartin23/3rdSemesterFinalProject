@@ -19,6 +19,10 @@ public partial class Player
 
     public DateTime Updatedat { get; set; }
 
+    public bool Isdeleted { get; set; }
+
+    public DateTime? Deletedat { get; set; }
+
     public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
 
     public virtual ICollection<Repeatingboard> Repeatingboards { get; set; } = new List<Repeatingboard>();
