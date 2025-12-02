@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-//builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);

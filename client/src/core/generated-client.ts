@@ -7,7 +7,7 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-export class GameClient {
+export class TransactionClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -17,8 +17,11 @@ export class GameClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    getGames(): Promise<GameDto[]> {
-        let url_ = this.baseUrl + "/api/Game";
+    getBalance(playerId: string): Promise<number> {
+        let url_ = this.baseUrl + "/player/{playerId}/balance";
+        if (playerId === undefined || playerId === null)
+            throw new globalThis.Error("The parameter 'playerId' must be defined.");
+        url_ = url_.replace("{playerId}", encodeURIComponent("" + playerId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -29,17 +32,17 @@ export class GameClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetGames(_response);
+            return this.processGetBalance(_response);
         });
     }
 
-    protected processGetGames(response: Response): Promise<GameDto[]> {
+    protected processGetBalance(response: Response): Promise<number> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as GameDto[];
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number;
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -47,66 +50,29 @@ export class GameClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<GameDto[]>(null as any);
+        return Promise.resolve<number>(null as any);
     }
 
-    createGame(req: CreateGameRequest): Promise<GameDto> {
-        let url_ = this.baseUrl + "/api/Game";
+    approve(id: string): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/{id}/approve";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(req);
-
         let options_: RequestInit = {
-            body: content_,
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processCreateGame(_response);
-        });
-    }
-
-    protected processCreateGame(response: Response): Promise<GameDto> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as GameDto;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<GameDto>(null as any);
-    }
-
-    deleteGame(gameId: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Game/{gameId}";
-        if (gameId === undefined || gameId === null)
-            throw new globalThis.Error("The parameter 'gameId' must be defined.");
-        url_ = url_.replace("{gameId}", encodeURIComponent("" + gameId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "DELETE",
             headers: {
                 "Accept": "application/octet-stream"
             }
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processDeleteGame(_response);
+            return this.processApprove(_response);
         });
     }
 
-    protected processDeleteGame(response: Response): Promise<FileResponse> {
+    protected processApprove(response: Response): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200 || status === 206) {
@@ -127,19 +93,47 @@ export class GameClient {
         }
         return Promise.resolve<FileResponse>(null as any);
     }
-}
 
-export interface GameDto {
-    gameid?: string;
-    weekidentity?: string;
-    winningnumbers?: number[] | undefined;
-    cutofftime?: string;
-    createdat?: string;
-    isOpen?: boolean;
-}
+    reject(id: string): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/{id}/reject";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
 
-export interface CreateGameRequest {
-    weekidentity?: string;
+        let options_: RequestInit = {
+            method: "POST",
+            headers: {
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processReject(_response);
+        });
+    }
+
+    protected processReject(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
 }
 
 export interface FileResponse {

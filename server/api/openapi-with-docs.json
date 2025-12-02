@@ -6,52 +6,32 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Game": {
+    "/player/{playerId}/balance": {
       "get": {
         "tags": [
-          "Game"
+          "Transaction"
         ],
-        "operationId": "Game_GetGames",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GameDto"
-                  }
-                }
-              }
-            }
+        "operationId": "Transaction_GetBalance",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
           }
-        }
-      },
-      "post": {
-        "tags": [
-          "Game"
         ],
-        "operationId": "Game_CreateGame",
-        "requestBody": {
-          "x-name": "req",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateGameRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameDto"
+                  "type": "number",
+                  "format": "decimal"
                 }
               }
             }
@@ -59,15 +39,48 @@
         }
       }
     },
-    "/api/Game/{gameId}": {
-      "delete": {
+    "/{id}/approve": {
+      "post": {
         "tags": [
-          "Game"
+          "Transaction"
         ],
-        "operationId": "Game_DeleteGame",
+        "operationId": "Transaction_Approve",
         "parameters": [
           {
-            "name": "gameId",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/reject": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Reject",
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -93,51 +106,5 @@
       }
     }
   },
-  "components": {
-    "schemas": {
-      "GameDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "gameid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "weekidentity": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "winningnumbers": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "cutofftime": {
-            "type": "string",
-            "format": "time"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isOpen": {
-            "type": "boolean"
-          }
-        }
-      },
-      "CreateGameRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "weekidentity": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      }
-    }
-  }
+  "components": {}
 }
