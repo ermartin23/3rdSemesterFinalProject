@@ -10,8 +10,12 @@ jobs:
   backend:
     name: Build and test API
     runs-on: ubuntu-latest
-
-    steps:
+   
+    env:
+      AppOptions__DbConnectionString: ${{ secrets.DB_CONNECTION_STRING }}
+      AppOptions__JwtSecret: ${{ secrets.JWT_SECRET }}
+      
+      steps:
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -60,3 +64,5 @@ jobs:
 
       - name: Deploy
         run: echo "Deployment goes here"
+        
+        

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using dataaccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Postgres.Scaffolding;
 using api.DTOs;
@@ -15,11 +16,14 @@ namespace api.Controllers
         {
             _context = context;
         }
-
+        
+        /// Returns all games (current + history)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameDto>>> GetGames()
         {
-            var games = await _context.Games.ToListAsync();
+            var games = await _context.Games
+                .OrderByDescending(g => g.Createdat)
+                .ToListAsync();
 
             var result = games.Select(g => new GameDto
             {
@@ -33,7 +37,8 @@ namespace api.Controllers
 
             return Ok(result);
         }
-
+        
+        /// Creates a new game if no active game exists
         [HttpPost]
         public async Task<ActionResult<GameDto>> CreateGame(CreateGameRequest req)
         {
@@ -73,6 +78,8 @@ namespace api.Controllers
             return Ok(dto);
         }
 
+        
+        /// Deletes a game by id
         [HttpDelete("{gameId:guid}")]
         public async Task<IActionResult> DeleteGame(Guid gameId)
         {
@@ -86,6 +93,7 @@ namespace api.Controllers
             return Ok("Game deleted.");
         }
 
+        // Helper to determine if the game is open before deadline (Saturdays)
         private bool IsGameOpen(DateTime createdAt, TimeOnly cutoffTime)
         {
             var now = DateTime.UtcNow;
@@ -95,5 +103,19 @@ namespace api.Controllers
 
             return now < cutoff;
         }
+
+        // Helper for cutoff using Denmark - local timezone
+        private DateTime GetRealCutoff(Game game)
+        {
+            var cutoff = game.Weekidentity.Date
+                .AddHours(game.Cutofftime.Hour)
+                .AddMinutes(game.Cutofftime.Minute);
+
+            var denmarkZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
+            var cutoffLocal = TimeZoneInfo.ConvertTimeToUtc(cutoff, denmarkZone);
+
+            return cutoffLocal;
+        }
+
     }
 }
