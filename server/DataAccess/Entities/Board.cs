@@ -5,11 +5,11 @@ namespace dataaccess.Entities;
 
 public partial class Board
 {
-    public string Boardid { get; set; } = null!;
+    public Guid Boardid { get; set; }
 
-    public string Playerid { get; set; } = null!;
+    public Guid Playerid { get; set; }
 
-    public string Gameid { get; set; } = null!;
+    public Guid Gameid { get; set; }
 
     public int? Chosennumbers { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Board
 
     public decimal Price { get; set; }
 
-    public string? Repeatingboardid { get; set; }
+    public Guid? Repeatingboardid { get; set; }
 
     public virtual Game Game { get; set; } = null!;
 
