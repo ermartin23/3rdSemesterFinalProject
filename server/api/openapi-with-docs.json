@@ -6,6 +6,105 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/player/{playerId}/balance": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_GetBalance",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/approve": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Approve",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/reject": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Reject",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Players": {
       "get": {
         "tags": [
@@ -98,15 +197,6 @@
         "parameters": [
           {
             "name": "id",
-    "/player/{playerId}/balance": {
-      "get": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_GetBalance",
-        "parameters": [
-          {
-            "name": "playerId",
             "in": "path",
             "required": true,
             "schema": {
@@ -146,21 +236,6 @@
           "Players"
         ],
         "operationId": "Players_Delete",
-                  "type": "number",
-                  "format": "decimal"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/{id}/approve": {
-      "post": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_Approve",
         "parameters": [
           {
             "name": "id",
@@ -194,12 +269,6 @@
           "Players"
         ],
         "operationId": "Players_ToggleActive",
-    "/{id}/reject": {
-      "post": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_Reject",
         "parameters": [
           {
             "name": "id",
@@ -315,17 +384,4 @@
       }
     }
   }
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {}
 }
