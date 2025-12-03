@@ -7,6 +7,7 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
+export class PlayersClient {
 export class TransactionClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -17,6 +18,8 @@ export class TransactionClient {
         this.baseUrl = baseUrl ?? "";
     }
 
+    getAll(): Promise<PlayerResponseDto[]> {
+        let url_ = this.baseUrl + "/api/Players";
     getBalance(playerId: string): Promise<number> {
         let url_ = this.baseUrl + "/player/{playerId}/balance";
         if (playerId === undefined || playerId === null)
@@ -32,6 +35,11 @@ export class TransactionClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAll(_response);
+        });
+    }
+
+    protected processGetAll(response: Response): Promise<PlayerResponseDto[]> {
             return this.processGetBalance(_response);
         });
     }
@@ -42,6 +50,7 @@ export class TransactionClient {
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as PlayerResponseDto[];
             result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number;
             return result200;
             });
@@ -50,6 +59,48 @@ export class TransactionClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
+        return Promise.resolve<PlayerResponseDto[]>(null as any);
+    }
+
+    create(dto: PlayerCreateRequestDto): Promise<PlayerResponseDto> {
+        let url_ = this.baseUrl + "/api/Players";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<PlayerResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as PlayerResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PlayerResponseDto>(null as any);
+    }
+
+    getById(id: string): Promise<PlayerResponseDto> {
+        let url_ = this.baseUrl + "/api/Players/{id}";
         return Promise.resolve<number>(null as any);
     }
 
@@ -61,6 +112,9 @@ export class TransactionClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
             method: "POST",
             headers: {
                 "Accept": "application/octet-stream"
@@ -68,6 +122,59 @@ export class TransactionClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetById(_response);
+        });
+    }
+
+    protected processGetById(response: Response): Promise<PlayerResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as PlayerResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PlayerResponseDto>(null as any);
+    }
+
+    update(id: string, dto: PlayerUpdateRequestDto): Promise<PlayerResponseDto> {
+        let url_ = this.baseUrl + "/api/Players/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: Response): Promise<PlayerResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as PlayerResponseDto;
+            return result200;
+            });
             return this.processApprove(_response);
         });
     }
@@ -91,6 +198,11 @@ export class TransactionClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
+        return Promise.resolve<PlayerResponseDto>(null as any);
+    }
+
+    delete(id: string): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Players/{id}";
         return Promise.resolve<FileResponse>(null as any);
     }
 
@@ -102,6 +214,7 @@ export class TransactionClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
+            method: "DELETE",
             method: "POST",
             headers: {
                 "Accept": "application/octet-stream"
@@ -109,6 +222,11 @@ export class TransactionClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: Response): Promise<FileResponse> {
             return this.processReject(_response);
         });
     }
@@ -134,6 +252,64 @@ export class TransactionClient {
         }
         return Promise.resolve<FileResponse>(null as any);
     }
+
+    toggleActive(id: string): Promise<PlayerResponseDto> {
+        let url_ = this.baseUrl + "/api/Players/{id}/toggle-active";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "PATCH",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processToggleActive(_response);
+        });
+    }
+
+    protected processToggleActive(response: Response): Promise<PlayerResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as PlayerResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PlayerResponseDto>(null as any);
+    }
+}
+
+export interface PlayerResponseDto {
+    playerId?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface PlayerCreateRequestDto {
+    name: string;
+    phone: string;
+    email: string;
+}
+
+export interface PlayerUpdateRequestDto {
+    name: string;
+    phone: string;
+    email: string;
 }
 
 export interface FileResponse {
