@@ -98,6 +98,15 @@
         "parameters": [
           {
             "name": "id",
+    "/player/{playerId}/balance": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_GetBalance",
+        "parameters": [
+          {
+            "name": "playerId",
             "in": "path",
             "required": true,
             "schema": {
@@ -137,6 +146,21 @@
           "Players"
         ],
         "operationId": "Players_Delete",
+                  "type": "number",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/approve": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Approve",
         "parameters": [
           {
             "name": "id",
@@ -170,6 +194,12 @@
           "Players"
         ],
         "operationId": "Players_ToggleActive",
+    "/{id}/reject": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Reject",
         "parameters": [
           {
             "name": "id",
@@ -285,4 +315,17 @@
       }
     }
   }
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {}
 }
