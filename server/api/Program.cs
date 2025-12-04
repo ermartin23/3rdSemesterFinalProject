@@ -1,14 +1,17 @@
 using System.Text.Json;
 using api;
-using api.Features.Games;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using api.Features.Players;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Swagger / OpenAPI
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
 builder.Services.AddEndpointsApiExplorer();
@@ -16,28 +19,32 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-
-// ❌ COMENTAR ESTO SI TU BRANCH NO TIENE PLAYER SERVICE
-// builder.Services.AddScoped<IPlayerService, PlayerService>();
-
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IGameService, GameService>();
+
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
+Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
+//builder.Services.AddScoped<"Add IService and Service here (Alex uses ITodoService, TodoService) 1:37:21">();
 builder.Services.AddDbContext<MyDbContext>(conf =>
 {
     conf.UseNpgsql(appOptions.DbConnectionString);
 });
 
+
+
+// Build the app
 var app = builder.Build();
 
 app.UseExceptionHandler();
+
 app.UseCors(config => config
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()
-    .SetIsOriginAllowed(_ => true));
+    .SetIsOriginAllowed(x => true));
 
+// Enable Swagger UI in development mode
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -45,7 +52,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+
 app.UseOpenApi();
 app.UseSwaggerUi();
 await app.GenerateApiClientsFromOpenApi("/../../client/src/core/generated-client.ts");
+
 app.Run();

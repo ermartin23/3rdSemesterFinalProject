@@ -15,5 +15,9 @@ public partial class Game
 
     public DateTime Createdat { get; set; } = DateTime.Now;
 
+    public bool Isdeleted { get; set; }
+
+    public DateTime? Deletedat { get; set; }
+
     public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
 }

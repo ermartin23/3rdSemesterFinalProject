@@ -17,5 +17,9 @@ public partial class Transaction
 
     public DateTime Createdat { get; set; }
 
+    public bool Isdeleted { get; set; }
+
+    public DateTime? Deletedat { get; set; }
+
     public virtual Player Player { get; set; } = null!;
 }

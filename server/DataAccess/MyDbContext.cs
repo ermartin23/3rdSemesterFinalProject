@@ -34,7 +34,11 @@ public partial class MyDbContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("boardid");
             entity.Property(e => e.Chosennumbers).HasColumnName("chosennumbers");
+            entity.Property(e => e.Deletedat).HasColumnName("deletedat");
             entity.Property(e => e.Gameid).HasColumnName("gameid");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
             entity.Property(e => e.Iswinningboard).HasColumnName("iswinningboard");
             entity.Property(e => e.Playerid).HasColumnName("playerid");
             entity.Property(e => e.Price)
@@ -66,13 +70,13 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Gameid)
                 .ValueGeneratedNever()
                 .HasColumnName("gameid");
-            entity.Property(e => e.Createdat)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("createdat");
+            entity.Property(e => e.Createdat).HasColumnName("createdat");
             entity.Property(e => e.Cutofftime).HasColumnName("cutofftime");
-            entity.Property(e => e.Weekidentity)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("weekidentity");
+            entity.Property(e => e.Deletedat).HasColumnName("deletedat");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
+            entity.Property(e => e.Weekidentity).HasColumnName("weekidentity");
             entity.Property(e => e.Winningnumbers).HasColumnName("winningnumbers");
         });
 
@@ -86,15 +90,15 @@ public partial class MyDbContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("playerid");
             entity.Property(e => e.Active).HasColumnName("active");
-            entity.Property(e => e.Createdat)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("createdat");
+            entity.Property(e => e.Createdat).HasColumnName("createdat");
+            entity.Property(e => e.Deletedat).HasColumnName("deletedat");
             entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Phone).HasColumnName("phone");
-            entity.Property(e => e.Updatedat)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updatedat");
+            entity.Property(e => e.Updatedat).HasColumnName("updatedat");
         });
 
         modelBuilder.Entity<Repeatingboard>(entity =>
@@ -106,6 +110,10 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Repeatingboardid)
                 .ValueGeneratedNever()
                 .HasColumnName("repeatingboardid");
+            entity.Property(e => e.Deletedat).HasColumnName("deletedat");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
             entity.Property(e => e.Isrepeating)
                 .HasDefaultValue(false)
                 .HasColumnName("isrepeating");
@@ -129,8 +137,11 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Amount).HasColumnName("amount");
             entity.Property(e => e.Createdat)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("createdat");
+            entity.Property(e => e.Deletedat).HasColumnName("deletedat");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
             entity.Property(e => e.Mobilepaytransactionnumber).HasColumnName("mobilepaytransactionnumber");
             entity.Property(e => e.Playerid).HasColumnName("playerid");
             entity.Property(e => e.Status)

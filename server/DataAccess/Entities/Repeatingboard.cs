@@ -11,6 +11,10 @@ public partial class Repeatingboard
 
     public bool Isrepeating { get; set; }
 
+    public bool Isdeleted { get; set; }
+
+    public DateTime? Deletedat { get; set; }
+
     public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
 
     public virtual Player Player { get; set; } = null!;
