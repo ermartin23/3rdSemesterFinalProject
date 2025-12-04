@@ -1,121 +1,74 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using api.Features.Games.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using dataaccess.Entities;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Postgres.Scaffolding;
-using api.DTOs;
 
-namespace api.Controllers
+namespace api.Features.Games;
+
+[ApiController]
+[Route("api/games")]
+public class GameController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class GameController : ControllerBase
+    private readonly IGameService _svc;
+
+    public GameController(IGameService svc)
     {
-        private readonly MyDbContext _context;
+        _svc = svc;
+    }
 
-        public GameController(MyDbContext context)
+    // GET api/games
+    [HttpGet]
+    public async Task<ActionResult<List<GameResponseDto>>> GetAll()
+    {
+        var result = await _svc.GetAllAsync();
+        return Ok(result);
+    }
+
+    // GET api/games/{id}
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<GameResponseDto>> GetById(Guid id)
+    {
+        var game = await _svc.GetByIdAsync(id);
+        if (game == null)
+            return NotFound();
+
+        return Ok(game);
+    }
+
+    // POST api/games
+    [HttpPost]
+    public async Task<ActionResult<GameResponseDto>> Create([FromBody] GameCreateRequestDto dto)
+    {
+        try
         {
-            _context = context;
+            var created = await _svc.CreateAsync(dto);
+
+            return CreatedAtAction(nameof(GetById), 
+                new { id = created.Gameid }, created);
         }
-        
-        /// Returns all games (current + history)
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GameDto>>> GetGames()
+        catch (InvalidOperationException ex)
         {
-            var games = await _context.Games
-                .OrderByDescending(g => g.Createdat)
-                .ToListAsync();
-
-            var result = games.Select(g => new GameDto
-            {
-                Gameid = g.Gameid,
-                Weekidentity = g.Weekidentity,
-                Winningnumbers = g.Winningnumbers,
-                Createdat = g.Createdat,
-                IsOpen = IsGameOpen(g.Createdat, g.Cutofftime)
-            })
-            .ToList();
-
-            return Ok(result);
+            return BadRequest(ex.Message);
         }
-        
-        /// Creates a new game if no active game exists
-        [HttpPost]
-        public async Task<ActionResult<GameDto>> CreateGame(CreateGameRequest req)
+    }
+
+    // POST api/games/{id}/winners
+    [HttpPost("{id:guid}/winners")]
+    public async Task<ActionResult<GameResponseDto>> SetWinners(Guid id, [FromBody] GameSetWinnersDto dto)
+    {
+        try
         {
-            var now = DateTime.UtcNow;
-
-            if (req.Weekidentity < now)
-                return BadRequest("WeekIdentity must be in the future.");
-
-            var open = await _context.Games
-                .Where(g => IsGameOpen(g.Createdat, g.Cutofftime))
-                .FirstOrDefaultAsync();
-
-            if (open != null)
-                return BadRequest("There is already an open game.");
-
-            var newGame = new dataaccess.Entities.Game
-            {
-                Gameid = Guid.NewGuid(),
-                Weekidentity = req.Weekidentity,
-                Winningnumbers = new List<int>(),
-                Cutofftime = new TimeOnly(17, 0),
-                Createdat = now
-            };
-
-            _context.Games.Add(newGame);
-            await _context.SaveChangesAsync();
-
-            var dto = new GameDto
-            {
-                Gameid = newGame.Gameid,
-                Weekidentity = newGame.Weekidentity,
-                Winningnumbers = newGame.Winningnumbers,
-                Createdat = newGame.Createdat,
-                IsOpen = true
-            };
-
-            return Ok(dto);
+            var updated = await _svc.SetWinningNumbersAsync(id, dto);
+            return Ok(updated);
         }
-
-        
-        /// Deletes a game by id
-        [HttpDelete("{gameId:guid}")]
-        public async Task<IActionResult> DeleteGame(Guid gameId)
+        catch (KeyNotFoundException ex)
         {
-            var game = await _context.Games.FindAsync(gameId);
-            if (game == null)
-                return NotFound();
-
-            _context.Games.Remove(game);
-            await _context.SaveChangesAsync();
-
-            return Ok("Game deleted.");
+            return NotFound(ex.Message);
         }
-
-        // Helper to determine if the game is open before deadline (Saturdays)
-        private bool IsGameOpen(DateTime createdAt, TimeOnly cutoffTime)
+        catch (InvalidOperationException ex)
         {
-            var now = DateTime.UtcNow;
-
-            var cutoff = createdAt.Date.AddHours(cutoffTime.Hour)
-                                       .AddMinutes(cutoffTime.Minute);
-
-            return now < cutoff;
+            return BadRequest(ex.Message);
         }
-
-        // Helper for cutoff using Denmark - local timezone
-        private DateTime GetRealCutoff(Game game)
-        {
-            var cutoff = game.Weekidentity.Date
-                .AddHours(game.Cutofftime.Hour)
-                .AddMinutes(game.Cutofftime.Minute);
-
-            var denmarkZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
-            var cutoffLocal = TimeZoneInfo.ConvertTimeToUtc(cutoff, denmarkZone);
-
-            return cutoffLocal;
-        }
-
     }
 }
