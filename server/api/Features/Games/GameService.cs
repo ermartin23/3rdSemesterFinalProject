@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.Features.Games.Dtos;
 using api.Features.Games.Mappings;
 using dataaccess.Entities;
@@ -49,13 +45,13 @@ public class GameService : IGameService
 
         var dk = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
 
-        // Treat input as UTC explicitly
+        // input as UTC directly
         var weekUtc = DateTime.SpecifyKind(dto.Weekidentity, DateTimeKind.Utc);
 
         // Convert the week date into Danish local time
         var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekUtc, dk);
 
-        // Saturday 17:00 in DK
+        // Saturday 17:00 in DK - deadline for submitting numbers
         var saturdayDk = weekDk.AddDays(-1).Date.AddHours(17);
 
         // Convert cutoff back to UTC
