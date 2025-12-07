@@ -26,6 +26,22 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Features\Transactions\Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Features\Transactions\Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Features\Transactions\Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Features\Transactions\Services\**" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>

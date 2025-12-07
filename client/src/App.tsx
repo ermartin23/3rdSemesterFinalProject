@@ -3,15 +3,15 @@ import {createBrowserRouter, type RouteObject, RouterProvider} from "react-route
 import { baseUrl } from "./core/baseUrl";
 
 const myRoutes: RouteObject[]
-= [
-    {
-        path: '/',
-        element: <Home/>
-    },
-    {
-        path: '/settings',
-        element: <div>Hello there, this is settings route test:))))</div>
-    }
+  = [
+  {
+    path: '/',
+    element: <Home/>
+  },
+  {
+    path: '/settings',
+    element: <div>Hello there, this is settings route test:))))</div>
+  }
 ]
 
 function Home() {
@@ -29,12 +29,10 @@ function Home() {
             </button>
         </>
     )
-}
-
-
-
-function App() {
     
+    
+function App() {
+
   return <RouterProvider router={createBrowserRouter(myRoutes)} />
 }
 
