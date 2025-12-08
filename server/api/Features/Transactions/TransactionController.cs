@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api;
 
+[ApiController]
+[Route("transaction")]
 public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
@@ -26,16 +28,18 @@ public class TransactionController : ControllerBase
         return Ok(balance);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionDto createTransactionDto)
+    [HttpPost("player/{playerId:guid}/transaction")]
+    public async Task<ActionResult<Transaction>> Create(
+        [FromRoute] Guid playerId,
+        [FromBody] CreateTransactionDto createTransactionDto)
     {
         try
         {
             var t = await _transactionService.CreatePendingAsync(
-                createTransactionDto.PlayerId,
+                playerId,
                 createTransactionDto.Amount,
                 createTransactionDto.MobilePayTransactionNumber
-                );
+            );
             return Ok(t);
         }
         catch (ArgumentException ex)
