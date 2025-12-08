@@ -29,6 +29,7 @@ function Home() {
             </button>
         </>
     )
+}
     
     
 function App() {

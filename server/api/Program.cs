@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using api.Features.Players;
+using api.Features.RepeatingBoards;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
-
+builder.Services.AddScoped<IRepeatingBoardService, RepeatingBoardService>();
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
 Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
