@@ -42,7 +42,7 @@ create table DeadPigeonsDB.Board(
                                     boardId uuid not null primary key,
                                     playerId uuid not null,
                                     gameId uuid not null,
-                                    chosenNumbers int check ( chosenNumbers between 1 and 16),
+                                    chosenNumbers int[] not null,
                                     isWinningBoard boolean not null,
                                     price decimal(10,2) not null check ( price >= 0 ),
                                     repeatingBoardId uuid null,
@@ -58,6 +58,17 @@ create table DeadPigeonsDB.Board(
                                         references DeadPigeonsDB.RepeatingBoard(repeatingBoardId)
 );
 
+alter table DeadPigeonsDB.Board
+    add constraint chosen_numbers_count check (
+        array_length(chosenNumbers, 1) between 5 and 8
+        );
+alter table DeadPigeonsDB.Board
+    add constraint chosen_numbers_values check (
+        chosenNumbers <@ ARRAY[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+    );
+alter table DeadPigeonsDB.Board
+ADD COLUMN IsDeleted boolean NOT NULL DEFAULT false;
+
 
 
 create table DeadPigeonsDB.Transaction(
@@ -65,8 +76,8 @@ create table DeadPigeonsDB.Transaction(
                                           playerId uuid not null,
                                           amount int not null,
                                           mobilepayTransactionNumber text not null,
-                                          status text not null 
-                                              default 'pending'
+                                          status text not null
+                                                                       default 'pending'
                                               check (status in ('pending','approved','declined')),
                                           createdAt timestamptz not null default now(),
 

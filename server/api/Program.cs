@@ -1,5 +1,6 @@
 using System.Text.Json;
 using api;
+using api.Features.Boards;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
 
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
