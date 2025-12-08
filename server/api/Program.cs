@@ -25,13 +25,11 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
 Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
-//builder.Services.AddScoped<"Add IService and Service here (Alex uses ITodoService, TodoService) 1:37:21">();
+//builder.Services.AddScoped<"Add IService and Service here (Alex uses ITodoService, TodoService) video 1:37:21">();
 builder.Services.AddDbContext<MyDbContext>(conf =>
 {
     conf.UseNpgsql(appOptions.DbConnectionString);
 });
-
-
 
 // Build the app
 var app = builder.Build();
