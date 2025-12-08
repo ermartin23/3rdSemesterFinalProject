@@ -11,7 +11,7 @@ public partial class Board
 
     public Guid Gameid { get; set; }
 
-    public List<int> Chosennumbers { get; set; } = null!;
+    public int? Chosennumbers { get; set; }
 
     public bool Iswinningboard { get; set; }
 
@@ -20,6 +20,8 @@ public partial class Board
     public Guid? Repeatingboardid { get; set; }
 
     public bool Isdeleted { get; set; }
+
+    public DateTime? Deletedat { get; set; }
 
     public virtual Game Game { get; set; } = null!;
 

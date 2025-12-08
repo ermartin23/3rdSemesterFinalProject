@@ -7,16 +7,22 @@ create table DeadPigeonsDB.Player(
                                      phone text not null,
                                      email text not null,
                                      active boolean not null,
-                                     createdAt timestamp not null,
-                                     updatedAt timestamp not null
+                                     createdAt timestamptz not null,
+                                     updatedAt timestamptz not null,
+
+                                     isDeleted  boolean     not null default false,
+                                     deletedAt  timestamptz null
 );
 
 create table DeadPigeonsDB.Game(
                                    gameId uuid not null primary key,
-                                   weekIdentity timestamp not null,
+                                   weekIdentity timestamptz not null,
                                    winningNumbers int[3],
                                    cutoffTime time not null,
-                                   createdAt timestamp not null
+                                   createdAt timestamptz not null,
+
+                                   isDeleted     boolean     not null default false,
+                                   deletedAt     timestamptz null
 );
 
 
@@ -24,6 +30,9 @@ create table DeadPigeonsDB.RepeatingBoard(
                                              repeatingBoardId uuid not null primary key,
                                              playerId uuid not null,
                                              isRepeating boolean not null default false,
+
+                                             isDeleted        boolean     not null default false,
+                                             deletedAt        timestamptz null,
 
                                              foreign key (playerId)
                                                  references DeadPigeonsDB.Player(playerId)
@@ -37,6 +46,9 @@ create table DeadPigeonsDB.Board(
                                     isWinningBoard boolean not null,
                                     price decimal(10,2) not null check ( price >= 0 ),
                                     repeatingBoardId uuid null,
+
+                                    isDeleted        boolean     not null default false,
+                                    deletedAt        timestamptz null,
 
                                     foreign key (playerId)
                                         references DeadPigeonsDB.Player(playerId),
@@ -67,7 +79,10 @@ create table DeadPigeonsDB.Transaction(
                                           status text not null
                                                                        default 'pending'
                                               check (status in ('pending','approved','declined')),
-                                          createdAt timestamp not null default now(),
+                                          createdAt timestamptz not null default now(),
+
+                                          isDeleted                  boolean     not null default false,
+                                          deletedAt                  timestamptz null,
 
                                           foreign key (playerId)
                                               references DeadPigeonsDB.Player(playerId)
