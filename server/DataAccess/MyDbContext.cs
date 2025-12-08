@@ -35,6 +35,9 @@ public partial class MyDbContext : DbContext
                 .HasColumnName("boardid");
             entity.Property(e => e.Chosennumbers).HasColumnName("chosennumbers");
             entity.Property(e => e.Gameid).HasColumnName("gameid");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
             entity.Property(e => e.Iswinningboard).HasColumnName("iswinningboard");
             entity.Property(e => e.Playerid).HasColumnName("playerid");
             entity.Property(e => e.Price)

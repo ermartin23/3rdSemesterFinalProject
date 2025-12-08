@@ -1,5 +1,6 @@
 using System.Text.Json;
 using api;
+using api.Features.Boards;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ builder.Services.AddCors();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
 
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
@@ -42,25 +44,6 @@ app.UseCors(config => config
     .AllowAnyHeader()
     .SetIsOriginAllowed(x => true));
 
-app.MapGet("/", (
-    [FromServices]IOptionsMonitor<AppOptions> optionsMonitor,
-    [FromServices]MyDbContext dbContext) =>
-{
-    
-    var myPlayer = new Player()
-    {
-        Playerid = Guid.NewGuid(),
-        Name = "Jeremy Morris",
-        Phone = "+45 78 78 97 69",
-        Email = "jeremy@morris.com",
-        Active = true,
-        Createdat = DateTime.Now
-    };
-    dbContext.Players.Add(myPlayer);
-    dbContext.SaveChanges();
-    var objects = dbContext.Players.ToList();
-    return objects;
-});
 
 // Enable Swagger UI in development mode
 if (app.Environment.IsDevelopment())
