@@ -10,7 +10,7 @@ public class RepeatingBoardService : IRepeatingBoardService
 
     public RepeatingBoardService(MyDbContext dbContext)
     {
-        this._dbContext = dbContext;
+        _dbContext = dbContext;
     }
 
     

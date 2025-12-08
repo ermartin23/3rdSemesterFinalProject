@@ -12,7 +12,7 @@ public class RepeatingBoardController : ControllerBase
 
     public RepeatingBoardController(IRepeatingBoardService repeatingBoardService)
     {
-        this._repeatingBoardService = repeatingBoardService;
+        _repeatingBoardService = repeatingBoardService;
     }
 
     [HttpPost("toggle")]
