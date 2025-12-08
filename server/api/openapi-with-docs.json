@@ -294,6 +294,135 @@
           }
         }
       }
+    },
+    "/api/games": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_GetAll",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_Create",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameCreateRequestDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}/winners": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_SetWinners",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameSetWinnersDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -379,6 +508,67 @@
             "format": "email",
             "maxLength": 200,
             "minLength": 1
+          }
+        }
+      },
+      "GameResponseDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gameid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "weekidentity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cutofftime": {
+            "type": "string",
+            "format": "time"
+          },
+          "winningnumbers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "isOpen": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GameCreateRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "weekidentity": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GameSetWinnersDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "winningNumbers"
+        ],
+        "properties": {
+          "winningNumbers": {
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       }

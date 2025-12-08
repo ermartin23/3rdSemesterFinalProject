@@ -1,5 +1,6 @@
 using System.Text.Json;
 using api;
+using api.Features.Boards;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -21,17 +22,16 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
 
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
 Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
-//builder.Services.AddScoped<"Add IService and Service here (Alex uses ITodoService, TodoService) 1:37:21">();
+//builder.Services.AddScoped<"Add IService and Service here (Alex uses ITodoService, TodoService) video 1:37:21">();
 builder.Services.AddDbContext<MyDbContext>(conf =>
 {
     conf.UseNpgsql(appOptions.DbConnectionString);
 });
-
-
 
 // Build the app
 var app = builder.Build();
