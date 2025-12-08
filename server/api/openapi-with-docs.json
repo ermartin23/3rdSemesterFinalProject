@@ -6,6 +6,105 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/player/{playerId}/balance": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_GetBalance",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/approve": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Approve",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{id}/reject": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_Reject",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Players": {
       "get": {
         "tags": [
@@ -98,15 +197,6 @@
         "parameters": [
           {
             "name": "id",
-    "/player/{playerId}/balance": {
-      "get": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_GetBalance",
-        "parameters": [
-          {
-            "name": "playerId",
             "in": "path",
             "required": true,
             "schema": {
@@ -146,21 +236,6 @@
           "Players"
         ],
         "operationId": "Players_Delete",
-                  "type": "number",
-                  "format": "decimal"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/{id}/approve": {
-      "post": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_Approve",
         "parameters": [
           {
             "name": "id",
@@ -194,12 +269,6 @@
           "Players"
         ],
         "operationId": "Players_ToggleActive",
-    "/{id}/reject": {
-      "post": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_Reject",
         "parameters": [
           {
             "name": "id",
@@ -219,6 +288,135 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlayerResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_GetAll",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_Create",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameCreateRequestDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}/winners": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_SetWinners",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameSetWinnersDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResponseDto"
                 }
               }
             }
@@ -312,237 +510,8 @@
             "minLength": 1
           }
         }
-      }
-    }
-  }
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Board": {
-      "get": {
-        "tags": [
-          "Board"
-        ],
-        "operationId": "Board_GetAllBoards",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Board"
-                  }
-                }
-              }
-            }
-          }
-        }
       },
-      "post": {
-        "tags": [
-          "Board"
-        ],
-        "operationId": "Board_CreateBoard",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBoardRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Board"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Board/{id}": {
-      "get": {
-        "tags": [
-          "Board"
-        ],
-        "operationId": "Board_GetBoardById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Board"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Board"
-        ],
-        "operationId": "Board_UpdateBoard",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBoardRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Board"
-        ],
-        "operationId": "Board_DeleteBoard",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Board": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "boardid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "gameid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "chosennumbers": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "iswinningboard": {
-            "type": "boolean"
-          },
-          "price": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "repeatingboardid": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "isdeleted": {
-            "type": "boolean"
-          },
-          "game": {
-            "$ref": "#/components/schemas/Game"
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
-          },
-          "repeatingboard": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Repeatingboard"
-              }
-            ]
-          }
-        }
-      },
-      "Game": {
+      "GameResponseDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -554,6 +523,14 @@
             "type": "string",
             "format": "date-time"
           },
+          "createdat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cutofftime": {
+            "type": "string",
+            "format": "time"
+          },
           "winningnumbers": {
             "type": "array",
             "nullable": true,
@@ -562,190 +539,36 @@
               "format": "int32"
             }
           },
-          "cutofftime": {
-            "type": "string",
-            "format": "time"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "boards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Board"
-            }
-          }
-        }
-      },
-      "Player": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "active": {
+          "isOpen": {
             "type": "boolean"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "boards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Board"
-            }
-          },
-          "repeatingboards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Repeatingboard"
-            }
-          },
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
           }
         }
       },
-      "Repeatingboard": {
+      "GameCreateRequestDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "repeatingboardid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "isrepeating": {
-            "type": "boolean"
-          },
-          "boards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Board"
-            }
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
-          }
-        }
-      },
-      "Transaction": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "transactionid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "amount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "mobilepaytransactionnumber": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "createdat": {
+          "weekidentity": {
             "type": "string",
             "format": "date-time"
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
           }
         }
       },
-      "CreateBoardRequest": {
+      "GameSetWinnersDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "winningNumbers"
+        ],
         "properties": {
-          "playerId": {
-            "type": "string",
-            "format": "guid"
-          },
-          "gameId": {
-            "type": "string",
-            "format": "guid"
-          },
-          "chosenNumbers": {
+          "winningNumbers": {
             "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
             "items": {
               "type": "integer",
               "format": "int32"
             }
-          },
-          "isWinningBoard": {
-            "type": "boolean"
-          },
-          "price": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "repeatingBoardId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          }
-        }
-      },
-      "UpdateBoardRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "playerId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "gameId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "chosenNumbers": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "isWinningBoard": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "price": {
-            "type": "number",
-            "format": "decimal",
-            "nullable": true
           }
         }
       }
