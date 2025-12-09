@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace api;
 
 [ApiController]
-[Route("transaction")]
+[Route("api/[controller]")]
 public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
@@ -28,6 +28,28 @@ public class TransactionController : ControllerBase
         return Ok(balance);
     }
 
+    [HttpGet("{id:guid}/transaction")]
+    public async Task<ActionResult<Transaction>> GetById([FromRoute] Guid id)
+    {
+        var transaction = await _transactionService.GetByIdAsync(id);
+        
+        if (transaction is null) return NotFound();
+        
+        return Ok(transaction);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionDto dto)
+    {
+        var created = await _transactionService.CreatePendingAsync(
+            dto.PlayerId,
+            dto.Amount,
+            dto.MobilePayTransactionNumber
+        );
+
+        return CreatedAtAction(nameof(GetById), new { id = created.Transactionid }, created);
+    }
+    
     [HttpPost("player/{playerId:guid}/transaction")]
     public async Task<ActionResult<Transaction>> Create(
         [FromRoute] Guid playerId,
