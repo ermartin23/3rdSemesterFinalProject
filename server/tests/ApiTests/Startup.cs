@@ -1,5 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using api;
+using api.Features.Boards;
+using api.Features.Games;
 using api.Features.Players;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +49,10 @@ public class Startup : IDisposable
         });
 
         services.AddScoped<IPlayerService, PlayerService>();
+        services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<IBoardService, BoardService>();
+        services.AddScoped<IGameService, GameService>();
+
     }
 
     public void Configure(IHostEnvironment env, ITestOutputHelperAccessor accessor)

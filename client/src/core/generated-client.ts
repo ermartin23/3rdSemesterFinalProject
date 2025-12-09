@@ -671,6 +671,43 @@ export class GameClient {
         }
         return Promise.resolve<GameResponseDto>(null as any);
     }
+
+    getDetails(id: string | undefined): Promise<GameDetailsResponseDto> {
+        let url_ = this.baseUrl + "/api/games/id:guid/details?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetDetails(_response);
+        });
+    }
+
+    protected processGetDetails(response: Response): Promise<GameDetailsResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as GameDetailsResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GameDetailsResponseDto>(null as any);
+    }
 }
 
 export class BoardClient {
@@ -982,6 +1019,114 @@ export interface GameCreateRequestDto {
 
 export interface GameSetWinnersDto {
     winningNumbers: number[];
+}
+
+export interface CreateBoardRequest {
+    playerId?: string;
+    gameId?: string;
+    chosenNumbers?: number[];
+    isWinningBoard?: boolean;
+    price?: number;
+    repeatingBoardId?: string | undefined;
+}
+
+export interface UpdateBoardRequest {
+    playerId?: string | undefined;
+    gameId?: string | undefined;
+    chosenNumbers?: number[] | undefined;
+    isWinningBoard?: boolean | undefined;
+    price?: number | undefined;
+}
+
+export interface GameDetailsResponseDto {
+    gameId?: string;
+    weekIdentity?: string;
+    createdAt?: string;
+    cutoffTime?: string;
+    winningNumbers?: number[] | undefined;
+    isOpen?: boolean;
+    totalWinningBoards?: number;
+    players?: GamePlayerBoardsDto[];
+}
+
+export interface GamePlayerBoardsDto {
+    playerId?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    boards?: GameBoardSummaryDto[];
+}
+
+export interface GameBoardSummaryDto {
+    boardId?: string;
+    playerId?: string;
+    chosenNumbers?: number[];
+    price?: number;
+    isWinningBoard?: boolean;
+}
+
+export interface Board {
+    boardid?: string;
+    playerid?: string;
+    gameid?: string;
+    chosennumbers?: number[] | undefined;
+    iswinningboard?: boolean;
+    price?: number;
+    repeatingboardid?: string | undefined;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    game?: Game;
+    player?: Player;
+    repeatingboard?: Repeatingboard | undefined;
+}
+
+export interface Game {
+    gameid?: string;
+    weekidentity?: string;
+    winningnumbers?: number[] | undefined;
+    cutofftime?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+}
+
+export interface Player {
+    playerid?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    createdat?: string;
+    updatedat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    repeatingboards?: Repeatingboard[];
+    transactions?: Transaction[];
+}
+
+export interface Repeatingboard {
+    repeatingboardid?: string;
+    playerid?: string;
+    isrepeating?: boolean;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    player?: Player;
+}
+
+export interface Transaction {
+    transactionid?: string;
+    playerid?: string;
+    amount?: number;
+    mobilepaytransactionnumber?: string;
+    status?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    player?: Player;
 }
 
 export interface CreateBoardRequest {
