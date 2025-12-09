@@ -71,4 +71,15 @@ public class GameController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+    
+    // Jeg er Emre
+    [HttpGet("id:guid/details")]
+    public async Task<ActionResult<GameDetailsResponseDto>> GetDetails(Guid id)
+    {
+        var details = await _svc.GetDetailsAsync(id);
+        if (details == null)
+            return NotFound();
+
+        return Ok(details);
+    }
 }
