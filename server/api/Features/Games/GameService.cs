@@ -76,7 +76,10 @@ public class GameService : IGameService
 
     public async Task<GameResponseDto> SetWinningNumbersAsync(Guid id, GameSetWinnersDto dto)
     {
-        var game = await _db.Games.FirstOrDefaultAsync(g => g.Gameid == id);
+        var game = await _db.Games
+            .Include(g => g.Boards)
+            .ThenInclude(b => b.Player)
+            .FirstOrDefaultAsync(g => g.Gameid == id);
 
         if (game == null)
             throw new KeyNotFoundException($"Game {id} not found.");
@@ -94,6 +97,11 @@ public class GameService : IGameService
             throw new InvalidOperationException("Winning numbers must be between 1 and 16.");
 
         game.Winningnumbers = dto.WinningNumbers;
+
+        foreach (var board in game.Boards.Where(b => !b.Isdeleted))
+        {
+            board.Iswinningboard = IsWinningBoard(board, game);
+        }
 
         await _db.SaveChangesAsync();
 
@@ -128,5 +136,81 @@ public class GameService : IGameService
 
         _db.Games.Add(newGame);
         await _db.SaveChangesAsync();
+    }
+    
+    
+    // Jeg er Emre
+    private static bool IsWinningBoard(Board board, Game game)
+    {
+        if (game.Winningnumbers == null || game.Winningnumbers.Count != 3)
+            return false;
+
+        if (board.Chosennumbers == null || board.Chosennumbers.Count == 0)
+            return false;
+        
+        // Treat both as sets and check if the board CONTAINS all 3 winning numbers.
+        // Order does not matter, and the board may have 5–8 numbers.
+        var winningSet = game.Winningnumbers.ToHashSet();
+        var boardSet = board.Chosennumbers.ToHashSet();
+
+        return winningSet.All(n => boardSet.Contains(n));
+    }
+
+    public async Task<GameDetailsResponseDto?> GetDetailsAsync(Guid id)
+    {
+        var game = await _db.Games
+            .AsNoTracking()
+            .Include(g => g.Boards)
+            .ThenInclude(b => b.Player)
+            .FirstOrDefaultAsync(g => g.Gameid == id && !g.Isdeleted);
+
+        if (game == null)
+            return null;
+
+        var activeBoards = game.Boards
+            .Where(b => !b.Isdeleted && b.Player != null && !b.Player.Isdeleted)
+            .ToList();
+
+        var totalWinningBoards = activeBoards.Count(b => b.Iswinningboard);
+
+        var players = activeBoards
+            .GroupBy(b => b.Playerid)
+            .Select(group =>
+            {
+                
+                var firstBoard = group.First();
+
+                return new GamePlayerBoardsDto
+                {
+                    PlayerId = group.Key,
+                    Name = firstBoard.Player!.Name,
+                    Phone = firstBoard.Player.Phone,
+                    Email = firstBoard.Player.Email,
+                    Active = firstBoard.Player.Active,
+                    Boards = group.Select(b => new GameBoardSummaryDto
+                    {
+                        BoardId = b.Boardid,
+                        PlayerId = b.Playerid,
+                        ChosenNumbers = b.Chosennumbers ?? new List<int>(),
+                        Price = b.Price,
+                        IsWinningBoard = b.Iswinningboard
+                    }).ToList()
+                };
+            })
+            .ToList();
+
+        var isOpen = game.Winningnumbers == null || game.Winningnumbers.Count == 0;
+
+        return new GameDetailsResponseDto
+        {
+            GameId = game.Gameid,
+            WeekIdentity = game.Weekidentity,
+            CreatedAt = game.Createdat,
+            CutoffTime = game.Cutofftime,
+            WinningNumbers = game.Winningnumbers,
+            IsOpen = isOpen,
+            TotalWinningBoards = totalWinningBoards,
+            Players = players
+        };
     }
 }
