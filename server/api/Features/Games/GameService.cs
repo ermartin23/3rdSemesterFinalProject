@@ -174,22 +174,28 @@ public class GameService : IGameService
         var totalWinningBoards = activeBoards.Count(b => b.Iswinningboard);
 
         var players = activeBoards
-            .GroupBy(b => b.Player)
-            .Select(group => new GamePlayerBoardsDto
+            .GroupBy(b => b.Playerid)
+            .Select(group =>
             {
-                PlayerId = group.Key!.Playerid,
-                Name = group.Key.Name,
-                Phone = group.Key.Phone,
-                Email = group.Key.Email,
-                Active = group.Key.Active,
-                Boards = group.Select(b => new GameBoardSummaryDto
+                
+                var firstBoard = group.First();
+
+                return new GamePlayerBoardsDto
                 {
-                    BoardId = b.Boardid,
-                    PlayerId = b.Playerid,
-                    ChosenNumbers = b.Chosennumbers ?? new List<int>(),
-                    Price = b.Price,
-                    IsWinningBoard = b.Iswinningboard
-                }).ToList()
+                    PlayerId = group.Key,
+                    Name = firstBoard.Player!.Name,
+                    Phone = firstBoard.Player.Phone,
+                    Email = firstBoard.Player.Email,
+                    Active = firstBoard.Player.Active,
+                    Boards = group.Select(b => new GameBoardSummaryDto
+                    {
+                        BoardId = b.Boardid,
+                        PlayerId = b.Playerid,
+                        ChosenNumbers = b.Chosennumbers ?? new List<int>(),
+                        Price = b.Price,
+                        IsWinningBoard = b.Iswinningboard
+                    }).ToList()
+                };
             })
             .ToList();
 

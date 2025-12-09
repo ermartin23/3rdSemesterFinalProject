@@ -21,6 +21,10 @@ public class PlayerServiceSoftDeleteTests
     [Fact]
     public async Task SoftDeleteAsync_MarksPlayerAsDeleted_AndExcludesFromGetAll()
     {
+        
+        await _db.Database.EnsureDeletedAsync();
+        await _db.Database.EnsureCreatedAsync();
+        
         var created = await _playerService.CreateAsync(new PlayerCreateRequestDto
         {
             Name = "Ali Emre",
