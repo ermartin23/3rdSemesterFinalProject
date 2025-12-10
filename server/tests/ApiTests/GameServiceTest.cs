@@ -8,7 +8,7 @@ using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace tests.Features.Games;
+namespace tests.ApiTests.Games;
 
 public class GameServiceTests
 {
