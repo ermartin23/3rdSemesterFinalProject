@@ -5,6 +5,8 @@ import AdminDashboard from "../pages/Admin/AdminDashboard";
 import PlayerLogin from "../pages/Player/PlayerLogin.tsx";
 import PlayerDashboard from "../pages/Player/PlayerDashboard";
 import PlayerHistory from "../pages/Player/PlayerHistory";
+import PlayerWinners from "../pages/Player/PlayerWinners";
+
 
 
 
@@ -19,7 +21,9 @@ export default function AppRouter() {
         <Route path="/player-login" element={<PlayerLogin />} />
         <Route path="/player-dashboard" element={<PlayerDashboard />} />
         <Route path="/player-history" element={<PlayerHistory />} />
-
+          <Route path="/player-winners" element={<PlayerWinners />} />
+          
+        
 
 
 
