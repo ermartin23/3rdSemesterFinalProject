@@ -8,10 +8,24 @@ namespace api.Features.Boards;
 public class BoardService : IBoardService
 {
     private readonly MyDbContext _dbContext;
+    private readonly ITransactionService _transactionService;
 
-    public BoardService(MyDbContext dbContext)
+    public BoardService(MyDbContext dbContext, ITransactionService transactionService)
     {
         _dbContext = dbContext;
+        _transactionService = transactionService;
+    }
+
+    private int CalculateBoardPrice(int numberCount)
+    {
+        return numberCount switch
+        {
+            5 => 20,
+            6 => 40,
+            7 => 80,
+            8 => 160,
+            _ => throw new ArgumentException("You must choose between 5 to 8 numbers!")
+        };
     }
 
     public async Task<List<Board>> GetAllBoards()
@@ -33,30 +47,26 @@ public class BoardService : IBoardService
             .FirstOrDefaultAsync(b => b.Boardid == id && !b.Isdeleted);
     }
 
-    public async Task<Board> CreateBoard(CreateBoardRequest request)
+    public async Task<Board> CreateBoardAsync(CreateBoardRequest request)
     {
-        var player = await _dbContext.Players.FindAsync(request.PlayerId);
-        var game = await _dbContext.Games.FindAsync(request.GameId);
-        var repeatingBoard = request.RepeatingBoardId.HasValue
-            ? await _dbContext.Repeatingboards.FindAsync(request.RepeatingBoardId.Value)
-            : null;
-
-        if (player == null) throw new ArgumentException("Player does not exist");
-        if (game == null) throw new ArgumentException("Game does not exist");
-
+        return await CreateBoardAsync(request.PlayerId, request.ChosenNumbers, request.RepeatingBoardId);
+    }
+    
+    public async Task<Board> CreateBoardAsync(Guid playerId, List<int> chosenNumbers, Guid? repeatingBoardId = null)
+    {
+    var price = CalculateBoardPrice(chosenNumbers.Count);
+        
+        var balance = await _transactionService.GetBalanceAsync(playerId);
+        if (balance < price)
+            throw new InvalidOperationException("Insufficient balance to purchase board.");
+        
         var board = new Board
         {
             Boardid = Guid.NewGuid(),
-            Playerid = request.PlayerId,
-            Gameid = request.GameId,
-            Chosennumbers = request.ChosenNumbers,
-            Iswinningboard = request.IsWinningBoard,
-            Price = request.Price,
-            Repeatingboardid = request.RepeatingBoardId,
-
-            Player = player,
-            Game = game,
-            Repeatingboard = repeatingBoard
+            Playerid = playerId,
+            Chosennumbers = chosenNumbers,
+            Price = price,
+            Repeatingboardid = repeatingBoardId
         };
 
         _dbContext.Boards.Add(board);

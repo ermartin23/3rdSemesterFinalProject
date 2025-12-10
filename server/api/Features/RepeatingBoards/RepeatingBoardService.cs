@@ -7,10 +7,12 @@ namespace api.Features.RepeatingBoards;
 public class RepeatingBoardService : IRepeatingBoardService
 {
     private readonly MyDbContext _dbContext;
+    private readonly ITransactionService _transactionService;
 
-    public RepeatingBoardService(MyDbContext dbContext)
+    public RepeatingBoardService(MyDbContext dbContext, ITransactionService transactionService)
     {
         _dbContext = dbContext;
+        _transactionService = transactionService;
     }
 
     
@@ -59,12 +61,34 @@ public class RepeatingBoardService : IRepeatingBoardService
             
             bool exists = await _dbContext.Boards
                 .AnyAsync(b => b.Repeatingboardid == rb.Repeatingboardid && b.Gameid == newGame.Gameid);
-
             if (exists) continue;
-
             
             var lastBoard = rb.Boards.OrderByDescending(b => b.Boardid).FirstOrDefault();
             if (lastBoard == null) continue;
+
+            int price = lastBoard.Chosennumbers.Count switch
+            {
+                5 => 20,
+                6 => 40,
+                7 => 80,
+                8 => 160,
+                _ => throw new ArgumentException("Invalid number of chosen numbers")
+            };
+
+            var balance = await _transactionService.GetBalanceAsync(rb.Playerid);
+            if (balance < price)
+            {
+                continue;
+            }
+
+            var transaction = new Transaction
+            {
+                Transactionid = Guid.NewGuid(),
+                Playerid = rb.Playerid,
+                Amount = -price,
+                Createdat = DateTime.Now
+            };
+            _dbContext.Transactions.Add(transaction);
 
             var newBoard = new Board
             {
@@ -73,7 +97,7 @@ public class RepeatingBoardService : IRepeatingBoardService
                 Gameid = newGame.Gameid,
                 Chosennumbers = lastBoard.Chosennumbers,
                 Iswinningboard = false,
-                Price = lastBoard.Price,
+                Price = price,
                 Repeatingboardid = rb.Repeatingboardid,
                 Player = rb.Player,
                 Repeatingboard = rb,
