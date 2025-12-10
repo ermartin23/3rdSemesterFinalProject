@@ -35,8 +35,12 @@ public class BoardController : ControllerBase
     {
         try
         {
-            var board = await _boardService.CreateBoard(request);
+            var board = await _boardService.CreateBoardAsync(request);
             return Ok(board);
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest(e.Message);
         }
         catch (ArgumentException ex)
         {
