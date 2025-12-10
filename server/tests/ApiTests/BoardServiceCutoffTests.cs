@@ -44,8 +44,6 @@ public class BoardServiceCutoffTests
         db.Games.Add(game);
         await db.SaveChangesAsync();
 
-        var service = new BoardService(db);
-
         var request = new CreateBoardRequest
         {
             PlayerId = Guid.NewGuid(),
