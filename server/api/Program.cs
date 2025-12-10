@@ -1,6 +1,7 @@
 using System.Text.Json;
 using api;
 using api.Features.Boards;
+using api.Features.Games;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IRepeatingBoardService, RepeatingBoardService>();
+builder.Services.AddScoped<IGameService, GameService>();
+
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
 Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));

@@ -424,6 +424,37 @@
         }
       }
     },
+    "/api/games/id:guid/details": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_GetDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameDetailsResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Board": {
       "get": {
         "tags": [
@@ -728,6 +759,105 @@
               "type": "integer",
               "format": "int32"
             }
+          }
+        }
+      },
+      "GameDetailsResponseDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gameId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "weekIdentity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cutoffTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "winningNumbers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "isOpen": {
+            "type": "boolean"
+          },
+          "totalWinningBoards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GamePlayerBoardsDto"
+            }
+          }
+        }
+      },
+      "GamePlayerBoardsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "boards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameBoardSummaryDto"
+            }
+          }
+        }
+      },
+      "GameBoardSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "playerId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "chosenNumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "isWinningBoard": {
+            "type": "boolean"
           }
         }
       },
