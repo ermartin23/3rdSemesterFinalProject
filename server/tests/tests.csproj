@@ -18,7 +18,9 @@
 
     <ItemGroup>
         <ProjectReference Include="../api/api.csproj" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.11" />
         <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.10.0" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
         <PackageReference Include="Testcontainers.PostgreSql" Version="4.9.0" />
         <PackageReference Include="Xunit.DependencyInjection" Version="10.7.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />

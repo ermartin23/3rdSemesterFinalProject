@@ -52,6 +52,7 @@ public class PlayerService : IPlayerService
             Name = dto.Name.Trim(),
             Phone = dto.Phone.Trim(),
             Email = dto.Email.Trim().ToLowerInvariant(),
+            Password = dto.Password.Trim(), // TODO later: hash this, don’t keep raw
             Active = false, // default inactive
             Createdat = now,
             Updatedat = now,
