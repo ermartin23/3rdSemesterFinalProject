@@ -12,6 +12,7 @@ using api.Features.Players;
 using api.Features.Admins;
 using api.Features.RepeatingBoards;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Swagger / OpenAPI
@@ -41,6 +42,14 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
 // Build the app
 var app = builder.Build();
 
+// Run database seeding
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    
+}
+
+
 app.UseExceptionHandler();
 
 app.UseCors(config => config
@@ -48,6 +57,13 @@ app.UseCors(config => config
     .AllowAnyMethod()
     .AllowAnyHeader()
     .SetIsOriginAllowed(x => true));
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    
+}
+
 
 // Enable Swagger UI in development mode
 if (app.Environment.IsDevelopment())

@@ -819,6 +819,83 @@ export class AdminsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+export interface Board {
+    boardid?: string;
+    playerid?: string;
+    gameid?: string;
+    chosennumbers?: number[] | undefined;
+    iswinningboard?: boolean;
+    price?: number;
+    repeatingboardid?: string | undefined;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    game?: Game;
+    player?: Player;
+    repeatingboard?: Repeatingboard | undefined;
+}
+
+export interface Game {
+    gameid?: string;
+    weekidentity?: string;
+    winningnumbers?: number[] | undefined;
+    cutofftime?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+}
+
+export interface Player {
+    playerid?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    createdat?: string;
+    updatedat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    repeatingboards?: Repeatingboard[];
+    transactions?: Transaction[];
+}
+
+export interface Repeatingboard {
+    repeatingboardid?: string;
+    playerid?: string;
+    isrepeating?: boolean;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    player?: Player;
+}
+
+export interface Transaction {
+    transactionid?: string;
+    playerid?: string;
+    amount?: number;
+    mobilepaytransactionnumber?: string;
+    status?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    player?: Player;
+}
+
+export interface ToggleRepeatingBoardRequest {
+    boardId?: string;
+    isRepeating?: boolean;
+}
+
+export interface PlayerResponseDto {
+    playerId?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
 
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         this.http = http ? http : window as any;
