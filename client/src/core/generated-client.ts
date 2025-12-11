@@ -136,6 +136,54 @@ export class TransactionClient {
     }
 }
 
+export class RepeatingBoardClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    toggleRepeatingBoard(request: ToggleRepeatingBoardRequest): Promise<Board> {
+        let url_ = this.baseUrl + "/api/RepeatingBoard/toggle";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processToggleRepeatingBoard(_response);
+        });
+    }
+
+    protected processToggleRepeatingBoard(response: Response): Promise<Board> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board>(null as any);
+    }
+}
+
 export class PlayersClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -767,6 +815,74 @@ export class BoardClient {
     }
 }
 
+export interface Board {
+    boardid?: string;
+    playerid?: string;
+    gameid?: string;
+    chosennumbers?: number[] | undefined;
+    iswinningboard?: boolean;
+    price?: number;
+    repeatingboardid?: string | undefined;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    game?: Game;
+    player?: Player;
+    repeatingboard?: Repeatingboard | undefined;
+}
+
+export interface Game {
+    gameid?: string;
+    weekidentity?: string;
+    winningnumbers?: number[] | undefined;
+    cutofftime?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+}
+
+export interface Player {
+    playerid?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    createdat?: string;
+    updatedat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    repeatingboards?: Repeatingboard[];
+    transactions?: Transaction[];
+}
+
+export interface Repeatingboard {
+    repeatingboardid?: string;
+    playerid?: string;
+    isrepeating?: boolean;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    player?: Player;
+}
+
+export interface Transaction {
+    transactionid?: string;
+    playerid?: string;
+    amount?: number;
+    mobilepaytransactionnumber?: string;
+    status?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    player?: Player;
+}
+
+export interface ToggleRepeatingBoardRequest {
+    boardId?: string;
+    isRepeating?: boolean;
+}
+
 export interface PlayerResponseDto {
     playerId?: string;
     name?: string;
@@ -832,69 +948,6 @@ export interface GameBoardSummaryDto {
     chosenNumbers?: number[];
     price?: number;
     isWinningBoard?: boolean;
-}
-
-export interface Board {
-    boardid?: string;
-    playerid?: string;
-    gameid?: string;
-    chosennumbers?: number[] | undefined;
-    iswinningboard?: boolean;
-    price?: number;
-    repeatingboardid?: string | undefined;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    game?: Game;
-    player?: Player;
-    repeatingboard?: Repeatingboard | undefined;
-}
-
-export interface Game {
-    gameid?: string;
-    weekidentity?: string;
-    winningnumbers?: number[] | undefined;
-    cutofftime?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-}
-
-export interface Player {
-    playerid?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    createdat?: string;
-    updatedat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    repeatingboards?: Repeatingboard[];
-    transactions?: Transaction[];
-}
-
-export interface Repeatingboard {
-    repeatingboardid?: string;
-    playerid?: string;
-    isrepeating?: boolean;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    player?: Player;
-}
-
-export interface Transaction {
-    transactionid?: string;
-    playerid?: string;
-    amount?: number;
-    mobilepaytransactionnumber?: string;
-    status?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    player?: Player;
 }
 
 export interface CreateBoardRequest {
