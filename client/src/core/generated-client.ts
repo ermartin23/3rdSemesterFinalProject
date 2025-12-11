@@ -17,78 +17,8 @@ export class TransactionClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    getAll(): Promise<Transaction[]> {
-        let url_ = this.baseUrl + "/api/Transaction";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetAll(_response);
-        });
-    }
-
-    protected processGetAll(response: Response): Promise<Transaction[]> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction[];
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<Transaction[]>(null as any);
-    }
-
-    create(dto: CreateTransactionDto): Promise<Transaction> {
-        let url_ = this.baseUrl + "/api/Transaction";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(dto);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processCreate(_response);
-        });
-    }
-
-    protected processCreate(response: Response): Promise<Transaction> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<Transaction>(null as any);
-    }
-
     getBalance(playerId: string): Promise<number> {
-        let url_ = this.baseUrl + "/api/Transaction/player/{playerId}/balance";
+        let url_ = this.baseUrl + "/player/{playerId}/balance";
         if (playerId === undefined || playerId === null)
             throw new globalThis.Error("The parameter 'playerId' must be defined.");
         url_ = url_.replace("{playerId}", encodeURIComponent("" + playerId));
@@ -123,84 +53,8 @@ export class TransactionClient {
         return Promise.resolve<number>(null as any);
     }
 
-    getById(id: string): Promise<Transaction> {
-        let url_ = this.baseUrl + "/api/Transaction/{id}/transaction";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetById(_response);
-        });
-    }
-
-    protected processGetById(response: Response): Promise<Transaction> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<Transaction>(null as any);
-    }
-
-    create2(playerId: string, createTransactionDto: CreateTransactionDto): Promise<Transaction> {
-        let url_ = this.baseUrl + "/api/Transaction/player/{playerId}/transaction";
-        if (playerId === undefined || playerId === null)
-            throw new globalThis.Error("The parameter 'playerId' must be defined.");
-        url_ = url_.replace("{playerId}", encodeURIComponent("" + playerId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(createTransactionDto);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processCreate2(_response);
-        });
-    }
-
-    protected processCreate2(response: Response): Promise<Transaction> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<Transaction>(null as any);
-    }
-
     approve(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Transaction/{id}/approve";
+        let url_ = this.baseUrl + "/{id}/approve";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -241,7 +95,7 @@ export class TransactionClient {
     }
 
     reject(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Transaction/{id}/reject";
+        let url_ = this.baseUrl + "/{id}/reject";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -961,142 +815,10 @@ export class BoardClient {
     }
 }
 
-export interface Transaction {
-    transactionid?: string;
-    playerid?: string;
-    amount?: number;
-    mobilepaytransactionnumber?: string;
-    status?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    player?: Player;
-}
-
-export interface Player {
-    playerid?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    createdat?: string;
-    updatedat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    repeatingboards?: Repeatingboard[];
-    transactions?: Transaction[];
-}
-
-export interface Board {
-    boardid?: string;
-    playerid?: string;
-    gameid?: string;
-    chosennumbers?: number[] | undefined;
-    iswinningboard?: boolean;
-    price?: number;
-    repeatingboardid?: string | undefined;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    game?: Game;
-    player?: Player;
-    repeatingboard?: Repeatingboard | undefined;
-}
-
-export interface Game {
-    gameid?: string;
-    weekidentity?: string;
-    winningnumbers?: number[] | undefined;
-    cutofftime?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-}
-
-export interface Repeatingboard {
-    repeatingboardid?: string;
-    playerid?: string;
-    isrepeating?: boolean;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    player?: Player;
-}
-
-export interface CreateTransactionDto {
-    playerId?: string;
-    amount?: number;
-    mobilePayTransactionNumber?: string;
-}
-
-export interface PlayerResponseDto {
-    playerId?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-}
-
-export interface PlayerCreateRequestDto {
-    name: string;
-    phone: string;
-    email: string;
-}
-
-export interface PlayerUpdateRequestDto {
-    name: string;
-    phone: string;
-    email: string;
-}
-
-export interface GameResponseDto {
-    gameid?: string;
-    weekidentity?: string;
-    createdat?: string;
-    cutofftime?: string;
-    winningnumbers?: number[] | undefined;
-    isOpen?: boolean;
-}
-
-export interface GameCreateRequestDto {
-    weekidentity?: string;
-}
-
-export interface GameSetWinnersDto {
-    winningNumbers: number[];
-}
-
-export interface GameDetailsResponseDto {
-    gameId?: string;
-    weekIdentity?: string;
-    createdAt?: string;
-    cutoffTime?: string;
-    winningNumbers?: number[] | undefined;
-    isOpen?: boolean;
-    totalWinningBoards?: number;
-    players?: GamePlayerBoardsDto[];
-}
-
-export interface GamePlayerBoardsDto {
-    playerId?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    boards?: GameBoardSummaryDto[];
-}
-
-export interface GameBoardSummaryDto {
-    boardId?: string;
-    playerId?: string;
-    chosenNumbers?: number[];
-    price?: number;
-    isWinningBoard?: boolean;
-}
-
+export class AdminsClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 export interface Board {
     boardid?: string;
     playerid?: string;
@@ -1175,10 +897,214 @@ export interface PlayerResponseDto {
     updatedAt?: string;
 }
 
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    create(dto: AdminCreateRequestDto): Promise<AdminResponseDto> {
+        let url_ = this.baseUrl + "/api/Admins";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<AdminResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AdminResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<AdminResponseDto>(null as any);
+    }
+
+    update(id: string, dto: AdminUpdateRequestDto): Promise<AdminResponseDto> {
+        let url_ = this.baseUrl + "/api/Admins/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: Response): Promise<AdminResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AdminResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<AdminResponseDto>(null as any);
+    }
+
+    delete(id: string): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Admins/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "DELETE",
+            headers: {
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+}
+
+export interface Board {
+    boardid?: string;
+    playerid?: string;
+    gameid?: string;
+    chosennumbers?: number[];
+    iswinningboard?: boolean;
+    price?: number;
+    repeatingboardid?: string | undefined;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    game?: Game;
+    player?: Player;
+    repeatingboard?: Repeatingboard | undefined;
+}
+
+export interface Game {
+    gameid?: string;
+    weekidentity?: string;
+    winningnumbers?: number[] | undefined;
+    cutofftime?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+}
+
+export interface Player {
+    playerid?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    password?: string;
+    active?: boolean;
+    createdat?: string;
+    updatedat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    repeatingboards?: Repeatingboard[];
+    transactions?: Transaction[];
+}
+
+export interface Repeatingboard {
+    repeatingboardid?: string;
+    playerid?: string;
+    isrepeating?: boolean;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    player?: Player;
+}
+
+export interface Transaction {
+    transactionid?: string;
+    playerid?: string;
+    amount?: number;
+    mobilepaytransactionnumber?: string;
+    status?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    player?: Player;
+}
+
+export interface ToggleRepeatingBoardRequest {
+    boardId?: string;
+    isRepeating?: boolean;
+}
+
+export interface PlayerResponseDto {
+    playerId?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    active?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
 export interface PlayerCreateRequestDto {
     name: string;
     phone: string;
     email: string;
+    password: string;
 }
 
 export interface PlayerUpdateRequestDto {
@@ -1247,6 +1173,28 @@ export interface UpdateBoardRequest {
     chosenNumbers?: number[] | undefined;
     isWinningBoard?: boolean | undefined;
     price?: number | undefined;
+}
+
+export interface AdminResponseDto {
+    adminId?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface AdminCreateRequestDto {
+    name: string;
+    phone: string;
+    email: string;
+    password: string;
+}
+
+export interface AdminUpdateRequestDto {
+    name: string;
+    phone: string;
+    email: string;
 }
 
 export interface FileResponse {

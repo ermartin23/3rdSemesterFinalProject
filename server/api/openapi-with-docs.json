@@ -774,6 +774,113 @@
           }
         }
       }
+    },
+    "/api/Admins": {
+      "post": {
+        "tags": [
+          "Admins"
+        ],
+        "operationId": "Admins_Create",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreateRequestDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Admins/{id}": {
+      "put": {
+        "tags": [
+          "Admins"
+        ],
+        "operationId": "Admins_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUpdateRequestDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admins"
+        ],
+        "operationId": "Admins_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1278,6 +1385,254 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "boardid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "playerid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "gameid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "chosennumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "iswinningboard": {
+            "type": "boolean"
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "repeatingboardid": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "isdeleted": {
+            "type": "boolean"
+          },
+          "deletedat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "game": {
+            "$ref": "#/components/schemas/Game"
+          },
+          "player": {
+            "$ref": "#/components/schemas/Player"
+          },
+          "repeatingboard": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Repeatingboard"
+              }
+            ]
+          }
+        }
+      },
+      "Game": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gameid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "weekidentity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "winningnumbers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "cutofftime": {
+            "type": "string",
+            "format": "time"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isdeleted": {
+            "type": "boolean"
+          },
+          "deletedat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "boards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Board"
+            }
+          }
+        }
+      },
+      "Player": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "playerid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isdeleted": {
+            "type": "boolean"
+          },
+          "deletedat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "boards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Board"
+            }
+          },
+          "repeatingboards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Repeatingboard"
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      "Repeatingboard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "repeatingboardid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "playerid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "isrepeating": {
+            "type": "boolean"
+          },
+          "isdeleted": {
+            "type": "boolean"
+          },
+          "deletedat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "boards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Board"
+            }
+          },
+          "player": {
+            "$ref": "#/components/schemas/Player"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "transactionid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "playerid": {
+            "type": "string",
+            "format": "guid"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mobilepaytransactionnumber": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isdeleted": {
+            "type": "boolean"
+          },
+          "deletedat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "player": {
+            "$ref": "#/components/schemas/Player"
+          }
+        }
+      },
+      "ToggleRepeatingBoardRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "isRepeating": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PlayerResponseDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
           "playerId": {
             "type": "string",
             "format": "guid"
@@ -1310,7 +1665,8 @@
         "required": [
           "name",
           "phone",
-          "email"
+          "email",
+          "password"
         ],
         "properties": {
           "name": {
@@ -1328,6 +1684,11 @@
             "format": "email",
             "maxLength": 200,
             "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 6
           }
         }
       },
@@ -1581,6 +1942,93 @@
             "type": "number",
             "format": "decimal",
             "nullable": true
+          }
+        }
+      },
+      "AdminResponseDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "adminId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminCreateRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "phone",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 6
+          }
+        }
+      },
+      "AdminUpdateRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "phone",
+          "email"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 200,
+            "minLength": 1
           }
         }
       }
