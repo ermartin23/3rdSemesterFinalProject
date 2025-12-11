@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using api.Features.Players;
+using api.Features.RepeatingBoards;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IRepeatingBoardService, RepeatingBoardService>();
 builder.Services.AddScoped<IGameService, GameService>();
 
 
@@ -38,6 +41,14 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
 // Build the app
 var app = builder.Build();
 
+// Run database seeding
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    
+}
+
+
 app.UseExceptionHandler();
 
 app.UseCors(config => config
@@ -45,6 +56,13 @@ app.UseCors(config => config
     .AllowAnyMethod()
     .AllowAnyHeader()
     .SetIsOriginAllowed(x => true));
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    
+}
+
 
 // Enable Swagger UI in development mode
 if (app.Environment.IsDevelopment())
