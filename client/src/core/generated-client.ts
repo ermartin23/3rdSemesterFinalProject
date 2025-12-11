@@ -1021,23 +1021,6 @@ export interface GameSetWinnersDto {
     winningNumbers: number[];
 }
 
-export interface CreateBoardRequest {
-    playerId?: string;
-    gameId?: string;
-    chosenNumbers?: number[];
-    isWinningBoard?: boolean;
-    price?: number;
-    repeatingBoardId?: string | undefined;
-}
-
-export interface UpdateBoardRequest {
-    playerId?: string | undefined;
-    gameId?: string | undefined;
-    chosenNumbers?: number[] | undefined;
-    isWinningBoard?: boolean | undefined;
-    price?: number | undefined;
-}
-
 export interface GameDetailsResponseDto {
     gameId?: string;
     weekIdentity?: string;
@@ -1064,69 +1047,6 @@ export interface GameBoardSummaryDto {
     chosenNumbers?: number[];
     price?: number;
     isWinningBoard?: boolean;
-}
-
-export interface Board {
-    boardid?: string;
-    playerid?: string;
-    gameid?: string;
-    chosennumbers?: number[] | undefined;
-    iswinningboard?: boolean;
-    price?: number;
-    repeatingboardid?: string | undefined;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    game?: Game;
-    player?: Player;
-    repeatingboard?: Repeatingboard | undefined;
-}
-
-export interface Game {
-    gameid?: string;
-    weekidentity?: string;
-    winningnumbers?: number[] | undefined;
-    cutofftime?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-}
-
-export interface Player {
-    playerid?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    createdat?: string;
-    updatedat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    repeatingboards?: Repeatingboard[];
-    transactions?: Transaction[];
-}
-
-export interface Repeatingboard {
-    repeatingboardid?: string;
-    playerid?: string;
-    isrepeating?: boolean;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    player?: Player;
-}
-
-export interface Transaction {
-    transactionid?: string;
-    playerid?: string;
-    amount?: number;
-    mobilepaytransactionnumber?: string;
-    status?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    player?: Player;
 }
 
 export interface CreateBoardRequest {

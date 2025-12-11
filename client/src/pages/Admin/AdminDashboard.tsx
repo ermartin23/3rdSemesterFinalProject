@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/jerne-if-logo.png";
 import type { JSX } from "react/jsx-runtime";
+import TransactionsTab from "./tabs/TransactionsTab.tsx";
 
 interface Player {
     playerId: string;
@@ -217,17 +218,6 @@ function PlayersTab() {
                     </div>
                 </Modal>
             )}
-        </div>
-    );
-}
-
-function TransactionsTab() {
-    return (
-        <div className="max-w-5xl mx-auto mt-10">
-            <h2 className="text-xl font-bold text-red-600 mb-4">Pending Transactions</h2>
-            <div className="bg-white border rounded-xl shadow p-6 mb-10 text-center text-gray-600">No pending transactions</div>
-            <h2 className="text-xl font-bold text-red-600 mb-4">Transaction History</h2>
-            <div className="bg-white border rounded-xl shadow p-6 text-center text-gray-600">No processed transactions yet</div>
         </div>
     );
 }
