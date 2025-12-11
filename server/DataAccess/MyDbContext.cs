@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using dataaccess.Entities;
@@ -12,6 +12,8 @@ public partial class MyDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Admin> Admins { get; set; }
+
     public virtual DbSet<Board> Boards { get; set; }
 
     public virtual DbSet<Game> Games { get; set; }
@@ -24,6 +26,27 @@ public partial class MyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Admin>(entity =>
+        {
+            entity.HasKey(e => e.Adminid).HasName("admin_pkey");
+
+            entity.ToTable("admin", "deadpigeonsdb");
+
+            entity.Property(e => e.Adminid)
+                .ValueGeneratedNever()
+                .HasColumnName("adminid");
+            entity.Property(e => e.Createdat).HasColumnName("createdat");
+            entity.Property(e => e.Deletedat).HasColumnName("deletedat");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Isdeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("isdeleted");
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.Password).HasColumnName("password");
+            entity.Property(e => e.Phone).HasColumnName("phone");
+            entity.Property(e => e.Updatedat).HasColumnName("updatedat");
+        });
+
         modelBuilder.Entity<Board>(entity =>
         {
             entity.HasKey(e => e.Boardid).HasName("board_pkey");
@@ -97,6 +120,7 @@ public partial class MyDbContext : DbContext
                 .HasDefaultValue(false)
                 .HasColumnName("isdeleted");
             entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.Password).HasColumnName("password");
             entity.Property(e => e.Phone).HasColumnName("phone");
             entity.Property(e => e.Updatedat).HasColumnName("updatedat");
         });
