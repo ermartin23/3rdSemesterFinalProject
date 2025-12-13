@@ -85,6 +85,10 @@ public class PlayerService : IPlayerService
         player.Name = dto.Name.Trim();
         player.Phone = dto.Phone.Trim();
         player.Email = dto.Email.Trim().ToLowerInvariant();
+        
+        if (!string.IsNullOrWhiteSpace(dto.Password))
+            player.Password = dto.Password.Trim();
+        
         player.Updatedat = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
