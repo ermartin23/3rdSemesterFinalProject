@@ -6,12 +6,26 @@ create table DeadPigeonsDB.Player(
                                      name text not null,
                                      phone text not null,
                                      email text not null,
+                                     password text not null,
                                      active boolean not null,
                                      createdAt timestamptz not null,
                                      updatedAt timestamptz not null,
 
                                      isDeleted  boolean     not null default false,
                                      deletedAt  timestamptz null
+);
+
+create table DeadPigeonsDB.Admin(
+                                    adminId    uuid        not null primary key,
+                                    name       text        not null,
+                                    phone      text        not null,
+                                    email      text        not null,
+                                    password   text        not null,
+                                    createdAt  timestamptz not null,
+                                    updatedAt  timestamptz not null,
+
+                                    isDeleted  boolean     not null default false,
+                                    deletedAt  timestamptz null
 );
 
 create table DeadPigeonsDB.Game(
@@ -66,8 +80,6 @@ alter table DeadPigeonsDB.Board
     add constraint chosen_numbers_values check (
         chosenNumbers <@ ARRAY[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
     );
-alter table DeadPigeonsDB.Board
-ADD COLUMN IsDeleted boolean NOT NULL DEFAULT false;
 
 
 

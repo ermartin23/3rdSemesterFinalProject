@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using api.Features.Players;
+using api.Features.Admins;
 using api.Features.RepeatingBoards;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IRepeatingBoardService, RepeatingBoardService>();
 builder.Services.AddScoped<IGameService, GameService>();
-
+builder.Services.AddScoped<IAdminService, AdminService>(); 
 
 var appOptions = builder.Services.AddAppOptions(builder.Configuration);
 Console.WriteLine("the app options are: " + JsonSerializer.Serialize(appOptions));
@@ -40,6 +42,14 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
 // Build the app
 var app = builder.Build();
 
+// Run database seeding
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    
+}
+
+
 app.UseExceptionHandler();
 
 app.UseCors(config => config
@@ -47,6 +57,13 @@ app.UseCors(config => config
     .AllowAnyMethod()
     .AllowAnyHeader()
     .SetIsOriginAllowed(x => true));
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    
+}
+
 
 // Enable Swagger UI in development mode
 if (app.Environment.IsDevelopment())

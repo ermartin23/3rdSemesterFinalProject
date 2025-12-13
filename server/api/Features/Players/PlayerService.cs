@@ -52,6 +52,7 @@ public class PlayerService : IPlayerService
             Name = dto.Name.Trim(),
             Phone = dto.Phone.Trim(),
             Email = dto.Email.Trim().ToLowerInvariant(),
+            Password = dto.Password.Trim(), // TODO later: hash this, don’t keep raw
             Active = false, // default inactive
             Createdat = now,
             Updatedat = now,
@@ -84,6 +85,10 @@ public class PlayerService : IPlayerService
         player.Name = dto.Name.Trim();
         player.Phone = dto.Phone.Trim();
         player.Email = dto.Email.Trim().ToLowerInvariant();
+        
+        if (!string.IsNullOrWhiteSpace(dto.Password))
+            player.Password = dto.Password.Trim();
+        
         player.Updatedat = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();

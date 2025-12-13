@@ -32,6 +32,7 @@ public class GameServiceWinningTests
             Name = "Test Player",
             Phone = "+45 11 44 31 13",
             Email = "test@example.com",
+            Password = "Test1234!",
             Active = true,
             Createdat = DateTime.UtcNow,
             Updatedat = DateTime.UtcNow,

@@ -11,7 +11,7 @@ public partial class Board
 
     public Guid Gameid { get; set; }
 
-    public List<int>? Chosennumbers { get; set; } = new();
+    public List<int> Chosennumbers { get; set; } = null!;
 
     public bool Iswinningboard { get; set; }
 
