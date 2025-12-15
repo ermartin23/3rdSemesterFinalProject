@@ -147,13 +147,13 @@ export default function PlayerDashboard() {
                     View History
                 </button>
 
-                {/* ✅ NEW BUTTON: Winning Number */}
+                {/*  NEW BUTTON: Winning Number */}
                 <button
                     onClick={() =>
                         navigate("/player-winners", {
                             state: {
                                 week: currentWeek,
-                                numbers: [3, 7, 12]   // TEMPORARY → placeholder until backend is connected
+                                numbers: [4, 9, 12]   // TEMPORARY → placeholder until backend is connected
                             }
                         })
                     }

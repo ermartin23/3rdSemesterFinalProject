@@ -1,15 +1,15 @@
 import { useState } from "react";
 import logo from "../../assets/jerne-if-logo.png";
 
-
 import PlayersTab from "./tabs/PlayersTab";
 import GamesTab from "./tabs/GamesTab";
+import AdminsTab from "./tabs/AdminsTab";
+
+type AdminTab = "players" | "transactions" | "games" | "admins";
 
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] =
-        useState<"players" | "transactions" | "games">("players");
+    const [activeTab, setActiveTab] = useState<AdminTab>("players");
 
-    // @ts-ignore
     return (
         <div className="min-h-screen bg-[#faf6ef]">
             {/* HEADER */}
@@ -21,11 +21,15 @@ export default function AdminDashboard() {
                         className="rounded-full shadow"
                         style={{ width: "50px", height: "50px", objectFit: "cover" }}
                     />
-                    <h1 className="text-2xl font-bold text-red-600">Admin Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-red-600">
+                        Admin Dashboard
+                    </h1>
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <span className="text-gray-600">Logged in as Administrator</span>
+                    <span className="text-gray-600">
+                        Logged in as Administrator
+                    </span>
 
                     <button
                         className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50"
@@ -61,18 +65,30 @@ export default function AdminDashboard() {
                     </a>
 
                     <a
-                        className={`tab ${activeTab === "games" ? "tab-active" : ""}`}
+                        className={`tab ${
+                            activeTab === "games" ? "tab-active" : ""
+                        }`}
                         onClick={() => setActiveTab("games")}
                     >
                         Games
                     </a>
+
+                    <a
+                        className={`tab ${
+                            activeTab === "admins" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("admins")}
+                    >
+                        Admins
+                    </a>
                 </div>
             </div>
 
-            {/* RENDER TABS */}
+            {/* TAB CONTENT */}
             <div className="p-4">
                 {activeTab === "players" && <PlayersTab />}
                 {activeTab === "games" && <GamesTab />}
+                {activeTab === "admins" && <AdminsTab />}
             </div>
         </div>
     );
