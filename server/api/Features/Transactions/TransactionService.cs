@@ -35,7 +35,7 @@ public class TransactionService : ITransactionService
             Playerid = playerId,
             Amount = amount,
             Mobilepaytransactionnumber = mobilePayTransactionNumber,
-            Status = TransactionStatus.Pending.ToString(),
+            Status = TransactionStatus.Pending.ToString().ToLower(),
             Createdat = DateTime.UtcNow
         };
         
@@ -63,7 +63,7 @@ public class TransactionService : ITransactionService
         if (newBalance < 0)
             throw new InvalidOperationException("Cannot approve a negative balance");
         
-        t.Status = TransactionStatus.Approved.ToString();
+        t.Status = TransactionStatus.Approved.ToString().ToLower();
         await _dbContext.SaveChangesAsync();
     }
 
@@ -76,19 +76,25 @@ public class TransactionService : ITransactionService
         if (t.Status == TransactionStatus.Approved.ToString())
             throw new InvalidOperationException("Cannot reject an approved transaction");
         
-        t.Status = TransactionStatus.Declined.ToString();
+        t.Status = TransactionStatus.Declined.ToString().ToLower();
         await _dbContext.SaveChangesAsync();
     }
 
     public async Task<decimal> GetBalanceAsync(Guid playerId)
     {
         var approvedTransactions = await _dbContext.Transactions
-            .Where(t => t.Playerid == playerId &&
-                        t.Status == TransactionStatus.Approved.ToString())
+            .Where(t =>
+                !t.Isdeleted &&
+                t.Playerid == playerId &&
+                t.Status == TransactionStatus.Approved.ToString().ToLower()
+            )
             .SumAsync(t => (decimal)t.Amount);
 
         var boardCost = await _dbContext.Boards
-            .Where(b => b.Playerid == playerId)
+            .Where(b =>
+                !b.Isdeleted &&
+                b.Playerid == playerId
+            )
             .SumAsync(b => (decimal?)b.Price ?? 0m);
         
         return approvedTransactions - boardCost;

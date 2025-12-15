@@ -6,8 +6,19 @@ namespace api.Features.Boards;
 public interface IBoardService
 {
     Task<List<Board>> GetAllBoards();
+
+    // Admin usage
     Task<Board?> GetBoardById(Guid id);
-    Task<Board> CreateBoardAsync(CreateBoardRequest dto);
+
+    // Player-safe usage
+    Task<Board?> GetBoardByIdForPlayer(Guid boardId, Guid playerId);
+
+    // Player creates board for themselves
+    Task<Board> CreateBoardAsync(Guid playerId, CreateBoardRequest request);
+
+    // Admin-only update (your controller already enforces this)
     Task<Board?> UpdateBoard(Guid id, UpdateBoardRequest dto);
-    Task<bool> DeleteBoard(Guid id);
+
+    // Player deletes only their own
+    Task<bool> DeleteBoard(Guid id, Guid playerId);
 }
