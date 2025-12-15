@@ -1,10 +1,14 @@
-﻿using api.Features.Boards.Dtos;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using api.Features.Boards.Dtos;
 using dataaccess.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Features.Boards;
 
-[Route("api/[controller]")]
+[Authorize]
+[Route("api/boards")]
 [ApiController]
 public class BoardController : ControllerBase
 {
@@ -15,6 +19,7 @@ public class BoardController : ControllerBase
         _boardService = boardService;
     }
 
+    [Authorize(Roles="Admin")]
     [HttpGet]
     public async Task<ActionResult<List<Board>>> GetAllBoards()
     {
@@ -25,17 +30,34 @@ public class BoardController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Board>> GetBoardById(Guid id)
     {
-        var board = await _boardService.GetBoardById(id);
+        Board? board;
+
+        if (User.IsInRole("Admin"))
+        {
+            board = await _boardService.GetBoardById(id);
+        }
+        else if (User.IsInRole("Player"))
+        {
+            var playerId = GetUserIdOrThrow();
+            board = await _boardService.GetBoardByIdForPlayer(id, playerId);
+        }
+        else
+        {
+            return Forbid();
+        }
+
         if (board == null) return NotFound("Board not found");
         return Ok(board);
     }
 
+    [Authorize(Roles="Player")]
     [HttpPost]
     public async Task<ActionResult<Board>> CreateBoard([FromBody] CreateBoardRequest request)
     {
         try
         {
-            var board = await _boardService.CreateBoardAsync(request);
+            var playerId = GetUserIdOrThrow();
+            var board = await _boardService.CreateBoardAsync(playerId, request);
             return Ok(board);
         }
         catch (InvalidOperationException e)
@@ -48,6 +70,9 @@ public class BoardController : ControllerBase
         }
     }
 
+    
+    //It's complicated if you have time implement it, probably you will not need it
+    [Authorize(Roles="Admin")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateBoard(Guid id, [FromBody] UpdateBoardRequest request)
     {
@@ -62,12 +87,24 @@ public class BoardController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
+    
+    [Authorize(Roles="Player")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteBoard(Guid id)
     {
-        var success = await _boardService.DeleteBoard(id);
+        var playerId = GetUserIdOrThrow();
+
+        var success = await _boardService.DeleteBoard(id, playerId);
         if (!success) return NotFound("Board not found");
         return NoContent();
+    }
+    
+    private Guid GetUserIdOrThrow()
+    {
+        var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        if (string.IsNullOrWhiteSpace(sub))
+            throw new UnauthorizedAccessException("Missing sub claim");
+
+        return Guid.Parse(sub);
     }
 }

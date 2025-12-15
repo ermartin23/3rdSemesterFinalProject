@@ -97,7 +97,10 @@ public class TransactionService : ITransactionService
             .SumAsync(t => (decimal)t.Amount);
 
         var boardCost = await _dbContext.Boards
-            .Where(b => b.Playerid == playerId)
+            .Where(b =>
+                !b.Isdeleted &&
+                b.Playerid == playerId
+            )
             .SumAsync(b => (decimal?)b.Price ?? 0m);
         
         return approvedTransactions - boardCost;

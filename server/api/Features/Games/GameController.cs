@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Features.Games.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Features.Games;
@@ -37,6 +38,7 @@ public class GameController : ControllerBase
     }
 
     // POST api/games
+    [Authorize(Roles="Admin")]
     [HttpPost]
     public async Task<ActionResult<GameResponseDto>> Create([FromBody] GameCreateRequestDto dto)
     {
@@ -54,6 +56,7 @@ public class GameController : ControllerBase
     }
 
     // POST api/games/{id}/winners
+    [Authorize(Roles = "Admin")]
     [HttpPost("{id:guid}/winners")]
     public async Task<ActionResult<GameResponseDto>> SetWinners(Guid id, [FromBody] GameSetWinnersDto dto)
     {
@@ -72,8 +75,8 @@ public class GameController : ControllerBase
         }
     }
     
-    // Jeg er Emre
-    [HttpGet("id:guid/details")]
+    
+    [HttpGet("{id:guid}/details")]
     public async Task<ActionResult<GameDetailsResponseDto>> GetDetails(Guid id)
     {
         var details = await _svc.GetDetailsAsync(id);
