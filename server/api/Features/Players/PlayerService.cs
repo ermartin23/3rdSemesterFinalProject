@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using api.Features.Auth;
 using api.Features.Players.Dtos;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
@@ -11,10 +12,12 @@ namespace api.Features.Players;
 public class PlayerService : IPlayerService
 {
     private readonly MyDbContext _db;
+    private readonly IPasswordService _passwords;
 
-    public PlayerService(MyDbContext db)
+    public PlayerService(MyDbContext db, IPasswordService passwords)
     {
         _db = db;
+        _passwords = passwords;
     }
 
     public async Task<List<PlayerResponseDto>> GetAllAsync()
@@ -52,7 +55,8 @@ public class PlayerService : IPlayerService
             Name = dto.Name.Trim(),
             Phone = dto.Phone.Trim(),
             Email = dto.Email.Trim().ToLowerInvariant(),
-            Password = dto.Password.Trim(), // TODO later: hash this, don’t keep raw
+            // Password = dto.Password.Trim(), // TODO later: hash this, don’t keep raw
+            Password = _passwords.Hash(dto.Password.Trim()),
             Active = false, // default inactive
             Createdat = now,
             Updatedat = now,
@@ -85,9 +89,9 @@ public class PlayerService : IPlayerService
         player.Name = dto.Name.Trim();
         player.Phone = dto.Phone.Trim();
         player.Email = dto.Email.Trim().ToLowerInvariant();
-        
+
         if (!string.IsNullOrWhiteSpace(dto.Password))
-            player.Password = dto.Password.Trim();
+            player.Password = _passwords.Hash(dto.Password.Trim());
         
         player.Updatedat = DateTime.UtcNow;
 

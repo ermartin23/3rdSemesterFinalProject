@@ -1,3 +1,4 @@
+using api.Features.Auth;
 using api.Features.Admins.Dtos;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
@@ -8,10 +9,11 @@ namespace api.Features.Admins;
 public class AdminService : IAdminService
 {
     private readonly MyDbContext _db;
-
-    public AdminService(MyDbContext db)
+    private readonly IPasswordService _passwords;
+    public AdminService(MyDbContext db, IPasswordService passwords)
     {
         _db = db;
+        _passwords = passwords;
     }
 
     public async Task<AdminResponseDto> CreateAsync(AdminCreateRequestDto dto)
@@ -24,7 +26,8 @@ public class AdminService : IAdminService
             Name = dto.Name.Trim(),
             Phone = dto.Phone.Trim(),
             Email = dto.Email.Trim().ToLowerInvariant(),
-            Password = dto.Password.Trim(), // Later HASH this!!!!
+            //Password = dto.Password.Trim(), // Later HASH this!!!!
+            Password = _passwords.Hash(dto.Password.Trim()),
             Createdat = now,
             Updatedat = now,
             Isdeleted = false,

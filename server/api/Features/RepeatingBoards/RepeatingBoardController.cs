@@ -1,5 +1,6 @@
 ﻿using api.Features.RepeatingBoards.Dtos;
 using dataaccess.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Features.RepeatingBoards;
@@ -15,6 +16,7 @@ public class RepeatingBoardController : ControllerBase
         _repeatingBoardService = repeatingBoardService;
     }
 
+    [Authorize(Roles="Player")]
     [HttpPost("toggle")]
     public async Task<ActionResult<Board>> ToggleRepeatingBoard([FromBody] ToggleRepeatingBoardRequest request)
     {

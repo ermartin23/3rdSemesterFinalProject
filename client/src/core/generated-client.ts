@@ -17,8 +17,111 @@ export class TransactionClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    getBalance(playerId: string): Promise<number> {
-        let url_ = this.baseUrl + "/player/{playerId}/balance";
+    getAll(): Promise<Transaction[]> {
+        let url_ = this.baseUrl + "/api/transactions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAll(_response);
+        });
+    }
+
+    protected processGetAll(response: Response): Promise<Transaction[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Transaction[]>(null as any);
+    }
+
+    create(dto: CreateTransactionDto): Promise<Transaction> {
+        let url_ = this.baseUrl + "/api/transactions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<Transaction> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Transaction>(null as any);
+    }
+
+    getMyBalance(): Promise<number> {
+        let url_ = this.baseUrl + "/api/transactions/me/balance";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetMyBalance(_response);
+        });
+    }
+
+    protected processGetMyBalance(response: Response): Promise<number> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<number>(null as any);
+    }
+
+    getBalanceForPlayer(playerId: string): Promise<number> {
+        let url_ = this.baseUrl + "/api/transactions/player/{playerId}/balance";
         if (playerId === undefined || playerId === null)
             throw new globalThis.Error("The parameter 'playerId' must be defined.");
         url_ = url_.replace("{playerId}", encodeURIComponent("" + playerId));
@@ -32,11 +135,11 @@ export class TransactionClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetBalance(_response);
+            return this.processGetBalanceForPlayer(_response);
         });
     }
 
-    protected processGetBalance(response: Response): Promise<number> {
+    protected processGetBalanceForPlayer(response: Response): Promise<number> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -54,7 +157,7 @@ export class TransactionClient {
     }
 
     approve(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/{id}/approve";
+        let url_ = this.baseUrl + "/api/transactions/{id}/approve";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -95,7 +198,7 @@ export class TransactionClient {
     }
 
     reject(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/{id}/reject";
+        let url_ = this.baseUrl + "/api/transactions/{id}/reject";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -195,7 +298,7 @@ export class PlayersClient {
     }
 
     getAll(): Promise<PlayerResponseDto[]> {
-        let url_ = this.baseUrl + "/api/Players";
+        let url_ = this.baseUrl + "/api/players";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -228,7 +331,7 @@ export class PlayersClient {
     }
 
     create(dto: PlayerCreateRequestDto): Promise<PlayerResponseDto> {
-        let url_ = this.baseUrl + "/api/Players";
+        let url_ = this.baseUrl + "/api/players";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(dto);
@@ -265,7 +368,7 @@ export class PlayersClient {
     }
 
     getById(id: string): Promise<PlayerResponseDto> {
-        let url_ = this.baseUrl + "/api/Players/{id}";
+        let url_ = this.baseUrl + "/api/players/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -301,7 +404,7 @@ export class PlayersClient {
     }
 
     update(id: string, dto: PlayerUpdateRequestDto): Promise<PlayerResponseDto> {
-        let url_ = this.baseUrl + "/api/Players/{id}";
+        let url_ = this.baseUrl + "/api/players/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -341,7 +444,7 @@ export class PlayersClient {
     }
 
     delete(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Players/{id}";
+        let url_ = this.baseUrl + "/api/players/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -382,7 +485,7 @@ export class PlayersClient {
     }
 
     toggleActive(id: string): Promise<PlayerResponseDto> {
-        let url_ = this.baseUrl + "/api/Players/{id}/toggle-active";
+        let url_ = this.baseUrl + "/api/players/{id}/toggle-active";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -574,12 +677,11 @@ export class GameClient {
         return Promise.resolve<GameResponseDto>(null as any);
     }
 
-    getDetails(id: string | undefined): Promise<GameDetailsResponseDto> {
-        let url_ = this.baseUrl + "/api/games/id:guid/details?";
-        if (id === null)
-            throw new globalThis.Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "id=" + encodeURIComponent("" + id) + "&";
+    getDetails(id: string): Promise<GameDetailsResponseDto> {
+        let url_ = this.baseUrl + "/api/games/{id}/details";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -623,7 +725,7 @@ export class BoardClient {
     }
 
     getAllBoards(): Promise<Board[]> {
-        let url_ = this.baseUrl + "/api/Board";
+        let url_ = this.baseUrl + "/api/boards";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -656,7 +758,7 @@ export class BoardClient {
     }
 
     createBoard(request: CreateBoardRequest): Promise<Board> {
-        let url_ = this.baseUrl + "/api/Board";
+        let url_ = this.baseUrl + "/api/boards";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -693,7 +795,7 @@ export class BoardClient {
     }
 
     getBoardById(id: string): Promise<Board> {
-        let url_ = this.baseUrl + "/api/Board/{id}";
+        let url_ = this.baseUrl + "/api/boards/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -729,7 +831,7 @@ export class BoardClient {
     }
 
     updateBoard(id: string, request: UpdateBoardRequest): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Board/{id}";
+        let url_ = this.baseUrl + "/api/boards/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -774,7 +876,7 @@ export class BoardClient {
     }
 
     deleteBoard(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Board/{id}";
+        let url_ = this.baseUrl + "/api/boards/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -815,87 +917,58 @@ export class BoardClient {
     }
 }
 
+export class AuthClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    login(dto: LoginRequestDto): Promise<LoginResponseDto> {
+        let url_ = this.baseUrl + "/api/auth/login";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processLogin(_response);
+        });
+    }
+
+    protected processLogin(response: Response): Promise<LoginResponseDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as LoginResponseDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<LoginResponseDto>(null as any);
+    }
+}
+
 export class AdminsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-export interface Board {
-    boardid?: string;
-    playerid?: string;
-    gameid?: string;
-    chosennumbers?: number[] | undefined;
-    iswinningboard?: boolean;
-    price?: number;
-    repeatingboardid?: string | undefined;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    game?: Game;
-    player?: Player;
-    repeatingboard?: Repeatingboard | undefined;
-}
-
-export interface Game {
-    gameid?: string;
-    weekidentity?: string;
-    winningnumbers?: number[] | undefined;
-    cutofftime?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-}
-
-export interface Player {
-    playerid?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    createdat?: string;
-    updatedat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    repeatingboards?: Repeatingboard[];
-    transactions?: Transaction[];
-}
-
-export interface Repeatingboard {
-    repeatingboardid?: string;
-    playerid?: string;
-    isrepeating?: boolean;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    player?: Player;
-}
-
-export interface Transaction {
-    transactionid?: string;
-    playerid?: string;
-    amount?: number;
-    mobilepaytransactionnumber?: string;
-    status?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    player?: Player;
-}
-
-export interface ToggleRepeatingBoardRequest {
-    boardId?: string;
-    isRepeating?: boolean;
-}
-
-export interface PlayerResponseDto {
-    playerId?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    active?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-}
 
     constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
         this.http = http ? http : window as any;
@@ -1021,6 +1094,34 @@ export interface PlayerResponseDto {
     }
 }
 
+export interface Transaction {
+    transactionid?: string;
+    playerid?: string;
+    amount?: number;
+    mobilepaytransactionnumber?: string;
+    status?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    player?: Player;
+}
+
+export interface Player {
+    playerid?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    password?: string;
+    active?: boolean;
+    createdat?: string;
+    updatedat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    repeatingboards?: Repeatingboard[];
+    transactions?: Transaction[];
+}
+
 export interface Board {
     boardid?: string;
     playerid?: string;
@@ -1047,22 +1148,6 @@ export interface Game {
     boards?: Board[];
 }
 
-export interface Player {
-    playerid?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    password?: string;
-    active?: boolean;
-    createdat?: string;
-    updatedat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    repeatingboards?: Repeatingboard[];
-    transactions?: Transaction[];
-}
-
 export interface Repeatingboard {
     repeatingboardid?: string;
     playerid?: string;
@@ -1073,16 +1158,9 @@ export interface Repeatingboard {
     player?: Player;
 }
 
-export interface Transaction {
-    transactionid?: string;
-    playerid?: string;
+export interface CreateTransactionDto {
     amount?: number;
-    mobilepaytransactionnumber?: string;
-    status?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    player?: Player;
+    mobilePayTransactionNumber?: string;
 }
 
 export interface ToggleRepeatingBoardRequest {
@@ -1111,6 +1189,7 @@ export interface PlayerUpdateRequestDto {
     name: string;
     phone: string;
     email: string;
+    password?: string | undefined;
 }
 
 export interface GameResponseDto {
@@ -1159,11 +1238,8 @@ export interface GameBoardSummaryDto {
 }
 
 export interface CreateBoardRequest {
-    playerId?: string;
     gameId?: string;
     chosenNumbers?: number[];
-    isWinningBoard?: boolean;
-    price?: number;
     repeatingBoardId?: string | undefined;
 }
 
@@ -1173,6 +1249,18 @@ export interface UpdateBoardRequest {
     chosenNumbers?: number[] | undefined;
     isWinningBoard?: boolean | undefined;
     price?: number | undefined;
+}
+
+export interface LoginResponseDto {
+    token?: string;
+    role?: string;
+    userId?: string;
+    email?: string;
+}
+
+export interface LoginRequestDto {
+    email: string;
+    password: string;
 }
 
 export interface AdminResponseDto {

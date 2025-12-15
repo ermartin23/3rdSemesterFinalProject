@@ -47,26 +47,42 @@ public class BoardService : IBoardService
             .FirstOrDefaultAsync(b => b.Boardid == id && !b.Isdeleted);
     }
 
-    public async Task<Board> CreateBoardAsync(CreateBoardRequest request)
+    public async Task<Board?> GetBoardByIdForPlayer(Guid boardId, Guid playerId)
     {
-        return await CreateBoardAsync(request.PlayerId, request.ChosenNumbers, request.RepeatingBoardId);
+        return await _dbContext.Boards
+            .Include(b => b.Player)
+            .Include(b => b.Game)
+            .Include(b => b.Repeatingboard)
+            .FirstOrDefaultAsync(b => b.Boardid == boardId && b.Playerid == playerId && !b.Isdeleted);
+    }
+    public async Task<Board> CreateBoardAsync(Guid playerId, CreateBoardRequest request)
+    {
+        return await CreateBoardAsync(playerId, request.GameId, request.ChosenNumbers, request.RepeatingBoardId);
     }
     
-    public async Task<Board> CreateBoardAsync(Guid playerId, List<int> chosenNumbers, Guid? repeatingBoardId = null)
+    public async Task<Board> CreateBoardAsync(Guid playerId, Guid gameId, List<int> chosenNumbers, Guid? repeatingBoardId = null)
     {
-    var price = CalculateBoardPrice(chosenNumbers.Count);
-        
+        // validate game exists )
+        var gameExists = await _dbContext.Games.AnyAsync(g => g.Gameid == gameId && !g.Isdeleted);
+        if (!gameExists) throw new ArgumentException("Game does not exist.");
+
+        var price = CalculateBoardPrice(chosenNumbers.Count);
+
         var balance = await _transactionService.GetBalanceAsync(playerId);
         if (balance < price)
             throw new InvalidOperationException("Insufficient balance to purchase board.");
-        
+
         var board = new Board
         {
             Boardid = Guid.NewGuid(),
             Playerid = playerId,
+            Gameid = gameId,                
             Chosennumbers = chosenNumbers,
             Price = price,
-            Repeatingboardid = repeatingBoardId
+            Repeatingboardid = repeatingBoardId,
+            Iswinningboard = false,
+            Isdeleted = false,
+            Deletedat = null
         };
 
         _dbContext.Boards.Add(board);
@@ -74,7 +90,9 @@ public class BoardService : IBoardService
 
         return board;
     }
-
+    
+    //It's complicated if you have time implement it, probably you will not need it
+    
     public async Task<Board?> UpdateBoard(Guid id, UpdateBoardRequest request)
     {
         var board = await _dbContext.Boards.FindAsync(id);
@@ -106,12 +124,16 @@ public class BoardService : IBoardService
         return board;
     }
 
-    public async Task<bool> DeleteBoard(Guid id)
+    public async Task<bool> DeleteBoard(Guid id, Guid playerId)
     {
-        var board = await _dbContext.Boards.FindAsync(id);
-        if (board == null || board.Isdeleted) return false;
+        var board = await _dbContext.Boards.FirstOrDefaultAsync(b => b.Boardid == id && !b.Isdeleted);
+        if (board == null) return false;
+
+        if (board.Playerid != playerId)
+            throw new UnauthorizedAccessException("You can only delete your own board.");
 
         board.Isdeleted = true;
+        board.Deletedat = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync();
         return true;
     }

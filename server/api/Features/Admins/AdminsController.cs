@@ -1,9 +1,10 @@
 using api.Features.Admins.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Features.Admins;
 
-
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")] // => api/admins
     public class AdminsController : ControllerBase
