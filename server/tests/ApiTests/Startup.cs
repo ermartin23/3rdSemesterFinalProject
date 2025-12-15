@@ -4,6 +4,7 @@ using api;
 using api.Features.Boards;
 using api.Features.Games;
 using api.Features.Players;
+using api.Features.Admins;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +53,7 @@ public class Startup : IDisposable
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IBoardService, BoardService>();
         services.AddScoped<IGameService, GameService>();
+        services.AddScoped<IAdminService, AdminService>();
 
     }
 

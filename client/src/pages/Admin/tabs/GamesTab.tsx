@@ -1,5 +1,6 @@
 import { useState } from "react";
-import logo from "../../assets/jerne-if-logo.png";
+import logo from "../../../assets/jerne-if-logo.png"; 
+
 
 interface Game {
   id: string;

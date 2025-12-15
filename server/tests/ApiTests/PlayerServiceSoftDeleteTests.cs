@@ -29,7 +29,8 @@ public class PlayerServiceSoftDeleteTests
         {
             Name = "Ali Emre",
             Phone = "+45 12 34 56 78",
-            Email = "ali@example.com"
+            Email = "ali@example.com",
+            Password = "Test1234!"
         });
         
         // Sanity check: player is returned by GetAll before delete

@@ -1,4 +1,4 @@
-﻿import {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 const TRANSACTION_API = "http://127.0.0.1:5239/api/Transaction";
 const TRANSACTION_PAGE_SIZE = 10;

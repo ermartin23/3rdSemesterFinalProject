@@ -10,7 +10,7 @@ export default function NotFound() {
             <div className="text-8xl mb-4">🐦</div>
 
             <h1 className="text-4xl font-bold text-red-600 mb-4">
-                Oops! Something went wrong.
+                Oops! Something went wrong. Error 404
             </h1>
 
             <p className="text-lg text-gray-700 mb-8 max-w-md">

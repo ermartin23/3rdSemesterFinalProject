@@ -1,30 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import logo from "../../assets/jerne-if-logo.png";
 import type { JSX } from "react/jsx-runtime";
 import TransactionsTab from "./tabs/TransactionsTab.tsx";
 
-interface Player {
-    playerId: string;
-    name: string;
-    email: string;
-    phone: string;
-    active: boolean;
-    balance: number;
-}
 
-interface Game {
-    id: string;
-    week: number;
-    deadline: string;
-    winningNumbers: number[];
-    revenue: number;
-}
+import PlayersTab from "./tabs/PlayersTab";
+import GamesTab from "./tabs/GamesTab";
 
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState<"players" | "transactions" | "games">("players");
+    const [activeTab, setActiveTab] =
+        useState<"players" | "transactions" | "games">("players");
 
+    // @ts-ignore
     return (
         <div className="min-h-screen bg-[#faf6ef]">
+            {/* HEADER */}
             <div className="flex items-center justify-between px-8 py-4 bg-[#faf6ef] shadow-sm">
                 <div className="flex items-center gap-3">
                     <img
@@ -38,6 +28,7 @@ export default function AdminDashboard() {
 
                 <div className="flex items-center gap-4">
                     <span className="text-gray-600">Logged in as Administrator</span>
+
                     <button
                         className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50"
                         onClick={() => {
@@ -50,136 +41,44 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
+            {/* TAB BAR */}
             <div className="flex justify-center mt-6">
                 <div className="tabs tabs-boxed bg-[#f7f2e9]">
-                    <a className={`tab ${activeTab === "players" ? "tab-active" : ""}`} onClick={() => setActiveTab("players")}>Players</a>
-                    <a className={`tab ${activeTab === "transactions" ? "tab-active" : ""}`} onClick={() => setActiveTab("transactions")}>Transactions</a>
-                    <a className={`tab ${activeTab === "games" ? "tab-active" : ""}`} onClick={() => setActiveTab("games")}>Games</a>
+                    <a
+                        className={`tab ${
+                            activeTab === "players" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("players")}
+                    >
+                        Players
+                    </a>
+
+                    <a
+                        className={`tab ${
+                            activeTab === "transactions" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("transactions")}
+                    >
+                        Transactions
+                    </a>
+
+                    <a
+                        className={`tab ${activeTab === "games" ? "tab-active" : ""}`}
+                        onClick={() => setActiveTab("games")}
+                    >
+                        Games
+                    </a>
                 </div>
             </div>
 
-            {activeTab === "players" && <PlayersTab />}
-            {activeTab === "transactions" && <TransactionsTab />}
-            {activeTab === "games" && <GamesTab />}
+            {/* RENDER TABS */}
+            <div className="p-4">
+                {activeTab === "players" && <PlayersTab />}
+                {activeTab === "games" && <GamesTab />}
+            </div>
         </div>
     );
 }
-
-function PlayersTab() {
-    const [players, setPlayers] = useState<Player[]>([]);
-    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-    const API = "http://127.0.0.1:5239/api/players";
-
-    useEffect(() => {
-        fetch(API)
-            .then(res => res.json())
-            .then(data => setPlayers(data));
-    }, []);
-
-    async function handleAddPlayer(e: React.FormEvent) {
-        e.preventDefault();
-        const form = e.currentTarget as HTMLFormElement;
-        const data = new FormData(form);
-
-        const newPlayer = {
-            name: String(data.get("name")),
-            email: String(data.get("email")),
-            phone: String(data.get("phone")),
-            active: data.get("active") === "on"
-        };
-
-        const res = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newPlayer)
-        });
-
-        const created = await res.json();
-        setPlayers(prev => [...prev, created]);
-
-        setShowAddModal(false);
-        form.reset();
-    }
-
-    async function handleEditPlayer(e: React.FormEvent) {
-        e.preventDefault();
-        if (!selectedPlayer) return;
-
-        const form = e.currentTarget as HTMLFormElement;
-        const data = new FormData(form);
-
-        const updated = {
-            playerId: selectedPlayer.playerId,
-            name: String(data.get("name")),
-            email: String(data.get("email")),
-            phone: String(data.get("phone")),
-            active: data.get("active") === "on"
-        };
-
-        const res = await fetch(`${API}/${selectedPlayer.playerId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updated)
-        });
-
-        const saved = await res.json();
-
-        setPlayers(prev => prev.map(p => (p.playerId === saved.playerId ? saved : p)));
-        setShowEditModal(false);
-    }
-
-    async function handleDeletePlayer() {
-        if (!selectedPlayer) return;
-
-        await fetch(`${API}/${selectedPlayer.playerId}`, { method: "DELETE" });
-
-        setPlayers(prev => prev.filter(p => p.playerId !== selectedPlayer.playerId));
-        setShowDeleteModal(false);
-    }
-
-    return (
-        <div className="max-w-5xl mx-auto mt-10">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-red-600">Player Management</h2>
-                <button onClick={() => setShowAddModal(true)} className="btn bg-red-600 text-white hover:bg-red-700 px-6 py-3 text-lg rounded-lg">
-                    + Add Player
-                </button>
-            </div>
-
-            <div className="bg-white border rounded-xl shadow p-6 text-gray-600">
-                {players.length === 0 ? (
-                    <p className="text-center">No players registered yet.</p>
-                ) : (
-                    <ul className="space-y-3">
-                        {players.map(player => (
-                            <li key={player.playerId} className="p-4 bg-[#faf6ef] rounded-xl shadow flex justify-between items-center">
-                                <span className="flex flex-col">
-                                    <strong>{player.name}</strong>
-                                    <span>{player.email}</span>
-                                    <span>{player.phone}</span>
-                                    <span>Balance: {player.balance ?? 0} DKK</span>
-                                    <span className={`mt-1 inline-block px-2 py-1 rounded text-xs font-semibold ${player.active ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
-                                        {player.active ? "Active" : "Inactive"}
-                                    </span>
-                                </span>
-
-                                <div className="flex gap-3">
-                                    <button className="btn btn-sm btn-outline border-blue-600 text-blue-600" onClick={() => { setSelectedPlayer(player); setShowEditModal(true); }}>
-                                        Edit
-                                    </button>
-                                    <button className="btn btn-sm btn-outline border-red-600 text-red-600" onClick={() => { setSelectedPlayer(player); setShowDeleteModal(true); }}>
-                                        Delete
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
 
             {showAddModal && (
                 <Modal onClose={() => setShowAddModal(false)}>
