@@ -27,36 +27,6 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_Create",
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTransactionDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Transaction"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/api/Transaction/player/{playerId}/balance": {
@@ -92,7 +62,7 @@
         }
       }
     },
-    "/api/Transaction/{id}/transaction": {
+    "/api/Transaction/{id}": {
       "get": {
         "tags": [
           "Transaction"
@@ -129,7 +99,7 @@
         "tags": [
           "Transaction"
         ],
-        "operationId": "Transaction_Create2",
+        "operationId": "Transaction_Create",
         "parameters": [
           {
             "name": "playerId",
@@ -941,6 +911,9 @@
           "email": {
             "type": "string"
           },
+          "password": {
+            "type": "string"
+          },
           "active": {
             "type": "boolean"
           },
@@ -998,7 +971,6 @@
           },
           "chosennumbers": {
             "type": "array",
-            "nullable": true,
             "items": {
               "type": "integer",
               "format": "int32"
@@ -1122,251 +1094,12 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "playerId": {
-            "type": "string",
-            "format": "guid"
-          },
           "amount": {
             "type": "integer",
             "format": "int32"
           },
           "mobilePayTransactionNumber": {
             "type": "string"
-          }
-        }
-      },
-      "Board": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "boardid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "gameid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "chosennumbers": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "iswinningboard": {
-            "type": "boolean"
-          },
-          "price": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "repeatingboardid": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "isdeleted": {
-            "type": "boolean"
-          },
-          "deletedat": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "game": {
-            "$ref": "#/components/schemas/Game"
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
-          },
-          "repeatingboard": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Repeatingboard"
-              }
-            ]
-          }
-        }
-      },
-      "Game": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "gameid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "weekidentity": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "winningnumbers": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "cutofftime": {
-            "type": "string",
-            "format": "time"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isdeleted": {
-            "type": "boolean"
-          },
-          "deletedat": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "boards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Board"
-            }
-          }
-        }
-      },
-      "Player": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "active": {
-            "type": "boolean"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isdeleted": {
-            "type": "boolean"
-          },
-          "deletedat": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "boards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Board"
-            }
-          },
-          "repeatingboards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Repeatingboard"
-            }
-          },
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
-          }
-        }
-      },
-      "Repeatingboard": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "repeatingboardid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "isrepeating": {
-            "type": "boolean"
-          },
-          "isdeleted": {
-            "type": "boolean"
-          },
-          "deletedat": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "boards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Board"
-            }
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
-          }
-        }
-      },
-      "Transaction": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "transactionid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "playerid": {
-            "type": "string",
-            "format": "guid"
-          },
-          "amount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "mobilepaytransactionnumber": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isdeleted": {
-            "type": "boolean"
-          },
-          "deletedat": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
           }
         }
       },
@@ -1441,7 +1174,7 @@
           },
           "password": {
             "type": "string",
-            "maxLength": 100,
+            "maxLength": 200,
             "minLength": 6
           }
         }
@@ -1470,6 +1203,12 @@
             "format": "email",
             "maxLength": 200,
             "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 6,
+            "nullable": true
           }
         }
       },

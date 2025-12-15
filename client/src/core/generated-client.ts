@@ -17,8 +17,41 @@ export class TransactionClient {
         this.baseUrl = baseUrl ?? "";
     }
 
+    getAll(): Promise<Transaction[]> {
+        let url_ = this.baseUrl + "/api/Transaction";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAll(_response);
+        });
+    }
+
+    protected processGetAll(response: Response): Promise<Transaction[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Transaction[]>(null as any);
+    }
+
     getBalance(playerId: string): Promise<number> {
-        let url_ = this.baseUrl + "/player/{playerId}/balance";
+        let url_ = this.baseUrl + "/api/Transaction/player/{playerId}/balance";
         if (playerId === undefined || playerId === null)
             throw new globalThis.Error("The parameter 'playerId' must be defined.");
         url_ = url_.replace("{playerId}", encodeURIComponent("" + playerId));
@@ -53,8 +86,84 @@ export class TransactionClient {
         return Promise.resolve<number>(null as any);
     }
 
+    getById(id: string): Promise<Transaction> {
+        let url_ = this.baseUrl + "/api/Transaction/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetById(_response);
+        });
+    }
+
+    protected processGetById(response: Response): Promise<Transaction> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Transaction>(null as any);
+    }
+
+    create(playerId: string, createTransactionDto: CreateTransactionDto): Promise<Transaction> {
+        let url_ = this.baseUrl + "/api/Transaction/player/{playerId}/transaction";
+        if (playerId === undefined || playerId === null)
+            throw new globalThis.Error("The parameter 'playerId' must be defined.");
+        url_ = url_.replace("{playerId}", encodeURIComponent("" + playerId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(createTransactionDto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: Response): Promise<Transaction> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Transaction;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Transaction>(null as any);
+    }
+
     approve(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/{id}/approve";
+        let url_ = this.baseUrl + "/api/Transaction/{id}/approve";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -95,7 +204,7 @@ export class TransactionClient {
     }
 
     reject(id: string): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/{id}/reject";
+        let url_ = this.baseUrl + "/api/Transaction/{id}/reject";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -944,6 +1053,34 @@ export class AdminsClient {
     }
 }
 
+export interface Transaction {
+    transactionid?: string;
+    playerid?: string;
+    amount?: number;
+    mobilepaytransactionnumber?: string;
+    status?: string;
+    createdat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    player?: Player;
+}
+
+export interface Player {
+    playerid?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    password?: string;
+    active?: boolean;
+    createdat?: string;
+    updatedat?: string;
+    isdeleted?: boolean;
+    deletedat?: string | undefined;
+    boards?: Board[];
+    repeatingboards?: Repeatingboard[];
+    transactions?: Transaction[];
+}
+
 export interface Board {
     boardid?: string;
     playerid?: string;
@@ -970,22 +1107,6 @@ export interface Game {
     boards?: Board[];
 }
 
-export interface Player {
-    playerid?: string;
-    name?: string;
-    phone?: string;
-    email?: string;
-    password?: string;
-    active?: boolean;
-    createdat?: string;
-    updatedat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    boards?: Board[];
-    repeatingboards?: Repeatingboard[];
-    transactions?: Transaction[];
-}
-
 export interface Repeatingboard {
     repeatingboardid?: string;
     playerid?: string;
@@ -996,16 +1117,9 @@ export interface Repeatingboard {
     player?: Player;
 }
 
-export interface Transaction {
-    transactionid?: string;
-    playerid?: string;
+export interface CreateTransactionDto {
     amount?: number;
-    mobilepaytransactionnumber?: string;
-    status?: string;
-    createdat?: string;
-    isdeleted?: boolean;
-    deletedat?: string | undefined;
-    player?: Player;
+    mobilePayTransactionNumber?: string;
 }
 
 export interface ToggleRepeatingBoardRequest {
@@ -1034,6 +1148,7 @@ export interface PlayerUpdateRequestDto {
     name: string;
     phone: string;
     email: string;
+    password?: string | undefined;
 }
 
 export interface GameResponseDto {

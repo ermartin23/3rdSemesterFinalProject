@@ -23,7 +23,7 @@ public class TransactionService : ITransactionService
 
     public async Task<Transaction> CreatePendingAsync(Guid playerId, int amount, string mobilePayTransactionNumber)
     {
-        if (amount == 0)
+        if (amount <= 0)
             throw new ArgumentException("Amount must not be 0", nameof(amount));
 
         if (string.IsNullOrWhiteSpace(mobilePayTransactionNumber))
@@ -57,10 +57,10 @@ public class TransactionService : ITransactionService
         var approved = TransactionStatus.Approved.ToString().ToLowerInvariant();
         var declined  = TransactionStatus.Declined.ToString().ToLowerInvariant();
 
-        if (t.Status == TransactionStatus.Approved.ToString())
+        if (t.Status == "approved")
             return;
         
-        if (t.Status == TransactionStatus.Declined.ToString())
+        if (t.Status == "declined")
             throw new InvalidOperationException("Cannot approve a declined transaction");
         
         var currentBalance = await GetBalanceAsync(t.Playerid);
@@ -82,7 +82,7 @@ public class TransactionService : ITransactionService
         var approved = TransactionStatus.Approved.ToString().ToLowerInvariant();
         var declined  = TransactionStatus.Declined.ToString().ToLowerInvariant();
 
-        if (t.Status == TransactionStatus.Approved.ToString())
+        if (t.Status == "approved")
             throw new InvalidOperationException("Cannot reject an approved transaction");
         
         t.Status = declined;

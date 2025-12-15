@@ -5,6 +5,10 @@ namespace api;
 
 [ApiController]
 [Route("api/[controller]")]
+
+// TODO: When JWT auth is implemented, remove playerId from route and take it from token claims.
+// This endpoint is NOT secure without authentication.
+
 public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
@@ -28,7 +32,7 @@ public class TransactionController : ControllerBase
         return Ok(balance);
     }
 
-    [HttpGet("{id:guid}/transaction")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<Transaction>> GetById([FromRoute] Guid id)
     {
         var transaction = await _transactionService.GetByIdAsync(id);
@@ -36,18 +40,6 @@ public class TransactionController : ControllerBase
         if (transaction is null) return NotFound();
         
         return Ok(transaction);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionDto dto)
-    {
-        var created = await _transactionService.CreatePendingAsync(
-            dto.PlayerId,
-            dto.Amount,
-            dto.MobilePayTransactionNumber
-        );
-
-        return CreatedAtAction(nameof(GetById), new { id = created.Transactionid }, created);
     }
     
     [HttpPost("player/{playerId:guid}/transaction")]

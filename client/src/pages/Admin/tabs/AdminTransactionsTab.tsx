@@ -1,15 +1,15 @@
 import {useEffect, useState} from "react";
 
-const TRANSACTION_API = "http://127.0.0.1:5239/api/Transaction";
+const TRANSACTION_API = `${import.meta.env.VITE_API_URL}/api/Transaction`;
 const TRANSACTION_PAGE_SIZE = 10;
 
 interface Transaction {
-    transactionid: string;
-    playerid: string;
+    transactionId: string;
+    playerId: string;
     amount: number;
-    mobilepaytransactionnumber: string;
+    mobilePayTransactionNumber: string;
     status: string;
-    createdat: string;
+    createdAt: string;
 }
 
 export default function TransactionsTab() {
@@ -87,7 +87,7 @@ export default function TransactionsTab() {
     ) {
         setTransactions((prev) =>
             prev.map((t) =>
-                t.transactionid === id ? { ...t, status: newStatus } : t
+                t.transactionId === id ? { ...t, status: newStatus } : t
             )
         );
     }
@@ -180,22 +180,22 @@ export default function TransactionsTab() {
                             <tbody>
                             {pending.map((t) => (
                                 <tr
-                                    key={t.transactionid}
+                                    key={t.transactionId}
                                     className="border-t"
                                 >
                                     <td className="px-4 py-2">
-                                        {formatDate(t.createdat)}
+                                        {formatDate(t.createdAt)}
                                     </td>
                                     <td className="px-4 py-2">
                                             <span className="font-mono text-xs">
-                                                {t.playerid}
+                                                {t.playerId}
                                             </span>
                                     </td>
                                     <td className="px-4 py-2">
                                         {t.amount} kr
                                     </td>
                                     <td className="px-4 py-2">
-                                        {t.mobilepaytransactionnumber}
+                                        {t.mobilePayTransactionNumber}
                                     </td>
                                     <td className="px-4 py-2 capitalize">
                                         {t.status}
@@ -204,12 +204,12 @@ export default function TransactionsTab() {
                                         <button
                                             onClick={() =>
                                                 handleApprove(
-                                                    t.transactionid
+                                                    t.transactionId
                                                 )
                                             }
                                             disabled={
                                                 actionLoadingId ===
-                                                t.transactionid
+                                                t.transactionId
                                             }
                                             className="btn btn-sm bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
                                         >
@@ -218,12 +218,12 @@ export default function TransactionsTab() {
                                         <button
                                             onClick={() =>
                                                 handleReject(
-                                                    t.transactionid
+                                                    t.transactionId
                                                 )
                                             }
                                             disabled={
                                                 actionLoadingId ===
-                                                t.transactionid
+                                                t.transactionId
                                             }
                                             className="btn btn-sm bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
                                         >
@@ -266,15 +266,15 @@ export default function TransactionsTab() {
                                 <tbody>
                                 {paginatedHistory.map((t) => (
                                     <tr
-                                        key={t.transactionid}
+                                        key={t.transactionId}
                                         className="border-t"
                                     >
                                         <td className="px-4 py-2">
-                                            {formatDate(t.createdat)}
+                                            {formatDate(t.createdAt)}
                                         </td>
                                         <td className="px-4 py-2">
                                                 <span className="font-mono text-xs">
-                                                    {t.playerid}
+                                                    {t.playerId}
                                                 </span>
                                         </td>
                                         <td className="px-4 py-2">
@@ -282,7 +282,7 @@ export default function TransactionsTab() {
                                         </td>
                                         <td className="px-4 py-2">
                                             {
-                                                t.mobilepaytransactionnumber
+                                                t.mobilePayTransactionNumber
                                             }
                                         </td>
                                         <td className="px-4 py-2 capitalize">

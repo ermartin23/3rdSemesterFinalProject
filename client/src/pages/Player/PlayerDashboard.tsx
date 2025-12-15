@@ -170,6 +170,13 @@ export default function PlayerDashboard() {
                 </button>
 
                 <button
+                    onClick={() => navigate("/player-transactions")}
+                    className="text-gray-600 hover:text-red-600"
+                >
+                    Transactions
+                </button>
+
+                <button
                     onClick={() => navigate(-1)}
                     className="text-gray-600 hover:text-red-600"
                 >
