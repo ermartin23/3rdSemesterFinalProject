@@ -93,6 +93,31 @@ Frontend project initialization
 
 📜 Future README Sections (Placeholders)
 
+
+12/15/2025 I added about authentication authorization
+
+Authentication & Authorization
+
+Passwords are hashed using ASP.NET Core Identity PasswordHasher
+
+Login endpoint returns JWT
+
+JWT includes claims:
+
+sub = userId
+
+role = Admin / Player
+
+Authorization:
+
+Admin endpoints require Admin role
+
+Player endpoints require Player role
+
+Ownership is enforced using JWT sub claim (playerId is never taken from client for player actions)
+
+That’s enough to satisfy your requirements and looks professional.
+
 These will be completed as the project grows:
 
 🔐 Security & Authorization Policies

@@ -5,6 +5,7 @@ using api.Features.Boards;
 using api.Features.Games;
 using api.Features.Players;
 using api.Features.Admins;
+using api.Features.Auth;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +55,19 @@ public class Startup : IDisposable
         services.AddScoped<IBoardService, BoardService>();
         services.AddScoped<IGameService, GameService>();
         services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<AuthController>();
+        services.AddSingleton<IPasswordService, PasswordService>();
+        
+        
+        services.AddScoped<IAdminService, AdminService>();
+        
+        services.Configure<AppOptions>(o =>
+        {
+            o.JwtSecret = "THIS_IS_A_LONG_RANDOM_SECRET_CHANGE_ME_123456789";
+            o.JwtIssuer = "DeadPigeonsAPI";
+            o.JwtAudience = "DeadPigeonsClient";
+            o.DbConnectionString = _connectionString;
+        });
 
     }
 
