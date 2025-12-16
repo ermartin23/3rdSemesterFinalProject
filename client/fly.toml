@@ -1,12 +1,13 @@
-# fly.toml app configuration file generated for deadpigeons on 2025-11-25T10:15:27+01:00
+# fly.toml app configuration file generated for deadpigeons-aged-voice-1352 on 2025-12-16T11:12:09+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'deadpigeons'
+app = 'deadpigeons-aged-voice-1352'
 primary_region = 'fra'
 
 [build]
+  dockerfile = './Dockerfile'
 
 [http_service]
   internal_port = 8080
