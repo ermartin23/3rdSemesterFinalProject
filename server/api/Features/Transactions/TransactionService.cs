@@ -23,7 +23,7 @@ public class TransactionService : ITransactionService
 
     public async Task<Transaction> CreatePendingAsync(Guid playerId, int amount, string mobilePayTransactionNumber)
     {
-        if (amount == 0)
+        if (amount <= 0)
             throw new ArgumentException("Amount must not be 0", nameof(amount));
 
         if (string.IsNullOrWhiteSpace(mobilePayTransactionNumber))
@@ -35,13 +35,16 @@ public class TransactionService : ITransactionService
             Playerid = playerId,
             Amount = amount,
             Mobilepaytransactionnumber = mobilePayTransactionNumber,
-            Status = TransactionStatus.Pending.ToString().ToLower(),
-            Createdat = DateTime.UtcNow
+            Status = TransactionStatus.Pending.ToString().ToLowerInvariant(),
+            Createdat = DateTime.UtcNow,
+            Isdeleted = false,
+            Deletedat = null
         };
-        
-        _dbContext.Transactions.Add(t);
-        await _dbContext.SaveChangesAsync();
 
+        _dbContext.Transactions.Add(t);
+        Console.WriteLine($"Debug before SaveChanges: {t.Transactionid}");
+        await _dbContext.SaveChangesAsync();
+        Console.WriteLine($"Debug after SaveChanges: {t.Transactionid}");
         return t;
     }
 
@@ -50,11 +53,14 @@ public class TransactionService : ITransactionService
         var t = await _dbContext.Transactions.FirstOrDefaultAsync(x => x.Transactionid == transactionId);
         if (t == null)
             throw new KeyNotFoundException("Transaction not found");
+        
+        var approved = TransactionStatus.Approved.ToString().ToLowerInvariant();
+        var declined  = TransactionStatus.Declined.ToString().ToLowerInvariant();
 
-        if (t.Status == TransactionStatus.Approved.ToString())
+        if (t.Status == "approved")
             return;
         
-        if (t.Status == TransactionStatus.Declined.ToString())
+        if (t.Status == "declined")
             throw new InvalidOperationException("Cannot approve a declined transaction");
         
         var currentBalance = await GetBalanceAsync(t.Playerid);
@@ -62,8 +68,8 @@ public class TransactionService : ITransactionService
         
         if (newBalance < 0)
             throw new InvalidOperationException("Cannot approve a negative balance");
-        
-        t.Status = TransactionStatus.Approved.ToString().ToLower();
+
+        t.Status = approved;
         await _dbContext.SaveChangesAsync();
     }
 
@@ -72,22 +78,22 @@ public class TransactionService : ITransactionService
         var t = await _dbContext.Transactions.FirstOrDefaultAsync(x => x.Transactionid == transactionId);
         if (t == null)
             throw new KeyNotFoundException("Transaction not found");
+        
+        var approved = TransactionStatus.Approved.ToString().ToLowerInvariant();
+        var declined  = TransactionStatus.Declined.ToString().ToLowerInvariant();
 
-        if (t.Status == TransactionStatus.Approved.ToString())
+        if (t.Status == "approved")
             throw new InvalidOperationException("Cannot reject an approved transaction");
         
-        t.Status = TransactionStatus.Declined.ToString().ToLower();
+        t.Status = declined;
         await _dbContext.SaveChangesAsync();
     }
 
     public async Task<decimal> GetBalanceAsync(Guid playerId)
     {
         var approvedTransactions = await _dbContext.Transactions
-            .Where(t =>
-                !t.Isdeleted &&
-                t.Playerid == playerId &&
-                t.Status == TransactionStatus.Approved.ToString().ToLower()
-            )
+            .Where(t => t.Playerid == playerId &&
+                        t.Status == TransactionStatus.Approved.ToString().ToLowerInvariant())
             .SumAsync(t => (decimal)t.Amount);
 
         var boardCost = await _dbContext.Boards
@@ -98,5 +104,11 @@ public class TransactionService : ITransactionService
             .SumAsync(b => (decimal?)b.Price ?? 0m);
         
         return approvedTransactions - boardCost;
+    }
+
+    public Task<Transaction?> GetByIdAsync(Guid id)
+    {
+        return _dbContext.Transactions
+            .FirstOrDefaultAsync(t => t.Transactionid == id);
     }
 }

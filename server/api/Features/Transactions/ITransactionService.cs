@@ -9,4 +9,5 @@ public interface ITransactionService
     Task ApproveAsync(Guid transactionId);
     Task RejectAsync(Guid transactionId);
     Task<decimal> GetBalanceAsync(Guid playerId);
+    Task<Transaction?> GetByIdAsync(Guid id);
 }
