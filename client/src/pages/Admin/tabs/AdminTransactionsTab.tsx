@@ -13,6 +13,9 @@ interface Transaction {
 }
 
 export default function TransactionsTab() {
+    const token = localStorage.getItem("token");
+    if (!token) return <div className="text-center mt-10">Not logged in</div>;
+    
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -25,10 +28,19 @@ export default function TransactionsTab() {
             setLoading(true);
             setError(null);
             
+            if (!token) {
+                setError("Missing token");
+                setLoading(false);
+                return;
+            }
+            
             try {
                 const res = await fetch(TRANSACTION_API, {
                     method: "GET",
-                    headers: {Accept: "application/json"},
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    }
                 });
                 
                 if (!res.ok) {
@@ -45,7 +57,7 @@ export default function TransactionsTab() {
             }
         }
         loadTransactions();
-    }, []);
+    }, [token]);
     
     const pending = transactions.filter(
         (t) => t.status?.toLowerCase() === "pending"
@@ -97,6 +109,9 @@ export default function TransactionsTab() {
         try {
             const res = await fetch(`${TRANSACTION_API}/${id}/approve`, {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
             });
             
             if (!res.ok) {
@@ -117,6 +132,9 @@ export default function TransactionsTab() {
         try {
             const res = await fetch(`${TRANSACTION_API}/${id}/reject`, {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             
             if (!res.ok) {

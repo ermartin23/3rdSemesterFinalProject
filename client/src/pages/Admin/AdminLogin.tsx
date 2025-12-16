@@ -1,19 +1,45 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {useNavigate} from "react-router-dom";
+import {login} from "../../api/auth.ts";
 
 export default function AdminLogin() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    if (token && role === "Admin") {
+      navigate("/admin-dashboard", { replace: true });
+      return;
+    }
+    
+    if (token && role === "Player") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("email");
+    }
+  }, [navigate]);
+  
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    // Fake Login to presentation (we can change later)
-    if (email === "admin@admin.com" && password === "admin123") {
-      localStorage.setItem("adminAuthenticated", "true");
-      window.location.href = "/admin-dashboard";
-    } else {
-      setError("Invalid email or password.");
+    setError("");
+    
+    try {
+      const data = await login(email, password);
+      
+      if (data.role !== "Admin") {
+        setError("This account is not an administrator");
+        return;
+      }
+      
+      navigate("/admin-dashboard");
+    } catch (err: any) {
+      setError(err.message ?? "Login failed");
     }
   }
 

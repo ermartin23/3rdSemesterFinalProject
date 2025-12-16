@@ -8,6 +8,7 @@ import PlayerHistory from "../pages/Player/PlayerHistory";
 import PlayerWinners from "../pages/Player/PlayerWinners";
 import NotFound from "../pages/NotFound";
 import PlayerTransactionsTab from "../pages/Player/PlayerTransactionsTab.tsx";
+import AdminTransactionsTab from "../pages/Admin/tabs/AdminTransactionsTab.tsx";
 
 export default function AppRouter() {
     return (
@@ -20,6 +21,7 @@ export default function AppRouter() {
                 {/* Admin */}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/admin-transactions" element={<AdminTransactionsTab />} />
 
                 {/* Player */}
                 <Route path="/player-login" element={<PlayerLogin />} />

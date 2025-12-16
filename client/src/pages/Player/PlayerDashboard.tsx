@@ -18,12 +18,13 @@ export default function PlayerDashboard() {
     const [lastBoard, setLastBoard] = useState<PlayedBoard | null>(null);
 
     useEffect(() => {
-        const auth = localStorage.getItem("playerAuthenticated");
-        const savedEmail = localStorage.getItem("playerEmail");
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        const savedEmail = localStorage.getItem("email");
         const savedBoard = localStorage.getItem("lastBoard");
-
-        if (!auth || !savedEmail) {
-            navigate("/player-login");
+        
+        if (!token || role !== "Player" || !savedEmail) {
+            navigate("/player-login", {replace: true});
             return;
         }
 
@@ -122,9 +123,11 @@ export default function PlayerDashboard() {
                 <button
                     className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50"
                     onClick={() => {
-                        localStorage.removeItem("playerAuthenticated");
-                        localStorage.removeItem("playerEmail");
-                        navigate("/player-login");
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("role");
+                        localStorage.removeItem("userId");
+                        localStorage.removeItem("email");
+                        navigate("/player-login", {replace: true});
                     }}
                 >
                     Logout

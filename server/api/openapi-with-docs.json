@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/transactions": {
+    "/api/Transaction/admin/transactions": {
       "get": {
         "tags": [
           "Transaction"
@@ -16,18 +16,71 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Transaction"
-                  }
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         }
-      },
+      }
+    },
+    "/api/Transaction/player/balance": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_GetMyBalance",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Transaction/{id}": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Transaction/player/createtransaction": {
       "post": {
         "tags": [
           "Transaction"
@@ -59,61 +112,7 @@
         }
       }
     },
-    "/api/transactions/me/balance": {
-      "get": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_GetMyBalance",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number",
-                  "format": "decimal"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/transactions/player/{playerId}/balance": {
-      "get": {
-        "tags": [
-          "Transaction"
-        ],
-        "operationId": "Transaction_GetBalanceForPlayer",
-        "parameters": [
-          {
-            "name": "playerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "number",
-                  "format": "decimal"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/transactions/{id}/approve": {
+    "/api/Transaction/{id}/approve": {
       "post": {
         "tags": [
           "Transaction"
@@ -146,7 +145,7 @@
         }
       }
     },
-    "/api/transactions/{id}/reject": {
+    "/api/Transaction/{id}/reject": {
       "post": {
         "tags": [
           "Transaction"

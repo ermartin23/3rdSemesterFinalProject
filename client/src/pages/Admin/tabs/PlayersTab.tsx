@@ -25,11 +25,30 @@ export default function PlayersTab() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    // Load players from API
     useEffect(() => {
-        fetch(API)
-            .then((res) => res.json())
-            .then((data) => setPlayers(data));
+        async function loadPlayers() {
+            const token = localStorage.getItem("token");
+            
+            const res = await fetch(API, {
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+            if (!res.ok) {
+                const text = await res.text().catch(() => "");
+                throw new Error(text || `Failed to load players (${res.status})`);
+            }
+            
+            const data = await res.json();
+            setPlayers(data);
+        }
+        
+        loadPlayers().catch((err) => {
+            console.error(err);
+            setPlayers([]);
+        });
     }, []);
 
     // ADD PLAYER

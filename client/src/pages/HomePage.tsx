@@ -1,4 +1,5 @@
 import logo from "../assets/jerne-if-logo.png";
+import {Link} from "react-router";
 
 export default function HomePage() {
   return (
@@ -64,17 +65,17 @@ export default function HomePage() {
 
         {/* Login Buttons */}
         <div className="flex gap-4 mt-10">
-          <a href="/admin-login">
+          <Link to="/admin-login">
             <button className="btn bg-red-600 text-white hover:bg-red-700 px-8">
               Admin Login
             </button>
-          </a>
+          </Link>
 
-          <a href="/player-login">
+          <Link to="/player-login">
             <button className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50 px-8">
               Player Login
             </button>
-          </a>
+          </Link>
         </div>
 
         <p className="text-gray-500 text-sm mt-10">

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import logo from "../../assets/jerne-if-logo.png";
+import {useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 
 import PlayersTab from "./tabs/PlayersTab";
 import GamesTab from "./tabs/GamesTab";
@@ -9,7 +11,17 @@ import AdminsTab from "./tabs/AdminsTab";
 type AdminTab = "players" | "transactions" | "games" | "admins";
 
 export default function AdminDashboard() {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<AdminTab>("players");
+    
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        
+        if (!token || role !== "Admin") {
+            navigate("/admin-login", { replace: true });
+        }
+    }, [navigate]);
 
     return (
         <div className="min-h-screen bg-[#faf6ef]">
@@ -35,7 +47,10 @@ export default function AdminDashboard() {
                     <button
                         className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50"
                         onClick={() => {
-                            localStorage.removeItem("adminAuthenticated");
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("role");
+                            localStorage.removeItem("userId");
+                            localStorage.removeItem("email");
                             window.location.href = "/admin-login";
                         }}
                     >

@@ -1,37 +1,52 @@
 ﻿using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using dataaccess.Entities;
+using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Features.Transactions;
 
 [ApiController]
 [Route("api/[controller]")]
 
-// TODO: When JWT auth is implemented, remove playerId from route and take it from token claims.
-// This endpoint is NOT secure without authentication.
 public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;
+    private readonly MyDbContext _myDbContext;
     
-    public TransactionController(ITransactionService transactionService)
+    public TransactionController(ITransactionService transactionService, MyDbContext myDbContext)
     {
         _transactionService = transactionService;
+        _myDbContext = myDbContext;
     }
 
     [Authorize(Roles="Admin")]
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Transaction>>> GetAll()
+    [HttpGet("admin/transactions")]
+    public async Task<ActionResult> GetAll()
     {
-        var transactions = await _transactionService.GetAllAync();
+        var transactions = await _myDbContext.Transactions
+            .AsNoTracking()
+            .OrderByDescending(t =>  t.Createdat)
+            .Select(t => new
+            {
+                transactionId = t.Transactionid,
+                playerId = t.Playerid,
+                playerEmail = t.Player.Email,
+                amount = t.Amount,
+                mobilePayTransactionNumber = t.Mobilepaytransactionnumber,
+                status = t.Status,
+                createdat = t.Createdat
+            })
+            .ToListAsync();
+        
         return Ok(transactions);
     }
     
     //Player gets their own!!! balance
     [Authorize(Roles="Player")]
-    [HttpGet("me/balance")]
+    [HttpGet("player/balance")]
     public async Task<ActionResult<decimal>> GetMyBalance()
     {
         var playerId = GetUserIdOrThrow();
@@ -39,14 +54,7 @@ public class TransactionController : ControllerBase
         return Ok(balance);
     }
 
-    [Authorize(Roles="Admin")]
-    [HttpGet("player/{playerId:guid}/balance")]
-    public async Task<ActionResult<decimal>> GetBalanceForPlayer([FromRoute] Guid playerId)
-    {
-        var balance = await _transactionService.GetBalanceAsync(playerId);
-        return Ok(balance);
-    }
-
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Transaction>> GetById([FromRoute] Guid id)
     {
@@ -56,28 +64,20 @@ public class TransactionController : ControllerBase
         
         return Ok(transaction);
     }
-    
-    [HttpPost("player/{playerId:guid}/transaction")]
-    public async Task<ActionResult<Transaction>> Create(
-        [FromRoute] Guid playerId,
-        [FromBody] CreateTransactionDto createTransactionDto)
-    [Authorize(Roles="Player")]
-    [HttpPost]
+
+    [Authorize(Roles = "Player")]
+    [HttpPost("player/createtransaction")]
     public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionDto dto)
     {
         try
         {
             var playerId = GetUserIdOrThrow();
-            var t = await _transactionService.CreatePendingAsync(
-                playerId,
-                createTransactionDto.Amount,
-                createTransactionDto.MobilePayTransactionNumber
-            );
-                playerId,
-                dto.Amount,
-                dto.MobilePayTransactionNumber
-            );
+            var t = await _transactionService.CreatePendingAsync(playerId, dto.Amount, dto.MobilePayTransactionNumber);
             return Ok(t);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
         }
         catch (ArgumentException ex)
         {
@@ -125,7 +125,10 @@ public class TransactionController : ControllerBase
     
     private Guid GetUserIdOrThrow()
     {
-        var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        var sub = 
+            User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
         if (string.IsNullOrWhiteSpace(sub))
             throw new UnauthorizedAccessException("Missing sub claim");
 

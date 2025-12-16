@@ -2,64 +2,58 @@
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL;
-const TRANSACTION_API = `${API_BASE}/api/transaction`;
+const TRANSACTION_API = `${API_BASE}/api/Transaction`;
 
 export default function PlayerTransactionsTab() {
     const navigate = useNavigate();
     
-    const [playerId, setPlayerId] = useState<string | null>(null);
     const [amount, setAmount] = useState<string>("");
     const [mobilePayTransactionNumber, setMobilePayTransactionNumber] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     
     useEffect(() => {
-        const auth = localStorage.getItem("playerAuthenticated");
-        if (!auth) {
-            navigate("/player/login");
-            return;
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/player-login");
         }
-        
-        const id = localStorage.getItem("playerId");
-        setPlayerId(id);
     }, [navigate]);
     
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setMessage(null);
         
-        if (!playerId) {
-            setMessage("Missing player id");
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setMessage("Not logged in");
             return;
         }
         
-        const parsedAmount = Number(amount.replace(",", "."));
-        if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-            setMessage("Please enter a valid amount greater than 0");
+        const parsedAmunt = Number(amount.replace(",", "."));
+        if (!Number.isFinite(parsedAmunt) || parsedAmunt <= 0) {
+            setMessage("Please enter valid amount greater than 0");
             return;
         }
         
-        if (!mobilePayTransactionNumber.trim) {
-            setMessage("Please enter a valid MobilePay transaction number");
+        if (!mobilePayTransactionNumber.trim()) {
+            setMessage("Please enter valid MobilePay transaction number");
             return;
         }
         
         setLoading(true);
         try {
-            const res = await fetch(
-                `${TRANSACTION_API}/player/${playerId}/transaction`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                    },
-                    body: JSON.stringify({
-                        amount: parsedAmount,
-                        mobilePayTransactionNumber: mobilePayTransactionNumber.trim(),
-                    }),
-                }
-            );
+            const res = await fetch(TRANSACTION_API, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    amount: parsedAmunt,
+                    mobilePayTransactionNumber: mobilePayTransactionNumber.trim(),
+                }),
+            });
             
             if (!res.ok) {
                 const text = await res.text().catch(() => "");
@@ -68,7 +62,7 @@ export default function PlayerTransactionsTab() {
             
             setAmount("");
             setMobilePayTransactionNumber("");
-            setMessage("Payment submitted! It will be pending until an admin approves it");
+            setMessage("Payment submitted! It will be pending until an administrator approves it");
         } catch (error: any) {
             console.error(error);
             setMessage(error.message ?? "Failed to submit payment request");
