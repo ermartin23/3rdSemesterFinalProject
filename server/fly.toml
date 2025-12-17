@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for deadpigeonsdev on 2025-11-25T09:31:34+01:00
+# fly.toml app configuration file generated for deadpigeonsdev-muddy-flower-4166 on 2025-12-16T13:20:09+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'deadpigeonsdev'
+app = 'deadpigeonsdev-muddy-flower-4166'
 primary_region = 'fra'
 
 [build]
