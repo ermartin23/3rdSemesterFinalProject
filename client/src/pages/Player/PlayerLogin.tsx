@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/jerne-if-logo.png";
 import {login} from "../../api/auth.ts";
+import PasswordInput from "../../components/PasswordInput";
+
 
 export default function PlayerLogin() {
     const navigate = useNavigate();
@@ -53,26 +55,17 @@ export default function PlayerLogin() {
 
             <form
                 onSubmit={handleSubmit}
-                className="bg-white p-6 rounded-xl shadow w-full max-w-md"
+                className="bg-white p-6 rounded-xl shadow w-full max-w-md space-y-4"
             >
-                <label className="block text-gray-700 font-semibold mb-2">Email</label>
+                <label className="block text-gray-700 font-semibold">Email</label>
                 <input
                     type="email"
-                    className="input input-bordered w-full mb-4"
+                    className="input input-bordered w-full mb-4 bg-gray-300 text-black"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-
-                <label className="block text-gray-700 font-semibold mb-2">Password</label>
-                <input
-                    type="password"
-                    className="input input-bordered w-full mb-5"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-
+                <PasswordInput className="bg-gray-300 text-black" value={password} onChange={setPassword} />
                 <button
                     type="submit"
                     className="btn w-full bg-red-600 text-white hover:bg-red-700"

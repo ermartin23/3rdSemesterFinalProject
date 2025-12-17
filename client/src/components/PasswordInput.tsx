@@ -2,19 +2,24 @@
 import eye from "../assets/eye.png";
 import eyeOff from "../assets/eye-off.png";
 
-export default function PasswordInput({
-                                          className = "",
-                                      }: {
+interface PasswordInputProps {
+    value: string;
+    onChange: (value: string) => void;
     className?: string;
-                                      }) {
+}
+
+export default function PasswordInput({
+                                          value,
+                                          onChange,
+                                          className = "",
+                                      }: PasswordInputProps) {
     const [visible, setVisible] = useState(false);
-    const [value, setValue] = useState("");
 
     const tooShort = value.length > 0 && value.length < 6;
 
     return (
         <div className="space-y-1">
-            <label className="block text-sm font-medium">
+            <label className="block text-sm font-medium text-black">
                 Password
             </label>
 
@@ -24,18 +29,16 @@ export default function PasswordInput({
                     type={visible ? "text" : "password"}
                     value={value}
                     required
-                    onChange={(e) => setValue(e.target.value)}
+                    onChange={(e) => onChange(e.target.value)}
                     className={`input input-bordered w-full pr-12 relative z-0 ${
                         tooShort ? "border-red-500" : ""
-                    }
-                    ${className}
-                    `}
+                    } ${className}`}
                 />
 
                 <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10   "
-                    onClick={() => setVisible(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10"
+                    onClick={() => setVisible(v => !v)}
                 >
                     <img
                         src={visible ? eyeOff : eye}
@@ -53,4 +56,3 @@ export default function PasswordInput({
         </div>
     );
 }
-
