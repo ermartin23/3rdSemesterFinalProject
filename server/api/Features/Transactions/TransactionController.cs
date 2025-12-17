@@ -34,6 +34,7 @@ public class TransactionController : ControllerBase
                 transactionId = t.Transactionid,
                 playerId = t.Playerid,
                 playerEmail = t.Player.Email,
+                playerName = t.Player.Name,
                 amount = t.Amount,
                 mobilePayTransactionNumber = t.Mobilepaytransactionnumber,
                 status = t.Status,

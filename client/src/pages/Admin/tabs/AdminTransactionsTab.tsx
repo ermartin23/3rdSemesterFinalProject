@@ -7,11 +7,11 @@ const TRANSACTION_PAGE_SIZE = 10;
 
 interface Transaction {
     transactionId: string;
-    playerId: string;
     amount: number;
     mobilePayTransactionNumber: string;
     status: string;
-    createdAt: string;
+    createdat: string;
+    playerName: string;
 }
 
 export default function TransactionsTab() {
@@ -50,6 +50,7 @@ export default function TransactionsTab() {
                 }
                 
                 const data: Transaction[] = await res.json();
+                console.log("Admin tx sample:", data[0]);
                 setTransactions(data);
             } catch (err: any) {
                 console.error(err);
@@ -183,9 +184,9 @@ export default function TransactionsTab() {
                         No pending transactions
                     </div>
                 ) : (
-                    <div className="bg-white border rounded-xl shadow overflow-hidden">
+                    <div className="bg-white border rounded-xl shadow overflow-hidden text-black">
                         <table className="min-w-full text-sm">
-                            <thead className="bg-gray-100 text-left">
+                            <thead className="bg-gray-100 text-left text-black">
                             <tr>
                                 <th className="px-4 py-2">Created</th>
                                 <th className="px-4 py-2">Player</th>
@@ -204,11 +205,11 @@ export default function TransactionsTab() {
                                     className="border-t"
                                 >
                                     <td className="px-4 py-2">
-                                        {formatDate(t.createdAt)}
+                                        {formatDate(t.createdat)}
                                     </td>
                                     <td className="px-4 py-2">
                                             <span className="font-mono text-xs">
-                                                {t.playerId}
+                                                {t.playerName}
                                             </span>
                                     </td>
                                     <td className="px-4 py-2">
@@ -220,36 +221,26 @@ export default function TransactionsTab() {
                                     <td className="px-4 py-2 capitalize">
                                         {t.status}
                                     </td>
-                                    <td className="px-4 py-2 text-right space-x-2">
-                                        <button
-                                            onClick={() =>
-                                                handleApprove(
-                                                    t.transactionId
-                                                )
-                                            }
-                                            disabled={
-                                                actionLoadingId ===
-                                                t.transactionId
-                                            }
-                                            className="btn btn-sm bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
-                                        >
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                handleReject(
-                                                    t.transactionId
-                                                )
-                                            }
-                                            disabled={
-                                                actionLoadingId ===
-                                                t.transactionId
-                                            }
-                                            className="btn btn-sm bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-                                        >
-                                            Reject
-                                        </button>
+                                    <td className="px-4 py-3">
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleApprove(t.transactionId)}
+                                                disabled={actionLoadingId === t.transactionId}
+                                                className="btn btn-sm bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 min-w-[92px]"
+                                            >
+                                                Approve
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleReject(t.transactionId)}
+                                                disabled={actionLoadingId === t.transactionId}
+                                                className="btn btn-sm bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 min-w-[92px]"
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
                                     </td>
+
                                 </tr>
                             ))}
                             </tbody>
@@ -271,8 +262,8 @@ export default function TransactionsTab() {
                 ) : (
                     <>
                         <div className="bg-white border rounded-xl shadow overflow-hidden">
-                            <table className="min-w-full text-sm">
-                                <thead className="bg-gray-100 text-left">
+                            <table className="min-w-full text-sm text-black">
+                                <thead className="bg-gray-100 text-left text-black">
                                 <tr>
                                     <th className="px-4 py-2">Created</th>
                                     <th className="px-4 py-2">Player</th>
@@ -290,11 +281,11 @@ export default function TransactionsTab() {
                                         className="border-t"
                                     >
                                         <td className="px-4 py-2">
-                                            {formatDate(t.createdAt)}
+                                            {formatDate(t.createdat)}
                                         </td>
                                         <td className="px-4 py-2">
-                                                <span className="font-mono text-xs">
-                                                    {t.playerId}
+                                                <span className="font-mono text-xs text-black">
+                                                    {t.playerName}
                                                 </span>
                                         </td>
                                         <td className="px-4 py-2">
@@ -316,7 +307,7 @@ export default function TransactionsTab() {
 
                         {/* Pagination controls */}
                         <div className="flex items-center justify-between mt-4 text-sm">
-                            <span className="text-gray-600">
+                            <span className="text-black">
                                 Page {historyPage} of {totalHistoryPages}
                             </span>
                             <div className="space-x-2">
