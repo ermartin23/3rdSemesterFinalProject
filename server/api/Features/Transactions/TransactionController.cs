@@ -44,6 +44,14 @@ public class TransactionController : ControllerBase
         
         return Ok(transactions);
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/player/{playerId:guid}/balance")]
+    public async Task<ActionResult<decimal>> GetPlayerBalance([FromRoute] Guid playerId)
+    {
+        var balance = await _transactionService.GetBalanceAsync(playerId);
+        return Ok(balance);
+    }
     
     //Player gets their own!!! balance
     [Authorize(Roles="Player")]
