@@ -19,6 +19,8 @@ export default function AdminsTab() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [password, setPassword] = useState("");
+
 
     useEffect(() => {
         loadAdmins();
@@ -43,10 +45,11 @@ export default function AdminsTab() {
                 name: data.get("name"),
                 email: data.get("email"),
                 phone: data.get("phone"),
-                password: data.get("password"),
+                password
             }),
         });
 
+        setPassword("");
         setShowAddModal(false);
         form.reset();
         loadAdmins();
@@ -148,7 +151,12 @@ export default function AdminsTab() {
                         <Input  name="name" label="Full Name" required className="bg-gray-300" />
                         <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
                         <Input name="phone" label="Phone" required className="bg-gray-300"/>
-                        <PasswordInput className="bg-gray-300"/>
+                        <PasswordInput
+                            className="bg-gray-300"
+                            value={password}
+                            onChange={setPassword}
+                        />
+
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full py-2">
                             Save Admin

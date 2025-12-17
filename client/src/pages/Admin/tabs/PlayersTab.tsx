@@ -24,6 +24,8 @@ export default function PlayersTab() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [password, setPassword] = useState("");
+
 
     useEffect(() => {
         async function loadPlayers() {
@@ -62,7 +64,7 @@ export default function PlayersTab() {
             email: data.get("email"),
             phone: data.get("phone"),
             active: data.get("active") === "on",
-            password: data.get("password") // required by backend
+            password // required by backend
         };
 
         const res = await fetch(API, {
@@ -74,6 +76,7 @@ export default function PlayersTab() {
         const created = await res.json();
         setPlayers((prev) => [...prev, created]);
 
+        setPassword("");
         setShowAddModal(false);
         form.reset();
     }
@@ -197,7 +200,11 @@ export default function PlayersTab() {
                         <Input name="name" label="Full Name" required className="bg-gray-300"/>
                         <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
                         <Input name="phone" label="Phone" required className="bg-gray-300"/>
-                        <PasswordInput className="bg-gray-300"/>
+                        <PasswordInput
+                            className="bg-gray-300"
+                            value={password}
+                            onChange={setPassword}
+                        />
                         <Toggle name="active" label="Active Player"/>
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full mt-4">
