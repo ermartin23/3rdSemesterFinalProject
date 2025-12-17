@@ -45,7 +45,7 @@ export default function PlayerWinners() {
                     Week {week} — 2025
                 </p>
 
-                <h2 className="text-xl font-semibold mb-4">
+                <h2 className="text-black text-xl font-semibold mb-4">
                     The winning numbers are:
                 </h2>
 
@@ -61,7 +61,7 @@ export default function PlayerWinners() {
                     ))}
                 </div>
 
-                <p className="text-lg font-medium mb-6">
+                <p className="text-black text-lg font-medium mb-6">
                     Congratulations to all winners! 🏆
                 </p>
 

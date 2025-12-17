@@ -178,13 +178,6 @@ export default function PlayerDashboard() {
                 >
                     Transactions
                 </button>
-
-                <button
-                    onClick={() => navigate(-1)}
-                    className="text-gray-600 hover:text-red-600"
-                >
-                    Back
-                </button>
             </div>
 
             {/* USER INFO */}
@@ -197,12 +190,12 @@ export default function PlayerDashboard() {
                 </p>
             </div>
 
-            <h3 className="text-center text-xl font-semibold mt-8">
+            <h3 className="text-black text-center text-xl font-semibold mt-8">
                 Current Game – Week {currentWeek} – 2025
             </h3>
 
             {/* NUMBER GRID */}
-            <div className="grid grid-cols-4 gap-4 max-w-xl mx-auto mt-8">
+            <div className="text-black grid grid-cols-4 gap-4 max-w-xl mx-auto mt-8">
                 {Array.from({ length: 16 }, (_, i) => i + 1).map((num) => {
                     const isSelected = selectedNumbers.includes(num);
                     return (
@@ -240,11 +233,11 @@ export default function PlayerDashboard() {
                             Last Played Board
                         </h3>
 
-                        <p className="text-lg">Week: {lastBoard.week} — 2025</p>
-                        <p className="text-lg mt-1">
+                        <p className="text-black text-lg">Week: {lastBoard.week} — 2025</p>
+                        <p className="text-black text-lg mt-1">
                             Numbers: {lastBoard.numbers.join(", ")}
                         </p>
-                        <p className="text-lg mt-1">Price Paid: {lastBoard.price} DKK</p>
+                        <p className="text-black text-lg mt-1">Price Paid: {lastBoard.price} DKK</p>
 
                         <button
                             className="btn bg-red-600 text-white mt-6 px-8 py-2 hover:bg-red-700"
