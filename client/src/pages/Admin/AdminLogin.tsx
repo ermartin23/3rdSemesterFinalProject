@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {useNavigate} from "react-router-dom";
 import {login} from "../../api/auth.ts";
+import PasswordInput from "../../components/PasswordInput";
+
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -55,27 +57,20 @@ export default function AdminLogin() {
           <div className="text-red-600 text-center mb-4">{error}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-
+        <form onSubmit={handleSubmit} className="space-y-4 text-black">
+          <label className="block text-gray-700 font-semibold">Email</label>
           <input
-            type="email"
-            className="input input-bordered w-full"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-            required
+              type="email"
+              className="input input-bordered w-full bg-gray-300"
+              placeholder=" Email"
+              onChange={(e) => setEmail(e.target.value)}
+              required
           />
-
-          <input
-            type="password"
-            className="input input-bordered w-full"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <PasswordInput className="bg-gray-300 text-black" value={password} onChange={setPassword} />
 
           <button
-            type="submit"
-            className="btn bg-red-600 text-white hover:bg-red-700 w-full"
+              type="submit"
+              className="btn bg-red-600 text-white hover:bg-red-700 w-full"
           >
             Login
           </button>
