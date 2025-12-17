@@ -3,7 +3,7 @@ import Modal from "../../../components/Modal";
 import Input from "../../../components/Input";
 import Toggle from "../../../components/Toggle";
 import PasswordInput from "../../../components/PasswordInput";
-
+import { getPlayers, createPlayer, updatePlayer, deletePlayer } from "../../../core/playersApi";
 
 
 interface Player {
@@ -12,11 +12,11 @@ interface Player {
     email: string;
     phone: string;
     active: boolean;
-    balance: number;
+    balance?: number;
 }
 
 export default function PlayersTab() {
-    const API = "http://127.0.0.1:5239/api/players";
+    
 
     const [players, setPlayers] = useState<Player[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -24,31 +24,16 @@ export default function PlayersTab() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [password, setPassword] = useState("");
+
 
     useEffect(() => {
-        async function loadPlayers() {
-            const token = localStorage.getItem("token");
-            
-            const res = await fetch(API, {
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+        getPlayers()
+            .then(setPlayers)
+            .catch((err) => {
+                console.error(err);
+                setPlayers([]);
             });
-            
-            if (!res.ok) {
-                const text = await res.text().catch(() => "");
-                throw new Error(text || `Failed to load players (${res.status})`);
-            }
-            
-            const data = await res.json();
-            setPlayers(data);
-        }
-        
-        loadPlayers().catch((err) => {
-            console.error(err);
-            setPlayers([]);
-        });
     }, []);
 
     // ADD PLAYER
@@ -58,25 +43,23 @@ export default function PlayersTab() {
         const data = new FormData(form);
 
         const newPlayer = {
-            name: data.get("name"),
-            email: data.get("email"),
-            phone: data.get("phone"),
-            active: data.get("active") === "on",
-            password: data.get("password") // required by backend
+            name: String(data.get("name") ?? ""),
+            email: String(data.get("email") ?? ""),
+            phone: String(data.get("phone") ?? ""),
+            password // required by backend
         };
 
-        const res = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newPlayer),
-        });
-
-        const created = await res.json();
-        setPlayers((prev) => [...prev, created]);
-
-        setShowAddModal(false);
-        form.reset();
+        try {
+            const created = await createPlayer(newPlayer);
+            setPlayers((prev) => [...prev, created]);
+            setPassword("");
+            setShowAddModal(false);
+            form.reset();
+        } catch (err: any) {
+            alert(err.message ?? "Failed to create player");
+        }
     }
+
 
     // EDIT PLAYER
     async function handleEditPlayer(e: React.FormEvent) {
@@ -87,40 +70,34 @@ export default function PlayersTab() {
         const data = new FormData(form);
 
         const updatedPlayer = {
-            name: data.get("name"),
-            email: data.get("email"),
-            phone: data.get("phone"),
-            active: data.get("active") === "on"
+            name: String(data.get("name") ?? ""),
+            email: String(data.get("email") ?? ""),
+            phone: String(data.get("phone") ?? ""),
         };
 
-        const res = await fetch(`${API}/${selectedPlayer.playerId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedPlayer),
-        });
-
-        const saved = await res.json();
-        setPlayers((prev) =>
-            prev.map((p) => (p.playerId === saved.playerId ? saved : p))
-        );
-
-        setShowEditModal(false);
+        try {
+            const saved = await updatePlayer(selectedPlayer.playerId, updatedPlayer);
+            setPlayers((prev) => prev.map((p) => (p.playerId === saved.playerId ? saved : p)));
+            setShowEditModal(false);
+        } catch (err: any) {
+            alert(err.message ?? "Failed to update player");
+        }
     }
+
 
     // DELETE PLAYER
     async function handleDeletePlayer() {
         if (!selectedPlayer) return;
 
-        await fetch(`${API}/${selectedPlayer.playerId}`, {
-            method: "DELETE",
-        });
-
-        setPlayers((prev) =>
-            prev.filter((p) => p.playerId !== selectedPlayer.playerId)
-        );
-
-        setShowDeleteModal(false);
+        try {
+            await deletePlayer(selectedPlayer.playerId);
+            setPlayers((prev) => prev.filter((p) => p.playerId !== selectedPlayer.playerId));
+            setShowDeleteModal(false);
+        } catch (err: any) {
+            alert(err.message ?? "Failed to delete player");
+        }
     }
+
 
     return (
         <div className="max-w-4xl mx-auto mt-10">
@@ -137,9 +114,9 @@ export default function PlayersTab() {
 
             <div className="bg-white shadow rounded-xl p-6">
                 {players.length === 0 ? (
-                    <p>No players registered yet.</p>
+                    <p className="text-black">No players registered yet.</p>
                 ) : (
-                    <ul className="space-y-4">
+                    <ul className="text-black space-y-4">
                         {players.map((player) => (
                             <li
                                 key={player.playerId}
@@ -193,12 +170,16 @@ export default function PlayersTab() {
                 <Modal onClose={() => setShowAddModal(false)}>
                     <h3 className="text-lg font-bold mb-3 text-red-600">Add New Player</h3>
 
-                    <form onSubmit={handleAddPlayer} className="space-y-4">
-                        <Input name="name" label="Full Name" required />
-                        <Input name="email" label="Email" type="email" required />
-                        <Input name="phone" label="Phone" required />
-                        <PasswordInput />
-                        <Toggle name="active" label="Active Player" />
+                    <form onSubmit={handleAddPlayer} className="space-y-4 text-black">
+                        <Input name="name" label="Full Name" required className="bg-gray-300"/>
+                        <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
+                        <Input name="phone" label="Phone" required className="bg-gray-300"/>
+                        <PasswordInput
+                            className="bg-gray-300"
+                            value={password}
+                            onChange={setPassword}
+                        />
+                        <Toggle name="active" label="Active Player"/>
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full mt-4">
                             Add Player
@@ -213,10 +194,10 @@ export default function PlayersTab() {
                         Edit Player
                     </h3>
 
-                    <form onSubmit={handleEditPlayer} className="space-y-4">
-                        <Input name="name" defaultValue={selectedPlayer.name} label={""} />
-                        <Input name="email" defaultValue={selectedPlayer.email} label={""} />
-                        <Input name="phone" defaultValue={selectedPlayer.phone} label={""} />
+                    <form onSubmit={handleEditPlayer} className="space-y-4 text-black">
+                        <Input name="name" defaultValue={selectedPlayer.name} label={""} className="bg-gray-300"/>
+                        <Input name="email" defaultValue={selectedPlayer.email} label={""} className="bg-gray-300"/>
+                        <Input name="phone" defaultValue={selectedPlayer.phone} label={""} className="bg-gray-300"/>
                         <Toggle
                             name="active"
                             label="Active Player"
@@ -233,14 +214,14 @@ export default function PlayersTab() {
             {showDeleteModal && selectedPlayer && (
                 <Modal onClose={() => setShowDeleteModal(false)}>
                     <h3 className="font-bold text-lg text-red-600">Delete Player</h3>
-                    <p className="mb-4">
+                    <p className="mb-4 text-black">
                         Are you sure you want to delete{" "}
                         <strong>{selectedPlayer.name}</strong>?
                     </p>
 
                     <div className="flex justify-end gap-4">
                         <button
-                            className="btn"
+                            className="btn text-black"
                             onClick={() => setShowDeleteModal(false)}
                         >
                             Cancel

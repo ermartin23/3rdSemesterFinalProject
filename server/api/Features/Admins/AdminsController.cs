@@ -15,6 +15,14 @@ namespace api.Features.Admins;
         {
             _adminService = adminService;
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<List<AdminResponseDto>>> GetAllAdmins()
+        {
+            var admins = await _adminService.GetAllAdminsAsync();
+            return Ok(admins);
+        }
+
 
         [HttpPost]
         public async Task<ActionResult<AdminResponseDto>> Create([FromBody] AdminCreateRequestDto dto)

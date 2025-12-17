@@ -66,7 +66,11 @@ export default function PlayerDashboard() {
         8: 160,
     };
 
-    const price = prices[selectedNumbers.length as keyof typeof prices] || 0;
+    const selectedCount = selectedNumbers.length;
+    const price = prices[selectedCount] ?? 0;
+    
+    const canPlay = selectedCount >= 5 && selectedCount <= 8 && balance >= price;
+    
 
     function toggleNumber(num: number) {
         if (selectedNumbers.includes(num)) {
@@ -74,10 +78,15 @@ export default function PlayerDashboard() {
             return;
         }
         if (selectedNumbers.length >= 8) return;
-        setSelectedNumbers([...selectedNumbers, num]);
+        setSelectedNumbers([...selectedNumbers, num].sort((a, b) => a - b));
     }
 
     function handlePlay() {
+        if (price === 0) {
+            alert("Invalid selection. Choose 5–8 numbers.");
+            return;
+        }
+        
         if (selectedNumbers.length < 5) {
             alert("You must choose at least 5 numbers.");
             return;
@@ -223,12 +232,48 @@ export default function PlayerDashboard() {
                 })}
             </div>
 
-            <p className="text-center text-lg font-semibold mt-6">Price: {price} DKK</p>
+            <div className="text-center mt-6">
+                {selectedCount < 5 && (
+                    <p className="text-gray-600 text-sm">
+                        Choose <span className="font-bold">{5 - selectedCount}</span> more number(s) to play.
+                    </p>
+                )}
+
+                {selectedCount >= 5 && selectedCount <= 8 && (
+                    <p className="text-lg font-semibold">
+                        Price: <span className="text-black">{price} DKK</span>{" "}
+                        <span className="text-gray-500 text-sm">
+        ({selectedCount} numbers)
+      </span>
+                    </p>
+                )}
+
+                {selectedCount > 8 && (
+                    <p className="text-red-600 font-semibold">
+                        Max 8 numbers allowed.
+                    </p>
+                )}
+
+                <div className="mt-3 text-xs text-gray-500">
+                    Pricing: 5→20 DKK · 6→40 DKK · 7→80 DKK · 8→160 DKK
+                </div>
+
+                {selectedCount >= 5 && balance < price && (
+                    <p className="text-red-600 font-semibold mt-2">
+                        Not enough balance for this board.
+                    </p>
+                )}
+            </div>
 
             <div className="text-center mt-4">
                 <button
                     onClick={handlePlay}
-                    className="btn bg-red-600 text-white hover:bg-red-700 px-10"
+                    disabled={!canPlay}
+                    className={`btn px-10 ${
+                        canPlay
+                            ? "bg-red-600 text-white hover:bg-red-700"
+                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    }`}
                 >
                     Play
                 </button>

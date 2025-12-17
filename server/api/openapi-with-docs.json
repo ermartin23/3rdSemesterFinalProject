@@ -774,6 +774,27 @@
       }
     },
     "/api/Admins": {
+      "get": {
+        "tags": [
+          "Admins"
+        ],
+        "operationId": "Admins_GetAllAdmins",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Admins"

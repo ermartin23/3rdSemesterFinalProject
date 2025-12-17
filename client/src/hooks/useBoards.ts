@@ -12,8 +12,9 @@ export function useBoards() {
         setBoards(data);
     }
 
-    async function createBoard(chosenNumbers: number[]) {
+    async function createBoard(playerId: string, chosenNumbers: number[]) {
         const newBoard = await client.createBoard({
+            playerId,
             chosenNumbers,
         });
 
