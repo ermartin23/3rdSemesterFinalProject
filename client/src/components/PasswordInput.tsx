@@ -8,17 +8,18 @@ type Props = {
 };
 
 export default function PasswordInput({
+                                          value,
+                                          onChange,
                                           className = "",
                                           required = true,      // ✅ default required
                                       }: Props) {
     const [visible, setVisible] = useState(false);
-    const [value, setValue] = useState("");
 
     const tooShort = value.length > 0 && value.length < 6;
 
     return (
         <div className="space-y-1">
-            <label className="block text-sm font-medium">
+            <label className="block text-sm font-medium text-black">
                 Password
             </label>
 
@@ -55,4 +56,3 @@ export default function PasswordInput({
         </div>
     );
 }
-
