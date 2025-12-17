@@ -2,11 +2,15 @@
 import eye from "../assets/eye.png";
 import eyeOff from "../assets/eye-off.png";
 
+type Props = {
+    className?: string;
+    required?: boolean;
+};
+
 export default function PasswordInput({
                                           className = "",
-                                      }: {
-    className?: string;
-                                      }) {
+                                          required = true,      // ✅ default required
+                                      }: Props) {
     const [visible, setVisible] = useState(false);
     const [value, setValue] = useState("");
 
@@ -23,18 +27,16 @@ export default function PasswordInput({
                     name="password"
                     type={visible ? "text" : "password"}
                     value={value}
-                    required
+                    required={required}
                     onChange={(e) => setValue(e.target.value)}
-                    className={`input input-bordered w-full pr-12 relative z-0 ${
+                    className={`input input-bordered w-full pr-12 ${
                         tooShort ? "border-red-500" : ""
-                    }
-                    ${className}
-                    `}
+                    } ${className}`}
                 />
 
                 <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10   "
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
                     onClick={() => setVisible(prev => !prev)}
                 >
                     <img
