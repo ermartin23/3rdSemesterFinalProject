@@ -3,6 +3,8 @@ import eye from "../assets/eye.png";
 import eyeOff from "../assets/eye-off.png";
 
 type Props = {
+    value: string;
+    onChange: (value: string) => void;
     className?: string;
     required?: boolean;
 };
@@ -29,8 +31,8 @@ export default function PasswordInput({
                     type={visible ? "text" : "password"}
                     value={value}
                     required={required}
-                    onChange={(e) => setValue(e.target.value)}
-                    className={`input input-bordered w-full pr-12 ${
+                    onChange={(e) => onChange(e.target.value)}
+                    className={`input input-bordered w-full pr-12 z-0 ${
                         tooShort ? "border-red-500" : ""
                     } ${className}`}
                 />

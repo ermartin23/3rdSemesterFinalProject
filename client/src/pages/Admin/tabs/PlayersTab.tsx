@@ -24,6 +24,8 @@ export default function PlayersTab() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [password, setPassword] = useState("");
+
 
     useEffect(() => {
         getPlayers()
@@ -44,12 +46,13 @@ export default function PlayersTab() {
             name: String(data.get("name") ?? ""),
             email: String(data.get("email") ?? ""),
             phone: String(data.get("phone") ?? ""),
-            password: String(data.get("password") ?? ""),
+            password // required by backend
         };
 
         try {
             const created = await createPlayer(newPlayer);
             setPlayers((prev) => [...prev, created]);
+            setPassword("");
             setShowAddModal(false);
             form.reset();
         } catch (err: any) {
@@ -171,7 +174,11 @@ export default function PlayersTab() {
                         <Input name="name" label="Full Name" required className="bg-gray-300"/>
                         <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
                         <Input name="phone" label="Phone" required className="bg-gray-300"/>
-                        <PasswordInput className="bg-gray-300"/>
+                        <PasswordInput
+                            className="bg-gray-300"
+                            value={password}
+                            onChange={setPassword}
+                        />
                         <Toggle name="active" label="Active Player"/>
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full mt-4">

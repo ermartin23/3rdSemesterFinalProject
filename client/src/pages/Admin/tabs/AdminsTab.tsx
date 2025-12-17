@@ -2,8 +2,7 @@
 import Modal from "../../../components/Modal";
 import Input from "../../../components/Input";
 import PasswordInput from "../../../components/PasswordInput";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { getAdmins, createAdmin, updateAdmin, deleteAdmin } from "../../../core/adminApi";
 
 interface Admin {
     adminId: string;
@@ -19,54 +18,48 @@ export default function AdminsTab() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [password, setPassword] = useState("");
+
 
     useEffect(() => {
         loadAdmins();
     }, []);
 
     async function loadAdmins() {
-        const res = await fetch(`${API_URL}/api/Admins`);
-        if (!res.ok) return;
-        const data = await res.json();
+        const data = await getAdmins();
         setAdmins(data);
     }
 
-    async function handleAddAdmin(e: React.FormEvent) {
+    async function handleAddAdmin(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        const form = e.currentTarget as HTMLFormElement;
+
+        const form = e.currentTarget;
         const data = new FormData(form);
 
-        await fetch(`${API_URL}/api/Admins`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                name: data.get("name"),
-                email: data.get("email"),
-                phone: data.get("phone"),
-                password: data.get("password"),
-            }),
+        await createAdmin({
+            name: String(data.get("name") ?? ""),
+            email: String(data.get("email") ?? ""),
+            phone: String(data.get("phone") ?? ""),
+            password,
         });
 
+        setPassword("");
         setShowAddModal(false);
         form.reset();
         loadAdmins();
     }
 
-    async function handleEditAdmin(e: React.FormEvent) {
+    async function handleEditAdmin(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!selectedAdmin) return;
 
-        const form = e.currentTarget as HTMLFormElement;
+        const form = e.currentTarget;
         const data = new FormData(form);
 
-        await fetch(`${API_URL}/api/Admins/${selectedAdmin.adminId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                name: data.get("name"),
-                email: data.get("email"),
-                phone: data.get("phone"),
-            }),
+        await updateAdmin(selectedAdmin.adminId, {
+            name: String(data.get("name") ?? ""),
+            email: String(data.get("email") ?? ""),
+            phone: String(data.get("phone") ?? ""),
         });
 
         setShowEditModal(false);
@@ -76,10 +69,7 @@ export default function AdminsTab() {
     async function handleDeleteAdmin() {
         if (!selectedAdmin) return;
 
-        await fetch(`${API_URL}/api/Admins/${selectedAdmin.adminId}`, {
-            method: "DELETE",
-        });
-
+        await deleteAdmin(selectedAdmin.adminId);
         setShowDeleteModal(false);
         loadAdmins();
     }
@@ -99,7 +89,7 @@ export default function AdminsTab() {
                 </button>
             </div>
 
-            <div className="bg-white shadow rounded-xl p-6">
+            <div className="bg-white shadow rounded-xl p-6 text-black">
                 <ul className="space-y-4">
                     {admins.map((admin) => (
                         <li
@@ -148,7 +138,12 @@ export default function AdminsTab() {
                         <Input  name="name" label="Full Name" required className="bg-gray-300" />
                         <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
                         <Input name="phone" label="Phone" required className="bg-gray-300"/>
-                        <PasswordInput className="bg-gray-300"/>
+                        <PasswordInput
+                            className="bg-gray-300"
+                            value={password}
+                            onChange={setPassword}
+                        />
+
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full py-2">
                             Save Admin
@@ -181,14 +176,14 @@ export default function AdminsTab() {
                         Delete Admin
                     </h3>
 
-                    <p className="mb-4">
+                    <p className="mb-4 text-black">
                         Are you sure you want to delete{" "}
                         <strong>{selectedAdmin.name}</strong>?
                     </p>
 
                     <div className="flex justify-end gap-4">
                         <button
-                            className="btn px-6"
+                            className="btn px-6 text-black"
                             onClick={() => setShowDeleteModal(false)}
                         >
                             Cancel
