@@ -56,9 +56,9 @@ export default function PlayerHistory() {
                 <p className="font-bold text-red-600">
                   Week {board.week} – 2025
                 </p>
-                <p>Numbers: {board.numbers.join(", ")}</p>
+                <p className="text-black">Numbers: {board.numbers.join(", ")}</p>
               </div>
-              <p className="font-bold">{board.price} DKK</p>
+              <p className="text-black font-bold">{board.price} DKK</p>
             </div>
           ))
         )}

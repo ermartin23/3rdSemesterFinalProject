@@ -44,19 +44,19 @@ export default function HomePage() {
 
             <div className="space-y-3">
               <div className="flex justify-between bg-[#f8ecd9] p-3 rounded-md">
-                <span>5 numbers</span>
+                <span className="text-black">5 numbers</span>
                 <span className="font-bold text-red-600">20 DKK</span>
               </div>
               <div className="flex justify-between bg-[#f8ecd9] p-3 rounded-md">
-                <span>6 numbers</span>
+                <span className="text-black">6 numbers</span>
                 <span className="font-bold text-red-600">40 DKK</span>
               </div>
               <div className="flex justify-between bg-[#f8ecd9] p-3 rounded-md">
-                <span>7 numbers</span>
+                <span className="text-black">7 numbers</span>
                 <span className="font-bold text-red-600">80 DKK</span>
               </div>
               <div className="flex justify-between bg-[#f8ecd9] p-3 rounded-md">
-                <span>8 numbers</span>
+                <span className="text-black">8 numbers</span>
                 <span className="font-bold text-red-600">160 DKK</span>
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function HomePage() {
         </div>
 
         <p className="text-gray-500 text-sm mt-10">
-          Created by Code Buster
+          Created by CodeBusters
         </p>
 
       </div>
