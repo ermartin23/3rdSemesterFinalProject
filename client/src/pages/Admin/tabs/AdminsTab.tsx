@@ -144,11 +144,11 @@ export default function AdminsTab() {
                         Add New Admin
                     </h3>
 
-                    <form onSubmit={handleAddAdmin} className="space-y-4">
-                        <Input name="name" label="Full Name" required />
-                        <Input name="email" label="Email" type="email" required />
-                        <Input name="phone" label="Phone" required />
-                        <PasswordInput />
+                    <form onSubmit={handleAddAdmin} className="text-black space-y-4">
+                        <Input  name="name" label="Full Name" required className="bg-gray-300" />
+                        <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
+                        <Input name="phone" label="Phone" required className="bg-gray-300"/>
+                        <PasswordInput className="bg-gray-300"/>
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full py-2">
                             Save Admin

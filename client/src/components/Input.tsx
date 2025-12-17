@@ -3,13 +3,15 @@
                                   label,
                                   type = "text",
                                   defaultValue,
-                                  required
+                                  required,
+    className = ""
                               }: {
     name: string;
     label: string;
     type?: string;
     defaultValue?: string;
     required?: boolean;
+    className?: string;
 }) {
     return (
         <div>
@@ -19,7 +21,7 @@
                 type={type}
                 defaultValue={defaultValue}
                 required={required}
-                className="input input-bordered w-full"
+                className={`input input-bordered w-full ${className}`}
             />
         </div>
     );

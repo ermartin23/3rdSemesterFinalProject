@@ -137,9 +137,9 @@ export default function PlayersTab() {
 
             <div className="bg-white shadow rounded-xl p-6">
                 {players.length === 0 ? (
-                    <p>No players registered yet.</p>
+                    <p className="text-black">No players registered yet.</p>
                 ) : (
-                    <ul className="space-y-4">
+                    <ul className="text-black space-y-4">
                         {players.map((player) => (
                             <li
                                 key={player.playerId}
@@ -193,12 +193,12 @@ export default function PlayersTab() {
                 <Modal onClose={() => setShowAddModal(false)}>
                     <h3 className="text-lg font-bold mb-3 text-red-600">Add New Player</h3>
 
-                    <form onSubmit={handleAddPlayer} className="space-y-4">
-                        <Input name="name" label="Full Name" required />
-                        <Input name="email" label="Email" type="email" required />
-                        <Input name="phone" label="Phone" required />
-                        <PasswordInput />
-                        <Toggle name="active" label="Active Player" />
+                    <form onSubmit={handleAddPlayer} className="space-y-4 text-black">
+                        <Input name="name" label="Full Name" required className="bg-gray-300"/>
+                        <Input name="email" label="Email" type="email" required className="bg-gray-300"/>
+                        <Input name="phone" label="Phone" required className="bg-gray-300"/>
+                        <PasswordInput className="bg-gray-300"/>
+                        <Toggle name="active" label="Active Player"/>
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full mt-4">
                             Add Player
@@ -213,10 +213,10 @@ export default function PlayersTab() {
                         Edit Player
                     </h3>
 
-                    <form onSubmit={handleEditPlayer} className="space-y-4">
-                        <Input name="name" defaultValue={selectedPlayer.name} label={""} />
-                        <Input name="email" defaultValue={selectedPlayer.email} label={""} />
-                        <Input name="phone" defaultValue={selectedPlayer.phone} label={""} />
+                    <form onSubmit={handleEditPlayer} className="space-y-4 text-black">
+                        <Input name="name" defaultValue={selectedPlayer.name} label={""} className="bg-gray-300"/>
+                        <Input name="email" defaultValue={selectedPlayer.email} label={""} className="bg-gray-300"/>
+                        <Input name="phone" defaultValue={selectedPlayer.phone} label={""} className="bg-gray-300"/>
                         <Toggle
                             name="active"
                             label="Active Player"
@@ -233,14 +233,14 @@ export default function PlayersTab() {
             {showDeleteModal && selectedPlayer && (
                 <Modal onClose={() => setShowDeleteModal(false)}>
                     <h3 className="font-bold text-lg text-red-600">Delete Player</h3>
-                    <p className="mb-4">
+                    <p className="mb-4 text-black">
                         Are you sure you want to delete{" "}
                         <strong>{selectedPlayer.name}</strong>?
                     </p>
 
                     <div className="flex justify-end gap-4">
                         <button
-                            className="btn"
+                            className="btn text-black"
                             onClick={() => setShowDeleteModal(false)}
                         >
                             Cancel

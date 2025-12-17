@@ -73,12 +73,12 @@ export default function GamesTab() {
                     Deadline: <strong>{activeGame.deadline}</strong>
                 </p>
 
-                <div className="bg-[#f7ead4] p-4 rounded-lg mb-6">
+                <div className="bg-[#f7ead4] p-4 rounded-lg mb-6 text-black">
                     <p>Current Boards: <strong>0</strong></p>
                     <p>Total Revenue: <strong>0 DKK</strong></p>
                 </div>
 
-                <div className="p-4 bg-[#fff4ef] border rounded-xl mb-6">
+                <div className="p-4 bg-[#fff4ef] border rounded-xl mb-6 text-black">
                     <p className="font-bold mb-4">Select 3 Winning Numbers</p>
 
                     <div className="grid grid-cols-8 gap-3">

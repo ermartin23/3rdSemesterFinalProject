@@ -2,7 +2,11 @@
 import eye from "../assets/eye.png";
 import eyeOff from "../assets/eye-off.png";
 
-export default function PasswordInput() {
+export default function PasswordInput({
+                                          className = "",
+                                      }: {
+    className?: string;
+                                      }) {
     const [visible, setVisible] = useState(false);
     const [value, setValue] = useState("");
 
@@ -21,14 +25,16 @@ export default function PasswordInput() {
                     value={value}
                     required
                     onChange={(e) => setValue(e.target.value)}
-                    className={`input input-bordered w-full pr-12 ${
+                    className={`input input-bordered w-full pr-12 relative z-0 ${
                         tooShort ? "border-red-500" : ""
-                    }`}
+                    }
+                    ${className}
+                    `}
                 />
 
                 <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-10   "
                     onClick={() => setVisible(prev => !prev)}
                 >
                     <img
