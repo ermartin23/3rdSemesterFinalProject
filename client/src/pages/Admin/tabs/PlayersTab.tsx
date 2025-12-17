@@ -3,7 +3,7 @@ import Modal from "../../../components/Modal";
 import Input from "../../../components/Input";
 import Toggle from "../../../components/Toggle";
 import PasswordInput from "../../../components/PasswordInput";
-
+import { getPlayers, createPlayer, updatePlayer, deletePlayer } from "../../../core/playersApi";
 
 
 interface Player {
@@ -12,11 +12,11 @@ interface Player {
     email: string;
     phone: string;
     active: boolean;
-    balance: number;
+    balance?: number;
 }
 
 export default function PlayersTab() {
-    const API = "http://127.0.0.1:5239/api/players";
+    
 
     const [players, setPlayers] = useState<Player[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -28,29 +28,12 @@ export default function PlayersTab() {
 
 
     useEffect(() => {
-        async function loadPlayers() {
-            const token = localStorage.getItem("token");
-            
-            const res = await fetch(API, {
-                headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
+        getPlayers()
+            .then(setPlayers)
+            .catch((err) => {
+                console.error(err);
+                setPlayers([]);
             });
-            
-            if (!res.ok) {
-                const text = await res.text().catch(() => "");
-                throw new Error(text || `Failed to load players (${res.status})`);
-            }
-            
-            const data = await res.json();
-            setPlayers(data);
-        }
-        
-        loadPlayers().catch((err) => {
-            console.error(err);
-            setPlayers([]);
-        });
     }, []);
 
     // ADD PLAYER
@@ -60,26 +43,23 @@ export default function PlayersTab() {
         const data = new FormData(form);
 
         const newPlayer = {
-            name: data.get("name"),
-            email: data.get("email"),
-            phone: data.get("phone"),
-            active: data.get("active") === "on",
+            name: String(data.get("name") ?? ""),
+            email: String(data.get("email") ?? ""),
+            phone: String(data.get("phone") ?? ""),
             password // required by backend
         };
 
-        const res = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newPlayer),
-        });
-
-        const created = await res.json();
-        setPlayers((prev) => [...prev, created]);
-
-        setPassword("");
-        setShowAddModal(false);
-        form.reset();
+        try {
+            const created = await createPlayer(newPlayer);
+            setPlayers((prev) => [...prev, created]);
+            setPassword("");
+            setShowAddModal(false);
+            form.reset();
+        } catch (err: any) {
+            alert(err.message ?? "Failed to create player");
+        }
     }
+
 
     // EDIT PLAYER
     async function handleEditPlayer(e: React.FormEvent) {
@@ -90,40 +70,34 @@ export default function PlayersTab() {
         const data = new FormData(form);
 
         const updatedPlayer = {
-            name: data.get("name"),
-            email: data.get("email"),
-            phone: data.get("phone"),
-            active: data.get("active") === "on"
+            name: String(data.get("name") ?? ""),
+            email: String(data.get("email") ?? ""),
+            phone: String(data.get("phone") ?? ""),
         };
 
-        const res = await fetch(`${API}/${selectedPlayer.playerId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedPlayer),
-        });
-
-        const saved = await res.json();
-        setPlayers((prev) =>
-            prev.map((p) => (p.playerId === saved.playerId ? saved : p))
-        );
-
-        setShowEditModal(false);
+        try {
+            const saved = await updatePlayer(selectedPlayer.playerId, updatedPlayer);
+            setPlayers((prev) => prev.map((p) => (p.playerId === saved.playerId ? saved : p)));
+            setShowEditModal(false);
+        } catch (err: any) {
+            alert(err.message ?? "Failed to update player");
+        }
     }
+
 
     // DELETE PLAYER
     async function handleDeletePlayer() {
         if (!selectedPlayer) return;
 
-        await fetch(`${API}/${selectedPlayer.playerId}`, {
-            method: "DELETE",
-        });
-
-        setPlayers((prev) =>
-            prev.filter((p) => p.playerId !== selectedPlayer.playerId)
-        );
-
-        setShowDeleteModal(false);
+        try {
+            await deletePlayer(selectedPlayer.playerId);
+            setPlayers((prev) => prev.filter((p) => p.playerId !== selectedPlayer.playerId));
+            setShowDeleteModal(false);
+        } catch (err: any) {
+            alert(err.message ?? "Failed to delete player");
+        }
     }
+
 
     return (
         <div className="max-w-4xl mx-auto mt-10">
