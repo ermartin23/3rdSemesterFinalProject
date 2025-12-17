@@ -66,6 +66,28 @@ public class TransactionController : ControllerBase
     }
 
     [Authorize(Roles = "Player")]
+    [HttpGet("player/transactions")]
+    public async Task<ActionResult> GetMyTransactions()
+    {
+        var playerId = GetUserIdOrThrow();
+        
+        var tx = await _myDbContext.Transactions
+            .AsNoTracking()
+            .Where(t => t.Playerid == playerId)
+            .OrderByDescending(t => t.Createdat)
+            .Select(t => new
+            {
+                transactionId = t.Transactionid,
+                amount = t.Amount,
+                mobilepaytransactionnumber = t.Mobilepaytransactionnumber,
+                status = t.Status,
+                createdat = t.Createdat
+            })
+            .ToListAsync();
+        return Ok(tx);
+    }
+    
+    [Authorize(Roles = "Player")]
     [HttpPost("player/createtransaction")]
     public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionDto dto)
     {

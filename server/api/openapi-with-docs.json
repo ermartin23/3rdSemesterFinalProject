@@ -80,6 +80,27 @@
         }
       }
     },
+    "/api/Transaction/player/transactions": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "operationId": "Transaction_GetMyTransactions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Transaction/player/createtransaction": {
       "post": {
         "tags": [

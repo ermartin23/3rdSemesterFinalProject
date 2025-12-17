@@ -1,6 +1,8 @@
 import {useEffect, useState} from "react";
 
-const TRANSACTION_API = `${import.meta.env.VITE_API_URL}/api/Transaction`;
+const API_BASE = import.meta.env.VITE_API_URL;
+const TRANSACTION_LIST_API = `${API_BASE}/api/Transaction/admin/transactions`;
+const TRANSACTION_ACTION_API = `${API_BASE}/api/Transaction`;
 const TRANSACTION_PAGE_SIZE = 10;
 
 interface Transaction {
@@ -35,7 +37,7 @@ export default function TransactionsTab() {
             }
             
             try {
-                const res = await fetch(TRANSACTION_API, {
+                const res = await fetch(TRANSACTION_LIST_API, {
                     method: "GET",
                     headers: {
                         Accept: "application/json",
@@ -107,7 +109,7 @@ export default function TransactionsTab() {
     async function handleApprove(id: string) {
         setActionLoadingId(id);
         try {
-            const res = await fetch(`${TRANSACTION_API}/${id}/approve`, {
+            const res = await fetch(`${TRANSACTION_ACTION_API}/${id}/approve`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -130,7 +132,7 @@ export default function TransactionsTab() {
     async function handleReject(id: string) {
         setActionLoadingId(id);
         try {
-            const res = await fetch(`${TRANSACTION_API}/${id}/reject`, {
+            const res = await fetch(`${TRANSACTION_ACTION_API}/${id}/reject`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
