@@ -15,6 +15,14 @@ public class AdminService : IAdminService
         _db = db;
         _passwords = passwords;
     }
+    
+    public async Task<List<AdminResponseDto>> GetAllAdminsAsync()
+    {
+        return await _db.Admins
+            .Where(a => !a.Isdeleted)
+            .Select(a => a.ToAdminResponseDto())
+            .ToListAsync();
+    }
 
     public async Task<AdminResponseDto> CreateAsync(AdminCreateRequestDto dto)
     {
