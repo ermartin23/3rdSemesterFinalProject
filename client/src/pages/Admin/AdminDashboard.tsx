@@ -61,7 +61,7 @@ export default function AdminDashboard() {
 
             {/* TAB BAR */}
             <div className="flex justify-center mt-6">
-                <div className="tabs tabs-boxed bg-[#f7f2e9]">
+                <div className="text-black tabs tabs-boxed bg-[#f7efe1]">
                     <a
                         className={`tab ${
                             activeTab === "players" ? "tab-active" : ""
