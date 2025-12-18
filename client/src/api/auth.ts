@@ -1,6 +1,4 @@
 ﻿import { baseUrl } from "../core/config";
-
-
 export async function login(email: string, password: string) {
     const res = await fetch(`${baseUrl}/api/auth/login`, {
         method: "POST",

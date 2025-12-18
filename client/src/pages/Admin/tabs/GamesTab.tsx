@@ -13,8 +13,7 @@ export default function GamesTab() {
     const [selected, setSelected] = useState<number[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
-
-    // ✅ details of the currently active game (for totals)
+    
     const [activeDetails, setActiveDetails] = useState<GameDetailsResponseDto | null>(null);
 
     const [expandedGameId, setExpandedGameId] = useState<string | null>(null);
@@ -33,8 +32,7 @@ export default function GamesTab() {
             setLoading(false);
         }
     }
-
-    // load list once
+    
     useEffect(() => {
         load();
     }, []);
@@ -52,8 +50,7 @@ export default function GamesTab() {
             .filter((g) => !g.isOpen)
             .sort((a, b) => b.weekidentity.localeCompare(a.weekidentity));
     }, [games]);
-
-    // ✅ load details whenever active game changes
+    
     useEffect(() => {
         async function loadDetails() {
             if (!activeGame) {
@@ -65,15 +62,12 @@ export default function GamesTab() {
                 const details = await getGameDetails(activeGame.gameid);
                 setActiveDetails(details);
             } catch {
-                // don’t crash UI if details fails
                 setActiveDetails(null);
             }
         }
-
         loadDetails();
     }, [activeGame?.gameid]);
-
-    // ✅ compute totals from details
+    
     const currentBoards = useMemo(() => {
         if (!activeDetails) return 0;
         return activeDetails.players.reduce((sum, p) => sum + p.boards.length, 0);
@@ -86,8 +80,7 @@ export default function GamesTab() {
             0
         );
     }, [activeDetails]);
-
-    // ✅ IMPORTANT: define this AFTER activeGame exists
+    
     const canSetNow = activeGame?.canSetWinnersNow ?? false;
 
     function toggleNumber(n: number) {
@@ -110,7 +103,7 @@ export default function GamesTab() {
         try {
             await setGameWinners(activeGame.gameid, { winningNumbers: selected });
             setSelected([]);
-            await load(); // refresh list (and details will refresh via useEffect)
+            await load();
         } catch (e: any) {
             setError(e.message ?? "Failed to close game");
         } finally {
@@ -119,15 +112,13 @@ export default function GamesTab() {
     }
 
     async function toggleHistoryDetails(gameId: string) {
-        // collapse if same item clicked
         if (expandedGameId === gameId) {
             setExpandedGameId(null);
             return;
         }
 
         setExpandedGameId(gameId);
-
-        // already loaded -> don't refetch
+        
         if (detailsCache[gameId]) return;
 
         setDetailsLoadingId(gameId);
@@ -152,7 +143,7 @@ export default function GamesTab() {
                     </div>
                 )}
 
-                {/* ACTIVE GAME */}
+                {}
                 <div className="p-6 border border-red-300 rounded-xl bg-white shadow">
                     <div className="flex items-center gap-3 mb-4">
                         <span className="font-bold text-lg text-red-600">Active Game</span>
@@ -169,7 +160,7 @@ export default function GamesTab() {
                                 Week: <strong>{formatWeek(activeGame.weekidentity)}</strong>
                             </p>
 
-                            {/* ✅ real totals */}
+                            {}
                             <div className="bg-[#f7ead4] p-4 rounded-lg mb-6 text-black">
                                 <p>
                                     Current Boards: <strong>{currentBoards}</strong>
@@ -227,15 +218,15 @@ export default function GamesTab() {
                     )}
                 </div>
 
-                {/* GAME HISTORY */}
+                {}
                 <div className="mt-10 mb-20">
                     <h2 className="text-xl font-bold text-red-600 mb-4">Game History</h2>
 
                     <div className="bg-white border rounded-xl shadow p-6">
                         {history.length === 0 ? (
                             <p className="text-center text-gray-600">No closed games yet</p>
-                        ) : (
-                            <ul className="space-y-3">
+                            ) : (
+                                <ul className="space-y-3">
                                 {history.map((g) => {
                                     const isExpanded = expandedGameId === g.gameid;
                                     const details = detailsCache[g.gameid];
@@ -250,26 +241,24 @@ export default function GamesTab() {
                                     return (
                                         <li
                                             key={g.gameid}
-                                            className="rounded-xl bg-white shadow border border-red-200"
-                                        >
+                                            className="rounded-xl bg-white shadow border border-red-200">
                                             <button
                                                 type="button"
                                                 onClick={() => toggleHistoryDetails(g.gameid)}
-                                                className="w-full p-4 flex justify-between items-center text-left bg-white rounded-xl text-gray-900 hover:bg-gray-50"
-                                            >
-                      <span className="text-gray-900">
-                        <strong className="text-red-600">
-                          {formatWeek(g.weekidentity)}
-                        </strong>
-                        <span className="text-gray-700"> — Winners: </span>
-                        <span className="text-gray-900 font-semibold">
-                          {g.winningnumbers?.join(", ")}
-                        </span>
-                      </span>
+                                                className="w-full p-4 flex justify-between items-center text-left bg-white rounded-xl text-gray-900 hover:bg-gray-50">
+                                                    <span className="text-gray-900">
+                                                        <strong className="text-red-600">
+                                                            {formatWeek(g.weekidentity)}
+                                                        </strong>
+                                                    <span className="text-gray-700"> — Winners: </span>
+                                                    <span className="text-gray-900 font-semibold">
+                                                    {g.winningnumbers?.join(", ")}
+                                                    </span>
+                                                </span>
 
                                                 <span className="text-gray-700">
-                        {isExpanded ? "▲" : "▼"}
-                      </span>
+                                                    {isExpanded ? "▲" : "▼"}
+                                                </span>
                                             </button>
 
                                             {isExpanded && (
@@ -311,22 +300,19 @@ export default function GamesTab() {
                                                                                 {p.boards.map((b) => (
                                                                                     <li
                                                                                         key={b.boardId}
-                                                                                        className="flex justify-between text-gray-800"
-                                                                                    >
-                                          <span>
-                                            Board: [{b.chosenNumbers.join(", ")}
-                                              ] — {b.price} DKK
-                                          </span>
-
+                                                                                        className="flex justify-between text-gray-800">
+                                                                                            <span>
+                                                                                                Board: [{b.chosenNumbers.join(", ")}
+                                                                                                ] — {b.price} DKK
+                                                                                            </span>
                                                                                         <span
                                                                                             className={
                                                                                                 b.isWinningBoard
                                                                                                     ? "text-green-600 font-semibold"
                                                                                                     : "text-gray-600"
-                                                                                            }
-                                                                                        >
-                                            {b.isWinningBoard ? "WIN" : "—"}
-                                          </span>
+                                                                                                }>
+                                                                                            {b.isWinningBoard ? "WIN" : "—"}
+                                                                                        </span>
                                                                                     </li>
                                                                                 ))}
                                                                             </ul>

@@ -6,7 +6,7 @@ namespace api.Features.Admins;
 
     [Authorize(Roles = "Admin")]
     [ApiController]
-    [Route("api/[controller]")] // => api/admins
+    [Route("api/[controller]")] 
     public class AdminsController : ControllerBase
     {
         private readonly IAdminService _adminService;
@@ -23,13 +23,11 @@ namespace api.Features.Admins;
             return Ok(admins);
         }
 
-
         [HttpPost]
         public async Task<ActionResult<AdminResponseDto>> Create([FromBody] AdminCreateRequestDto dto)
         {
             var created = await _adminService.CreateAsync(dto);
             return CreatedAtAction(nameof(Create), new { id = created.AdminId }, created);
-            // later you can add GetById and use that here instead
         }
 
         [HttpPut("{id:guid}")]

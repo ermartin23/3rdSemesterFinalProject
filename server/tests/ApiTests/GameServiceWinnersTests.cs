@@ -26,7 +26,6 @@ public class GameServiceWinnersTests
         return new MyDbContext(options);
     }
 
-    // Sunday 2025-12-21 00:00:00Z -> cutoff is Sat 17:00 DK = 16:00 UTC (December = CET)
     private static DateTime WeekSundayUtc => new DateTime(2025, 12, 21, 0, 0, 0, DateTimeKind.Utc);
     private static DateTime CutoffUtc_Expected => new DateTime(2025, 12, 20, 16, 0, 0, DateTimeKind.Utc);
 
@@ -84,8 +83,7 @@ public class GameServiceWinnersTests
 
         Assert.NotNull(updated.Winningnumbers);
         Assert.Equal(new[] { 1, 2, 3 }, updated.Winningnumbers);
-
-        // next week created
+        
         var nextWeek = WeekSundayUtc.AddDays(7);
         var exists = await db.Games.AnyAsync(g => g.Weekidentity == nextWeek && !g.Isdeleted);
         Assert.True(exists);
@@ -203,5 +201,4 @@ public class GameServiceWinnersTests
         public Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
             => Task.CompletedTask;
     }
-
 }

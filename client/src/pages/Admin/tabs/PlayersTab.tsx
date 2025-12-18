@@ -43,8 +43,7 @@ export default function PlayersTab() {
             loadBalanceForPlayer(player.playerId).catch(console.error);
         });
     }, [players]);
-
-    // ADD PLAYER
+    
     async function handleAddPlayer(e: React.FormEvent) {
         e.preventDefault();
         const form = e.currentTarget as HTMLFormElement;
@@ -68,9 +67,7 @@ export default function PlayersTab() {
             alert(err.message ?? "Failed to create player");
         }
     }
-
-
-    // EDIT PLAYER
+    
     async function handleEditPlayer(e: React.FormEvent) {
         e.preventDefault();
         if (!selectedPlayer) return;
@@ -93,9 +90,7 @@ export default function PlayersTab() {
             alert(err.message ?? "Failed to update player");
         }
     }
-
-
-    // DELETE PLAYER
+    
     async function handleDeletePlayer() {
         if (!selectedPlayer) return;
 
@@ -107,7 +102,7 @@ export default function PlayersTab() {
             alert(err.message ?? "Failed to delete player");
         }
     }
-
+    
     async function loadBalanceForPlayer(playerId: string) {
         const token = localStorage.getItem("token");
         const res = await fetch(`${API_BASE}/api/Transaction/admin/player/${playerId}/balance`, {
@@ -184,7 +179,7 @@ export default function PlayersTab() {
                 )}
             </div>
 
-            {/* ADD PLAYER MODAL */}
+            {}
             {showAddModal && (
                 <Modal onClose={() => setShowAddModal(false)}>
                     <h3 className="text-lg font-bold mb-3 text-red-600">Add New Player</h3>

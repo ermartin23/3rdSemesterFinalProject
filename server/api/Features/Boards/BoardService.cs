@@ -106,8 +106,6 @@ public class BoardService : IBoardService
         return board;
     }
 
-    //It's complicated if you have time implement it, probably you will not need it
-
     public async Task<Board?> UpdateBoard(Guid id, UpdateBoardRequest request)
     {
         var board = await _dbContext.Boards.FindAsync(id);

@@ -23,12 +23,10 @@ namespace api.Services.Game
         public async Task<Game?> CreateGameAsync(DateTime weekIdentity)
         {
             var now = DateTime.UtcNow;
-
-            // Week identity must be in future
+            
             if (weekIdentity < now)
                 return null;
-
-            // There must NOT be an open game
+            
             var anyOpen = await _context.Games
                 .AnyAsync(g => IsGameOpen(g.Createdat, g.Cutofftime));
 
@@ -40,7 +38,7 @@ namespace api.Services.Game
                 Gameid = Guid.NewGuid(),
                 Weekidentity = weekIdentity,
                 Winningnumbers = new List<int>(),
-                Cutofftime = new TimeOnly(17, 0), // default 17:00
+                Cutofftime = new TimeOnly(17, 0), 
                 Createdat = now
             };
 

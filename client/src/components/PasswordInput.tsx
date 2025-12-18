@@ -13,7 +13,7 @@ export default function PasswordInput({
                                           value,
                                           onChange,
                                           className = "",
-                                          required = true,      // ✅ default required
+                                          required = true,
                                       }: Props) {
     const [visible, setVisible] = useState(false);
 
@@ -40,13 +40,11 @@ export default function PasswordInput({
                 <button
                     type="button"
                     className="absolute right-3 top-1/2 -translate-y-1/2"
-                    onClick={() => setVisible(prev => !prev)}
-                >
+                    onClick={() => setVisible(prev => !prev)}>
                     <img
                         src={visible ? eyeOff : eye}
                         alt="Toggle password visibility"
-                        className="w-5 h-5 opacity-70 hover:opacity-100"
-                    />
+                        className="w-5 h-5 opacity-70 hover:opacity-100"/>
                 </button>
             </div>
 

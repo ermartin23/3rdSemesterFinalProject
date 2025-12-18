@@ -19,8 +19,7 @@ export default function AdminsTab() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [password, setPassword] = useState("");
-
-
+    
     useEffect(() => {
         loadAdmins();
     }, []);
@@ -143,7 +142,6 @@ export default function AdminsTab() {
                             value={password}
                             onChange={setPassword}
                         />
-
 
                         <button className="btn bg-red-600 text-white hover:bg-red-700 w-full py-2">
                             Save Admin

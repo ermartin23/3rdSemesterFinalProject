@@ -46,5 +46,4 @@ public class RepeatingBoardController : ControllerBase
 
         return Guid.Parse(sub);
     }
-
 }

@@ -17,8 +17,7 @@ public class AdminCreateRequestDto
     [EmailAddress]
     [MaxLength(200)]
     public string Email { get; set; } = null!;
-
-    // For now this is plain text; later you can hash it when storing.
+    
     [Required]
     [MinLength(6)]
     [MaxLength(100)]
@@ -39,7 +38,6 @@ public class AdminUpdateRequestDto
     [EmailAddress]
     [MaxLength(200)]
     public string Email { get; set; } = null!;
-    //  I can add a separate ChangePassword DTO later.
 }
 
 public class AdminResponseDto

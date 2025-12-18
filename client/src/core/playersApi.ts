@@ -11,7 +11,7 @@ export type PlayerUpdateRequestDto = {
     name: string;
     email: string;
     phone: string;
-    password?: string; // optional on update
+    password?: string;
 };
 
 export type PlayerResponseDto = {

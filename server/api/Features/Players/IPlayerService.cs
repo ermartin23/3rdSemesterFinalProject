@@ -12,6 +12,5 @@ public interface IPlayerService
     Task<PlayerResponseDto> CreateAsync(PlayerCreateRequestDto dto);
     Task<PlayerResponseDto> UpdateAsync(Guid id, PlayerUpdateRequestDto dto);
     Task<PlayerResponseDto> ToggleActiveAsync(Guid id);
-
     Task SoftDeleteAsync(Guid id);
 }

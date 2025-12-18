@@ -249,7 +249,7 @@ export default function TransactionsTab() {
                 )}
             </section>
 
-            {/* Transaction history */}
+            {}
             <section>
                 <h2 className="text-xl font-bold text-red-600 mb-4">
                     Transaction History
@@ -305,7 +305,7 @@ export default function TransactionsTab() {
                             </table>
                         </div>
 
-                        {/* Pagination controls */}
+                        {}
                         <div className="flex items-center justify-between mt-4 text-sm">
                             <span className="text-black">
                                 Page {historyPage} of {totalHistoryPages}

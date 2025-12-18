@@ -4,7 +4,6 @@ import logo from "../../assets/jerne-if-logo.png";
 import {login} from "../../api/auth.ts";
 import PasswordInput from "../../components/PasswordInput";
 
-
 export default function PlayerLogin() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
