@@ -11,5 +11,9 @@ namespace api.Features.Games.Dtos
         public TimeOnly Cutofftime { get; set; }
         public List<int>? Winningnumbers { get; set; }
         public bool IsOpen { get; set; }
+
+        // NEW:
+        public DateTime CutoffUtc { get; set; }
+        public bool CanSetWinnersNow { get; set; }
     }
 }

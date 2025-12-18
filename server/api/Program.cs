@@ -16,6 +16,7 @@ using api.Features.Players;
 using api.Features.Admins;
 using api.Features.Auth;
 using api.Features.RepeatingBoards;
+using api.Helpers.Time;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IRepeatingBoardService, RepeatingBoardService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddScoped<IAdminService, AdminService>(); 
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
 

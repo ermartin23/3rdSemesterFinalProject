@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/jerne-if-logo.png";
 
 interface PlayedBoard {
     week: number;
@@ -155,80 +154,6 @@ export default function PlayerDashboard() {
 
     return (
         <div className="min-h-screen bg-[#faf6ef]">
-            {/* HEADER */}
-            <div className="flex items-center justify-between px-8 py-4 shadow bg-[#faf6ef]">
-                <div className="flex items-center gap-3">
-                    <img
-                        src={logo}
-                        alt="Jerne IF"
-                        className="rounded-full shadow"
-                        style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                    />
-                    <h1 className="text-3xl font-bold text-red-600 mb-2 flex items-center gap-2">
-                        Player Dashboard <span className="text-4xl">🐦</span>
-                    </h1>
-                </div>
-
-                <button
-                    className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50"
-                    onClick={() => {
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("role");
-                        localStorage.removeItem("userId");
-                        localStorage.removeItem("email");
-                        navigate("/player-login", {replace: true});
-                    }}
-                >
-                    Logout
-                </button>
-            </div>
-
-            {/* NAV BUTTONS */}
-            <div className="flex justify-center gap-6 mt-6 text-lg">
-                <button
-                    onClick={() => navigate("/player-dashboard")}
-                    className="text-red-600 font-semibold underline"
-                >
-                    Play
-                </button>
-
-                <button
-                    onClick={() => navigate("/player-history")}
-                    className="text-gray-600 hover:text-red-600"
-                >
-                    View History
-                </button>
-
-                {/*  NEW BUTTON: Winning Number */}
-                <button
-                    onClick={() =>
-                        navigate("/player-winners", {
-                            state: {
-                                week: currentWeek,
-                                numbers: [4, 9, 12]   // TEMPORARY → placeholder until backend is connected
-                            }
-                        })
-                    }
-                    className="text-gray-600 hover:text-red-600"
-                >
-                    Winning Number
-                </button>
-                
-                <button
-                    onClick={() => navigate("/player-balance")}
-                    className="text-gray-600 hover:text-red-600"
-                >
-                    Balance
-                </button>
-
-                <button
-                    onClick={() => navigate("/player-transactions")}
-                    className="text-gray-600 hover:text-red-600"
-                >
-                    Transactions
-                </button>
-            </div>
-
             {/* USER INFO */}
             <div className="text-center mt-8">
                 <h2 className="text-3xl font-bold text-red-600">

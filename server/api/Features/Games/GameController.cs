@@ -75,7 +75,7 @@ public class GameController : ControllerBase
         }
     }
     
-    
+    [Authorize(Roles="Admin")]
     [HttpGet("{id:guid}/details")]
     public async Task<ActionResult<GameDetailsResponseDto>> GetDetails(Guid id)
     {
@@ -84,5 +84,14 @@ public class GameController : ControllerBase
             return NotFound();
 
         return Ok(details);
+    }
+
+    [Authorize(Roles = "Player")]
+    [HttpGet("latest-winning-numbers")]
+    public async Task<ActionResult<WinnerDto>> GetLatestWinningNumbers()
+    {
+        var winner = await _svc.GetLatestWinningNumbersAsync();
+        if (winner == null) return NotFound();
+        return Ok(winner);
     }
 }

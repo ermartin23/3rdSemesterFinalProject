@@ -37,3 +37,5 @@ public class GameDetailsResponseDto
 
     public List<GamePlayerBoardsDto> Players { get; set; } = new();
 }
+
+public record WinnerDto(int Week, int Year, int[] Numbers);

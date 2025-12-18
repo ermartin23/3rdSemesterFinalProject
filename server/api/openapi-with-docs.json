@@ -615,6 +615,26 @@
         }
       }
     },
+    "/api/games/latest-winning-numbers": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "operationId": "Game_GetLatestWinningNumbers",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WinnerDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/boards": {
       "get": {
         "tags": [
@@ -1353,6 +1373,13 @@
           },
           "isOpen": {
             "type": "boolean"
+          },
+          "cutoffUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canSetWinnersNow": {
+            "type": "boolean"
           }
         }
       },
@@ -1480,6 +1507,27 @@
           },
           "isWinningBoard": {
             "type": "boolean"
+          }
+        }
+      },
+      "WinnerDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "week": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       },

@@ -6,6 +6,7 @@ using api.Features.Games;
 using api.Features.Players;
 using api.Features.Admins;
 using api.Features.Auth;
+using api.Helpers.Time;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +58,8 @@ public class Startup : IDisposable
         services.AddScoped<IAdminService, AdminService>();
         services.AddScoped<AuthController>();
         services.AddSingleton<IPasswordService, PasswordService>();
+        services.AddSingleton<IClock, SystemClock>();
+
         
         
         services.AddScoped<IAdminService, AdminService>();

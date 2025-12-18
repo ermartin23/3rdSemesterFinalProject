@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import logo from "../../assets/jerne-if-logo.png";
 
 interface PlayedBoard {
     boardId: string;
@@ -12,7 +10,6 @@ interface PlayedBoard {
 }
 
 export default function PlayerHistory() {
-    const navigate = useNavigate();
     const [history, setHistory] = useState<PlayedBoard[]>([]);
 
     useEffect(() => {
@@ -59,27 +56,6 @@ export default function PlayerHistory() {
 
     return (
         <div className="min-h-screen bg-[#faf6ef]">
-            {/* HEADER */}
-            <div className="flex items-center justify-between px-8 py-4 shadow bg-[#faf6ef]">
-                <div className="flex items-center gap-3">
-                    <img
-                        src={logo}
-                        alt="Jerne IF"
-                        className="w-[50px] h-[50px] rounded-full"
-                    />
-                    <h1 className="text-2xl font-bold text-red-600">
-                        Your History
-                    </h1>
-                </div>
-
-                <button
-                    className="btn btn-outline border-red-600 text-red-600"
-                    onClick={() => navigate("/player-dashboard")}
-                >
-                    Back
-                </button>
-            </div>
-
             {/* CONTENT */}
             <div className="max-w-2xl mx-auto mt-10 px-4">
                 {history.length === 0 ? (

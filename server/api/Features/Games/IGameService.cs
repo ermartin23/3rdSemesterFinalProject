@@ -11,6 +11,6 @@ public interface IGameService
     Task<GameResponseDto?> GetByIdAsync(Guid id);
     Task<GameResponseDto> CreateAsync(GameCreateRequestDto dto);
     Task<GameResponseDto> SetWinningNumbersAsync(Guid id, GameSetWinnersDto dto);
-
     Task<GameDetailsResponseDto?> GetDetailsAsync(Guid id);
+    Task<WinnerDto?> GetLatestWinningNumbersAsync();
 }
