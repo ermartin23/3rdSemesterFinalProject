@@ -43,7 +43,10 @@ export default function PlayerHistory() {
                 repeatingBoardId: b.repeatingBoardId ?? null,
             }));
             
-            mapped.sort((a, b) => (b.year - a.year) || (b.week - a.week));
+            mapped.sort((a, b) => {
+                const byWeek = (b.year - a.year) || (b.week - a.week);
+                return byWeek !== 0 ? byWeek : (b.price - a.price);
+            });
 
             setHistory(mapped);
         }

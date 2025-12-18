@@ -26,6 +26,7 @@
         <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
         <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="TimeZoneConverter" Version="7.2.0" />
     </ItemGroup>
 
     <!-- Folder structure (optional, harmless) -->

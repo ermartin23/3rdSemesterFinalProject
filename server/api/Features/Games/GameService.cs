@@ -6,6 +6,7 @@ using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using api.Helpers.Time;
 using api.Features.RepeatingBoards;
+using TimeZoneConverter;
 
 
 namespace api.Features.Games;
@@ -30,7 +31,7 @@ public class GameService : IGameService
             .OrderByDescending(g => g.Createdat)
             .ToListAsync();
 
-        return games.ToGameResponseDtos();
+        return games.ToGameResponseDtos(_clock.UtcNow);
     }
 
     public async Task<GameResponseDto?> GetByIdAsync(Guid id)
@@ -39,8 +40,9 @@ public class GameService : IGameService
             .AsNoTracking()
             .FirstOrDefaultAsync(g => g.Gameid == id);
 
-        return game?.ToGameResponseDto();
+        return game?.ToGameResponseDto(_clock.UtcNow);
     }
+
 
     public async Task<GameResponseDto> CreateAsync(GameCreateRequestDto dto)
     {
@@ -51,8 +53,9 @@ public class GameService : IGameService
         if (active != null)
             throw new InvalidOperationException("There is already an active game.");
 
-        var dk = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
-        
+        var dk = TZConvert.GetTimeZoneInfo("Europe/Copenhagen");
+
+        // input as UTC directly
         var weekUtc = DateTime.SpecifyKind(dto.Weekidentity, DateTimeKind.Utc);
         
         var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekUtc, dk);
@@ -75,7 +78,8 @@ public class GameService : IGameService
         _db.Games.Add(game);
         await _db.SaveChangesAsync();
 
-        return game.ToGameResponseDto();
+        return game.ToGameResponseDto(_clock.UtcNow);
+
     }
 
     public async Task<GameResponseDto> SetWinningNumbersAsync(Guid id, GameSetWinnersDto dto)
@@ -116,7 +120,8 @@ public class GameService : IGameService
 
         await CreateNextWeeklyGameAsync(game.Weekidentity);
 
-        return game.ToGameResponseDto();
+        return game.ToGameResponseDto(_clock.UtcNow);
+
     }
 
     private async Task CreateNextWeeklyGameAsync(DateTime previousWeekSundayUtc)
@@ -218,7 +223,7 @@ public class GameService : IGameService
 
     private static DateTime GetCutoffUtcFromWeekSundayUtc(DateTime weekSundayUtc)
     {
-        var dk = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
+        var dk = TZConvert.GetTimeZoneInfo("Europe/Copenhagen");
 
         var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekSundayUtc, dk);
         
