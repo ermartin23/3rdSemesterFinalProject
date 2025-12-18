@@ -9,6 +9,9 @@ public static class GameMappings
 {
     public static GameResponseDto ToGameResponseDto(this Game g)
     {
+        var cutoffUtc = GameTime.GetCutoffUtcFromWeekSundayUtc(g.Weekidentity);
+        var isOpen = g.Winningnumbers == null || g.Winningnumbers.Count == 0;
+
         return new GameResponseDto
         {
             Gameid = g.Gameid,
@@ -16,12 +19,13 @@ public static class GameMappings
             Createdat = g.Createdat,
             Cutofftime = g.Cutofftime,
             Winningnumbers = g.Winningnumbers,
-            IsOpen = g.Winningnumbers == null || g.Winningnumbers.Count == 0
+            IsOpen = isOpen,
+
+            CutoffUtc = cutoffUtc,
+            CanSetWinnersNow = isOpen && DateTime.UtcNow >= cutoffUtc
         };
     }
 
     public static List<GameResponseDto> ToGameResponseDtos(this List<Game> games)
-    {
-        return games.Select(g => g.ToGameResponseDto()).ToList();
-    }
+        => games.Select(g => g.ToGameResponseDto()).ToList();
 }
