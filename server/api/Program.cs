@@ -35,7 +35,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Client", p => p
         .WithOrigins(
-            "http://localhost:5173", // Vite dev
+            "http://localhost:5173",
+            "http://localhost:5175",
             "https://deadpigeons-aged-voice-1352.fly.dev" // deployed frontend
         )
         .AllowAnyHeader()

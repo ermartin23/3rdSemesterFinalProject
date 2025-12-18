@@ -44,7 +44,10 @@ export default function PlayerHistory() {
             }));
 
             // Already ordered by backend, but safe:
-            mapped.sort((a, b) => (b.year - a.year) || (b.week - a.week));
+            mapped.sort((a, b) => {
+                const byWeek = (b.year - a.year) || (b.week - a.week);
+                return byWeek !== 0 ? byWeek : (b.price - a.price);
+            });
 
             setHistory(mapped);
         }
