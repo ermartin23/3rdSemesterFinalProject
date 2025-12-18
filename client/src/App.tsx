@@ -1,6 +1,7 @@
 import "./App.css";
 import {createBrowserRouter, type RouteObject, RouterProvider} from "react-router-dom";
-import { baseUrl } from "./core/baseUrl";
+
+
 
 const myRoutes: RouteObject[]
   = [
@@ -18,14 +19,7 @@ function Home() {
     return (
         <>
             <div>home!</div>
-            <button onClick={() => {
-                fetch(baseUrl)
-                    .then(response => {
-                        console.log(response)
-                    }).catch(e => {
-                    console.log(e)
-                })
-            }}>click me!
+            <button>click me!
             </button>
         </>
     )

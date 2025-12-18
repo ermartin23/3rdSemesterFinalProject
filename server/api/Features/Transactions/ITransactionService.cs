@@ -4,7 +4,7 @@ namespace api;
 
 public interface ITransactionService
 {
-    Task<IEnumerable<Transaction>> GetAllAync();
+    Task<IEnumerable<Transaction>> GetAllAsync();
     Task<Transaction> CreatePendingAsync(Guid playerId, int amount, string mobilePayTransactionNumber);
     Task ApproveAsync(Guid transactionId);
     Task RejectAsync(Guid transactionId);
