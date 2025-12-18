@@ -254,9 +254,10 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/Board"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -680,7 +681,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Board"
+                  "$ref": "#/components/schemas/BoardResponse"
                 }
               }
             }
@@ -1531,6 +1532,35 @@
           }
         }
       },
+      "BoardResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "gameId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "playerId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "chosenNumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
       "CreateBoardRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -1550,6 +1580,9 @@
             "type": "string",
             "format": "guid",
             "nullable": true
+          },
+          "repeat": {
+            "type": "boolean"
           }
         }
       },

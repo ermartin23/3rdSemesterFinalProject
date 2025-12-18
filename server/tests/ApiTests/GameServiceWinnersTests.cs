@@ -9,6 +9,8 @@ using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using api.Features.RepeatingBoards;
+
 
 namespace tests.ApiTests;
 
@@ -34,7 +36,7 @@ public class GameServiceWinnersTests
         using var db = CreateDb();
 
         var clock = new FakeClock { UtcNow = CutoffUtc_Expected.AddMinutes(-1) };
-        var svc = new GameService(db, clock);
+        var svc = new GameService(db, clock, new NoopRepeatingBoardService());
 
         var game = new Game
         {
@@ -60,7 +62,7 @@ public class GameServiceWinnersTests
         using var db = CreateDb();
 
         var clock = new FakeClock { UtcNow = CutoffUtc_Expected.AddMinutes(1) };
-        var svc = new GameService(db, clock);
+        var svc = new GameService(db, clock, new NoopRepeatingBoardService());
 
         var game = new Game
         {
@@ -95,7 +97,7 @@ public class GameServiceWinnersTests
         using var db = CreateDb();
 
         var clock = new FakeClock { UtcNow = CutoffUtc_Expected.AddMinutes(1) };
-        var svc = new GameService(db, clock);
+        var svc = new GameService(db, clock, new NoopRepeatingBoardService());
         var passwordService = new PasswordService();
 
         var player = new Player
@@ -169,7 +171,8 @@ public class GameServiceWinnersTests
         using var db = CreateDb();
 
         var clock = new FakeClock { UtcNow = CutoffUtc_Expected.AddMinutes(1) };
-        var svc = new GameService(db, clock);
+        var svc = new GameService(db, clock, new NoopRepeatingBoardService());
+
 
         var game = new Game
         {
@@ -188,4 +191,17 @@ public class GameServiceWinnersTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => svc.SetWinningNumbersAsync(game.Gameid, dto));
     }
+    
+    public class NoopRepeatingBoardService : IRepeatingBoardService
+    {
+        public Task<Board> ToggleRepeatingBoard(Guid playerId, Guid boardId, bool isRepeating)
+            => throw new NotImplementedException();
+
+        public Task GenerateBoardsForNewGame(Game newGame)
+            => Task.CompletedTask;
+
+        public Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
+            => Task.CompletedTask;
+    }
+
 }

@@ -328,7 +328,7 @@ export class RepeatingBoardClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    toggleRepeatingBoard(request: ToggleRepeatingBoardRequest): Promise<Board> {
+    toggleRepeatingBoard(request: ToggleRepeatingBoardRequest): Promise<FileResponse> {
         let url_ = this.baseUrl + "/api/RepeatingBoard/toggle";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -339,7 +339,7 @@ export class RepeatingBoardClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/octet-stream"
             }
         };
 
@@ -348,21 +348,26 @@ export class RepeatingBoardClient {
         });
     }
 
-    protected processToggleRepeatingBoard(response: Response): Promise<Board> {
+    protected processToggleRepeatingBoard(response: Response): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board;
-            return result200;
-            });
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<Board>(null as any);
+        return Promise.resolve<FileResponse>(null as any);
     }
 }
 
@@ -869,7 +874,7 @@ export class BoardClient {
         return Promise.resolve<Board[]>(null as any);
     }
 
-    createBoard(request: CreateBoardRequest): Promise<Board> {
+    createBoard(request: CreateBoardRequest): Promise<BoardResponse> {
         let url_ = this.baseUrl + "/api/boards";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -889,13 +894,13 @@ export class BoardClient {
         });
     }
 
-    protected processCreateBoard(response: Response): Promise<Board> {
+    protected processCreateBoard(response: Response): Promise<BoardResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BoardResponse;
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -903,7 +908,7 @@ export class BoardClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<Board>(null as any);
+        return Promise.resolve<BoardResponse>(null as any);
     }
 
     getBoardById(id: string): Promise<Board> {
@@ -1425,10 +1430,19 @@ export interface WinnerDto {
     numbers?: number[];
 }
 
+export interface BoardResponse {
+    boardId?: string;
+    gameId?: string;
+    playerId?: string;
+    chosenNumbers?: number[];
+    price?: number;
+}
+
 export interface CreateBoardRequest {
     gameId?: string;
     chosenNumbers?: number[];
     repeatingBoardId?: string | undefined;
+    repeat?: boolean;
 }
 
 export interface UpdateBoardRequest {

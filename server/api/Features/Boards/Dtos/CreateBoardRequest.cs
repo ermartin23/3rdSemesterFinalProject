@@ -6,6 +6,8 @@ public class CreateBoardRequest
     public Guid GameId { get; set; }
     public List<int> ChosenNumbers { get; set; } = new();
     public Guid? RepeatingBoardId { get; set; }
+    
+    public bool Repeat  { get; set; }
 }
 
 public record BoardResponse(

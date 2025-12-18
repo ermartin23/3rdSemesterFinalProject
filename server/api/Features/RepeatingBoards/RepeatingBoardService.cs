@@ -16,36 +16,64 @@ public class RepeatingBoardService : IRepeatingBoardService
     }
 
     
-    public async Task<Board> ToggleRepeatingBoard(Guid boardId, bool isRepeating)
+    public async Task<Board> ToggleRepeatingBoard(Guid playerId, Guid boardId, bool isRepeating)
     {
         var board = await _dbContext.Boards
-            .Include(b => b.Repeatingboard)
-            .FirstOrDefaultAsync(b => b.Boardid == boardId);
+            .FirstOrDefaultAsync(b => b.Boardid == boardId && !b.Isdeleted);
 
         if (board == null)
             throw new ArgumentException("Board not found");
+        if (board.Playerid != playerId)
+            throw new UnauthorizedAccessException("Not your board!");
 
-        if (board.Repeatingboard == null)
+        if (isRepeating)
         {
-            var repeatingBoard = new Repeatingboard
-            {
-                Repeatingboardid = Guid.NewGuid(),
-                Playerid = board.Playerid,
-                Isrepeating = isRepeating
-            };
-            _dbContext.Repeatingboards.Add(repeatingBoard);
+            // Find or create the repeatingboard record for this player
+            var rb = await _dbContext.Repeatingboards
+                .FirstOrDefaultAsync(r => r.Playerid == playerId && !r.Isdeleted);
 
-            board.Repeatingboardid = repeatingBoard.Repeatingboardid;
-            board.Repeatingboard = repeatingBoard;
+            if (rb == null)
+            {
+                rb = new Repeatingboard
+                {
+                    Repeatingboardid = Guid.NewGuid(),
+                    Playerid = playerId,
+                    Isrepeating = true,
+                    Isdeleted = false,
+                    Deletedat = null
+                };
+                _dbContext.Repeatingboards.Add(rb);
+            }
+            else
+            {
+                rb.Isrepeating = true;
+            }
+            
+            board.Repeatingboardid = rb.Repeatingboardid;
         }
         else
         {
-            board.Repeatingboard.Isrepeating = isRepeating;
+            board.Repeatingboardid = null;
+
+            var rb = await _dbContext.Repeatingboards
+                .FirstOrDefaultAsync(r => r.Playerid == playerId && !r.Isdeleted);
+
+            if (rb != null)
+            {
+                var anyLinkedBoards = await _dbContext.Boards.AnyAsync(b =>
+                    !b.Isdeleted &&
+                    b.Playerid == playerId &&
+                    b.Repeatingboardid == rb.Repeatingboardid);
+
+                if (!anyLinkedBoards)
+                    rb.Isrepeating = false;
+            }
         }
 
         await _dbContext.SaveChangesAsync();
         return board;
     }
+
 
     
     public async Task GenerateBoardsForNewGame(Game newGame)
@@ -54,54 +82,41 @@ public class RepeatingBoardService : IRepeatingBoardService
             .Where(rb => rb.Isrepeating && !rb.Isdeleted)
             .Include(rb => rb.Player)
             .Include(rb => rb.Boards)
+            .ThenInclude(b => b.Game)
             .ToListAsync();
 
         foreach (var rb in repeatingBoards)
         {
             
-            bool exists = await _dbContext.Boards
-                .AnyAsync(b => b.Repeatingboardid == rb.Repeatingboardid && b.Gameid == newGame.Gameid);
+            bool exists = await _dbContext.Boards.AnyAsync(b => 
+                !b.Isdeleted && 
+                b.Repeatingboardid == rb.Repeatingboardid && 
+                b.Gameid == newGame.Gameid);
             if (exists) continue;
-            
-            var lastBoard = rb.Boards.OrderByDescending(b => b.Boardid).FirstOrDefault();
-            if (lastBoard == null) continue;
 
-            int price = lastBoard.Chosennumbers.Count switch
-            {
-                5 => 20,
-                6 => 40,
-                7 => 80,
-                8 => 160,
-                _ => throw new ArgumentException("Invalid number of chosen numbers")
-            };
+            var template = rb.Boards
+                .Where(b => !b.Isdeleted)
+                .OrderByDescending(b => b.Game.Weekidentity)
+                .FirstOrDefault();
+            if (template == null) continue;
 
             var balance = await _transactionService.GetBalanceAsync(rb.Playerid);
-            if (balance < price)
+            if (balance < template.Price)
             {
                 continue;
             }
-
-            var transaction = new Transaction
-            {
-                Transactionid = Guid.NewGuid(),
-                Playerid = rb.Playerid,
-                Amount = -price,
-                Createdat = DateTime.Now
-            };
-            _dbContext.Transactions.Add(transaction);
-
+            
             var newBoard = new Board
             {
                 Boardid = Guid.NewGuid(),
                 Playerid = rb.Playerid,
                 Gameid = newGame.Gameid,
-                Chosennumbers = lastBoard.Chosennumbers,
+                Chosennumbers = template.Chosennumbers,
+                Price = template.Price,
                 Iswinningboard = false,
-                Price = price,
-                Repeatingboardid = rb.Repeatingboardid,
-                Player = rb.Player,
-                Repeatingboard = rb,
-                Game = newGame
+                Isdeleted = false,
+                Deletedat = null,
+                Repeatingboardid = rb.Repeatingboardid
             };
 
             _dbContext.Boards.Add(newBoard);
@@ -109,4 +124,17 @@ public class RepeatingBoardService : IRepeatingBoardService
 
         await _dbContext.SaveChangesAsync();
     }
+    
+    public async Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
+    {
+        var rb = await _dbContext.Repeatingboards
+            .FirstOrDefaultAsync(r => r.Playerid == playerId && !r.Isdeleted);
+
+        if (rb == null)
+            return;
+
+        rb.Isrepeating = isRepeating;
+        await _dbContext.SaveChangesAsync();
+    }
+
 }

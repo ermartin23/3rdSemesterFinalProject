@@ -7,6 +7,8 @@ using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using api.Features.RepeatingBoards;
+
 
 namespace tests.ApiTests;
 
@@ -184,6 +186,20 @@ public class GameServiceTests
     private static (GameService svc, FakeClock clock) CreateService(MyDbContext db, DateTime? nowUtc = null)
     {
         var clock = new FakeClock { UtcNow = nowUtc ?? DateTime.UtcNow };
-        return (new GameService(db, clock), clock);
+        var repeating = new NoopRepeatingBoardService();
+        return (new GameService(db, clock, repeating), clock);
     }
+    
+    public class NoopRepeatingBoardService : IRepeatingBoardService
+    {
+        public Task<Board> ToggleRepeatingBoard(Guid playerId, Guid boardId, bool isRepeating)
+            => throw new NotImplementedException();
+
+        public Task GenerateBoardsForNewGame(Game newGame)
+            => Task.CompletedTask;
+
+        public Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
+            => Task.CompletedTask;
+    }
+
 }

@@ -5,6 +5,8 @@ using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using api.Helpers.Time;
+using api.Features.RepeatingBoards;
+
 
 namespace api.Features.Games;
 
@@ -12,11 +14,14 @@ public class GameService : IGameService
 {
     private readonly MyDbContext _db;
     private readonly IClock _clock;
+    private readonly IRepeatingBoardService _repeatingBoardService;
 
-    public GameService(MyDbContext db, IClock clock)
+
+    public GameService(MyDbContext db, IClock clock, IRepeatingBoardService repeatingBoardService)
     {
         _db = db;
         _clock = clock;
+        _repeatingBoardService = repeatingBoardService;
     }
 
     public async Task<List<GameResponseDto>> GetAllAsync()
@@ -140,6 +145,8 @@ public class GameService : IGameService
 
         _db.Games.Add(newGame);
         await _db.SaveChangesAsync();
+
+        await _repeatingBoardService.GenerateBoardsForNewGame(newGame);
     }
     
     
