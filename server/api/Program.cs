@@ -37,6 +37,7 @@ builder.Services.AddCors(options =>
         .WithOrigins(
             "http://localhost:5173",
             "http://localhost:5175",
+            "http://localhost:5176",
             "https://deadpigeons-aged-voice-1352.fly.dev" // deployed frontend
         )
         .AllowAnyHeader()
