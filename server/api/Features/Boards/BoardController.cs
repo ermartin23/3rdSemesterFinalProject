@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using api.Features.Boards.Dtos;
+using api.Features.RepeatingBoards;
 using dataaccess.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,12 @@ namespace api.Features.Boards;
 public class BoardController : ControllerBase
 {
     private readonly IBoardService _boardService;
+    private readonly IRepeatingBoardService _repeatingBoardService;
 
-    public BoardController(IBoardService boardService)
+    public BoardController(IBoardService boardService, IRepeatingBoardService repeatingBoardService)
     {
         _boardService = boardService;
+        _repeatingBoardService = repeatingBoardService;
     }
 
     [Authorize(Roles="Admin")]
@@ -53,12 +56,18 @@ public class BoardController : ControllerBase
 
     [Authorize(Roles="Player")]
     [HttpPost]
-    public async Task<ActionResult<Board>> CreateBoard([FromBody] CreateBoardRequest request)
+    public async Task<ActionResult<BoardResponse>> CreateBoard([FromBody] CreateBoardRequest request)
     {
         try
         {
             var playerId = GetUserIdOrThrow();
             var board = await _boardService.CreateBoardAsync(playerId, request);
+            
+            if (request.Repeat)
+            {
+                await _repeatingBoardService.ToggleRepeatingBoard(playerId, board.Boardid, true);
+            }
+            
             var response = new BoardResponse(
                 board.Boardid,
                 board.Gameid,
@@ -137,11 +146,12 @@ public class BoardController : ControllerBase
                 year,
                 b.Chosennumbers,
                 b.Price,
-                b.Repeatingboardid
+                (b.Repeatingboard != null && b.Repeatingboard.Isrepeating)
+                ? b.Repeatingboardid
+                : null
             );
         }).ToList();
 
         return Ok(response);
     }
-
 }

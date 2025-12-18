@@ -6,6 +6,8 @@ using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using api.Features.RepeatingBoards;
+
 
 namespace tests.ApiTests;
 
@@ -33,8 +35,7 @@ public class GameServiceCutoffTests
 
         var db = CreateDb();
         var clock = new FakeClock { UtcNow = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) };
-        var service = new GameService(db, clock);
-
+        var service = new GameService(db, clock, new NoopRepeatingBoardService());
 
         // Act
         var result = await service.CreateAsync(dto);
@@ -47,4 +48,17 @@ public class GameServiceCutoffTests
 
         Assert.Equal(expectedCutoff, result.Cutofftime);
     }
+    
+    public class NoopRepeatingBoardService : IRepeatingBoardService
+    {
+        public Task<Board> ToggleRepeatingBoard(Guid playerId, Guid boardId, bool isRepeating)
+            => throw new NotImplementedException();
+
+        public Task GenerateBoardsForNewGame(Game newGame)
+            => Task.CompletedTask;
+
+        public Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
+            => Task.CompletedTask;
+    }
+
 }

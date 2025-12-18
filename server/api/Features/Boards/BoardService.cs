@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using api.Features.Boards.Dtos;
+using api.Features.RepeatingBoards;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,13 @@ public class BoardService : IBoardService
 {
     private readonly MyDbContext _dbContext;
     private readonly ITransactionService _transactionService;
+    private readonly IRepeatingBoardService _repeatingBoardService;
 
-    public BoardService(MyDbContext dbContext, ITransactionService transactionService)
+    public BoardService(MyDbContext dbContext, ITransactionService transactionService, IRepeatingBoardService repeatingBoardService)
     {
         _dbContext = dbContext;
         _transactionService = transactionService;
+        _repeatingBoardService = repeatingBoardService;
     }
 
     private int CalculateBoardPrice(int numberCount)
@@ -56,11 +59,12 @@ public class BoardService : IBoardService
             .Include(b => b.Repeatingboard)
             .FirstOrDefaultAsync(b => b.Boardid == boardId && b.Playerid == playerId && !b.Isdeleted);
     }
+
     public async Task<Board> CreateBoardAsync(Guid playerId, CreateBoardRequest request)
     {
         return await CreateBoardAsync(playerId, request.GameId, request.ChosenNumbers, request.RepeatingBoardId);
     }
-    
+
     public async Task<Board> CreateBoardAsync(Guid playerId, Guid gameId, List<int> chosenNumbers, Guid? repeatingBoardId = null)
     {
         var player = await _dbContext.Players.FirstOrDefaultAsync(p => p.Playerid == playerId);
@@ -73,7 +77,7 @@ public class BoardService : IBoardService
         {
             throw new InvalidOperationException("Player is not active!");
         }
-        
+
         var gameExists = await _dbContext.Games.AnyAsync(g => g.Gameid == gameId && !g.Isdeleted);
         if (!gameExists) throw new ArgumentException("Game does not exist.");
 
@@ -87,7 +91,7 @@ public class BoardService : IBoardService
         {
             Boardid = Guid.NewGuid(),
             Playerid = playerId,
-            Gameid = gameId,                
+            Gameid = gameId,
             Chosennumbers = chosenNumbers,
             Price = price,
             Repeatingboardid = repeatingBoardId,
@@ -101,9 +105,9 @@ public class BoardService : IBoardService
 
         return board;
     }
-    
+
     //It's complicated if you have time implement it, probably you will not need it
-    
+
     public async Task<Board?> UpdateBoard(Guid id, UpdateBoardRequest request)
     {
         var board = await _dbContext.Boards.FindAsync(id);
@@ -148,14 +152,15 @@ public class BoardService : IBoardService
         await _dbContext.SaveChangesAsync();
         return true;
     }
-    
+
     public async Task<List<Board>> GetBoardsForPlayerAsync(Guid playerId)
     {
         return await _dbContext.Boards
             .Where(b => b.Playerid == playerId && !b.Isdeleted)
-            .Include(b => b.Game)                 // needed for Weekidentity
+            .Include(b => b.Game)
+            .Include(b => b.Repeatingboard)
             .OrderByDescending(b => b.Game.Weekidentity)
-            .ThenByDescending(b => b.Boardid)     // stable ordering (since Board has no CreatedAt)
+            .ThenByDescending(b => b.Boardid) 
             .ToListAsync();
     }
 }

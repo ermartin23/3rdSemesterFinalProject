@@ -51,6 +51,34 @@ export default function PlayerHistory() {
 
         loadHistory();
     }, []);
+    async function stopRepeating(boardId: string) {
+        const ok = window.confirm(
+            "Are you sure you want to stop repeating this board? It cannot be undone."
+        );
+        if (!ok) return;
+
+        const token = localStorage.getItem("token");
+        const API_BASE = import.meta.env.VITE_API_URL;
+
+        const res = await fetch(`${API_BASE}/api/repeatingboard/toggle`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ boardId, isRepeating: false }),
+        });
+
+        if (!res.ok) {
+            alert(await res.text());
+            return;
+        }
+
+        setHistory(prev =>
+            prev.map(b => (b.boardId === boardId ? { ...b, repeatingBoardId: null } : b))
+        );
+    }
+
 
 
 
@@ -76,12 +104,18 @@ export default function PlayerHistory() {
                                     Numbers played: {board.numbers.join(", ")}
                                 </p>
                                 {board.repeatingBoardId && (
-                                    <p className="text-xs text-grey-500 mt-1">
-                                    Repeating Board
-                                    </p>
+                                    <div className="mt-2 flex items-center gap-3">
+                                        <span className="inline-block px-3 py-1 text-xs font-semibold text-red-600 bg-red-100 rounded-full">
+                                        Repeating every week
+                                        </span>
+                                        <button
+                                            className="text-xs font-semibold text-red-600 hover:text-red-700 underline"
+                                            onClick={() => stopRepeating(board.boardId)}>
+                                            Stop repeating
+                                        </button>
+                                    </div>
                                 )}
                             </div>
-
                             <p className="text-black font-bold text-lg">
                                 {board.price} DKK
                             </p>

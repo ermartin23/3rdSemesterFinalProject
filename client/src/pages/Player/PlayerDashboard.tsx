@@ -17,6 +17,8 @@ export default function PlayerDashboard() {
     const [currentWeek, setCurrentWeek] = useState<number>(0);
     const [lastBoard, setLastBoard] = useState<PlayedBoard | null>(null);
     const [currentGameId, setCurrentGameId] = useState<string | null>(null);
+    const [repeatEnabled, setRepeatEnabled] = useState(false);
+
 
 
     useEffect(() => {
@@ -120,7 +122,8 @@ export default function PlayerDashboard() {
                 },
                 body: JSON.stringify({
                     gameId: currentGameId, // ← MUST come from backend
-                    chosenNumbers: selectedNumbers
+                    chosenNumbers: selectedNumbers,
+                    repeat: repeatEnabled,
                 }),
             });
 
@@ -130,11 +133,13 @@ export default function PlayerDashboard() {
             }
 
             const board = await res.json();
+            
             setLastBoard({
                 week: currentWeek,
                 numbers: board.chosenNumbers,
                 price: board.price,
             });
+            setRepeatEnabled(false);
 
             // refresh balance from backend
             const balRes = await fetch(`${API_BASE}/api/Transaction/player/balance`, {
@@ -148,8 +153,7 @@ export default function PlayerDashboard() {
             alert(err.message);
         }
     }
-
-
+    
     if (!email) return null;
 
     return (
@@ -170,7 +174,7 @@ export default function PlayerDashboard() {
 
             {/* NUMBER GRID */}
             <div className="text-black grid grid-cols-4 gap-4 max-w-xl mx-auto mt-8">
-                {Array.from({ length: 16 }, (_, i) => i + 1).map((num) => {
+                {Array.from({length: 16}, (_, i) => i + 1).map((num) => {
                     const isSelected = selectedNumbers.includes(num);
                     return (
                         <button
@@ -220,6 +224,28 @@ export default function PlayerDashboard() {
                     </p>
                 )}
             </div>
+
+            <div className="mt-6 flex justify-center">
+                <label
+                    className="flex items-center gap-4 bg-white px-6 py-4 rounded-xl shadow-md border border-red-200 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={repeatEnabled}
+                        onChange={(e) => setRepeatEnabled(e.target.checked)}
+                        className="toggle toggle-lg toggle-error"
+                    />
+
+                    <div className="text-left">
+                        <p className="font-semibold text-gray-800">
+                            Auto-repeat this board
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            Replays the same numbers every week until stopped or balance runs out
+                        </p>
+                    </div>
+                </label>
+            </div>
+
 
             <div className="text-center mt-4">
                 <button
