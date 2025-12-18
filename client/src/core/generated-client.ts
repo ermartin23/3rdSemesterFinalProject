@@ -1313,6 +1313,8 @@ export interface GameResponseDto {
     cutofftime?: string;
     winningnumbers?: number[] | undefined;
     isOpen?: boolean;
+    cutoffUtc?: string;
+    canSetWinnersNow?: boolean;
 }
 
 export interface GameCreateRequestDto {

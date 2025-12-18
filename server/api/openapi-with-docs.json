@@ -1330,6 +1330,13 @@
           },
           "isOpen": {
             "type": "boolean"
+          },
+          "cutoffUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canSetWinnersNow": {
+            "type": "boolean"
           }
         }
       },

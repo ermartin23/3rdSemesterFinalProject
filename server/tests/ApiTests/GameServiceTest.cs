@@ -30,7 +30,7 @@ public class GameServiceTests
     {
         // Arrange
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameCreateRequestDto
         {
@@ -54,7 +54,7 @@ public class GameServiceTests
     {
         // Arrange
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameCreateRequestDto
         {
@@ -84,7 +84,7 @@ public class GameServiceTests
 
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameCreateRequestDto
         {
@@ -115,7 +115,7 @@ public class GameServiceTests
         db.Games.Add(game);
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameSetWinnersDto
         {
@@ -138,7 +138,7 @@ public class GameServiceTests
     {
         // Arrange
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameSetWinnersDto
         {
@@ -170,7 +170,7 @@ public class GameServiceTests
         db.Games.Add(game);
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameSetWinnersDto
         {
@@ -180,5 +180,11 @@ public class GameServiceTests
         // Act + Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => 
             service.SetWinningNumbersAsync(game.Gameid, dto));
+    }
+    
+    private static (GameService svc, FakeClock clock) CreateService(MyDbContext db, DateTime? nowUtc = null)
+    {
+        var clock = new FakeClock { UtcNow = nowUtc ?? DateTime.UtcNow };
+        return (new GameService(db, clock), clock);
     }
 }

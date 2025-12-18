@@ -32,7 +32,9 @@ public class GameServiceCutoffTests
         };
 
         var db = CreateDb();
-        var service = new GameService(db);
+        var clock = new FakeClock { UtcNow = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) };
+        var service = new GameService(db, clock);
+
 
         // Act
         var result = await service.CreateAsync(dto);
