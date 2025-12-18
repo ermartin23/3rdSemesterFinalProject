@@ -13,7 +13,7 @@ public class TransactionService : ITransactionService
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<Transaction>> GetAllAync()
+    public async Task<IEnumerable<Transaction>> GetAllAsync()
     {
         return await _dbContext.Transactions
             .Include(t => t.Player)
