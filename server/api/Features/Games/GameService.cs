@@ -13,7 +13,7 @@ public class GameService : IGameService
     private readonly MyDbContext _db;
     private readonly IClock _clock;
 
-    public GameService(MyDbContext db)
+    public GameService(MyDbContext db, IClock clock)
     {
         _db = db;
         _clock = clock;
@@ -229,7 +229,7 @@ public class GameService : IGameService
 
         return TimeZoneInfo.ConvertTimeToUtc(cutoffDk, dk);
     }
-}
+    
     public async Task<WinnerDto?> GetLatestWinningNumbersAsync()
     {
         var game = await _db.Games
