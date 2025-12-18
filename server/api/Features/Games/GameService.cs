@@ -140,7 +140,7 @@ public class GameService : IGameService
     }
     
     
-    // Jeg er Emre  this is my sttufff 
+    // Winning Board 
     private static bool IsWinningBoard(Board board, Game game)
     {
         if (game.Winningnumbers == null || game.Winningnumbers.Count != 3)
