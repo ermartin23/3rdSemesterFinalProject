@@ -1,4 +1,5 @@
-﻿using api.Features.Boards.Dtos;
+﻿using System.Security.Claims;
+using api.Features.Boards.Dtos;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -62,7 +63,17 @@ public class BoardService : IBoardService
     
     public async Task<Board> CreateBoardAsync(Guid playerId, Guid gameId, List<int> chosenNumbers, Guid? repeatingBoardId = null)
     {
-        // validate game exists )
+        var player = await _dbContext.Players.FirstOrDefaultAsync(p => p.Playerid == playerId);
+        if (player == null)
+        {
+            throw new InvalidOperationException("Player not found!");
+        }
+
+        if (!player.Active)
+        {
+            throw new InvalidOperationException("Player is not active!");
+        }
+        
         var gameExists = await _dbContext.Games.AnyAsync(g => g.Gameid == gameId && !g.Isdeleted);
         if (!gameExists) throw new ArgumentException("Game does not exist.");
 
@@ -136,5 +147,15 @@ public class BoardService : IBoardService
         board.Deletedat = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync();
         return true;
+    }
+    
+    public async Task<List<Board>> GetBoardsForPlayerAsync(Guid playerId)
+    {
+        return await _dbContext.Boards
+            .Where(b => b.Playerid == playerId && !b.Isdeleted)
+            .Include(b => b.Game)                 // needed for Weekidentity
+            .OrderByDescending(b => b.Game.Weekidentity)
+            .ThenByDescending(b => b.Boardid)     // stable ordering (since Board has no CreatedAt)
+            .ToListAsync();
     }
 }

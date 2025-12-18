@@ -1,4 +1,7 @@
-﻿using api.Features.Games;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using api.Features.Games;
 using api.Features.Games.Dtos;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
@@ -27,7 +30,7 @@ public class GameServiceTests
     public async Task CreateAsync_ShouldCreateGame_WhenValidSundayAndNoActiveGame()
     {
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameCreateRequestDto
         {
@@ -45,7 +48,7 @@ public class GameServiceTests
     public async Task CreateAsync_ShouldThrow_WhenWeekidentityIsNotSunday()
     {
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameCreateRequestDto
         {
@@ -71,7 +74,7 @@ public class GameServiceTests
 
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameCreateRequestDto
         {
@@ -98,12 +101,12 @@ public class GameServiceTests
 
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, _) = CreateService(db);
 
         var result = await service.GetAllAsync();
 
         Assert.Equal(2, result.Count);
-        Assert.True(result[0].Weekidentity >= result[1].Weekidentity);
+        Assert.True(result[0].Weekidentity.CompareTo(result[1].Weekidentity) >= 0);
     }
 
     // -------------------------
@@ -124,7 +127,7 @@ public class GameServiceTests
         db.Games.Add(game);
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var result = await service.GetByIdAsync(game.Gameid);
 
@@ -136,7 +139,7 @@ public class GameServiceTests
     public async Task GetByIdAsync_ShouldReturnNull_WhenNotExists()
     {
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, _) = CreateService(db);
 
         var result = await service.GetByIdAsync(Guid.NewGuid());
 
@@ -147,7 +150,7 @@ public class GameServiceTests
     public async Task SetWinningNumbers_ShouldThrow_WhenGameNotFound()
     {
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameSetWinnersDto
         {
@@ -167,7 +170,7 @@ public class GameServiceTests
         db.Games.Add(game);
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, clock) = CreateService(db);
 
         var dto = new GameSetWinnersDto
         {
@@ -177,4 +180,10 @@ public class GameServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.SetWinningNumbersAsync(game.Gameid, dto));
     }
+    
+    private static (GameService svc, FakeClock clock) CreateService(MyDbContext db, DateTime? nowUtc = null)
+    {
+        var clock = new FakeClock { UtcNow = nowUtc ?? DateTime.UtcNow };
+        return (new GameService(db, clock), clock);
     }
+}

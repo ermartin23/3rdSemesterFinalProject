@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using api.Features.Boards.Dtos;
 using dataaccess.Entities;
@@ -58,7 +59,14 @@ public class BoardController : ControllerBase
         {
             var playerId = GetUserIdOrThrow();
             var board = await _boardService.CreateBoardAsync(playerId, request);
-            return Ok(board);
+            var response = new BoardResponse(
+                board.Boardid,
+                board.Gameid,
+                board.Playerid,
+                board.Chosennumbers,
+                board.Price
+            );
+            return Ok(response);
         }
         catch (InvalidOperationException e)
         {
@@ -101,10 +109,39 @@ public class BoardController : ControllerBase
     
     private Guid GetUserIdOrThrow()
     {
-        var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(sub))
             throw new UnauthorizedAccessException("Missing sub claim");
 
         return Guid.Parse(sub);
     }
+    
+    [Authorize(Roles = "Player")]
+    [HttpGet("me")]
+    public async Task<ActionResult<List<BoardHistoryResponse>>> GetMyBoards()
+    {
+        var playerId = GetUserIdOrThrow();
+        var boards = await _boardService.GetBoardsForPlayerAsync(playerId);
+
+        var response = boards.Select(b =>
+        {
+            var weekDate = b.Game.Weekidentity; // best source of "week"
+            var week = ISOWeek.GetWeekOfYear(weekDate);
+            var year = ISOWeek.GetYear(weekDate);
+
+            return new BoardHistoryResponse(
+                b.Boardid,
+                b.Gameid,
+                weekDate,
+                week,
+                year,
+                b.Chosennumbers,
+                b.Price,
+                b.Repeatingboardid
+            );
+        }).ToList();
+
+        return Ok(response);
+    }
+
 }

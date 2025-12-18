@@ -75,7 +75,7 @@ public class GameController : ControllerBase
         }
     }
     
-    
+    [Authorize(Roles="Admin")]
     [HttpGet("{id:guid}/details")]
     public async Task<ActionResult<GameDetailsResponseDto>> GetDetails(Guid id)
     {

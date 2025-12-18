@@ -4,16 +4,19 @@ using api.Features.Games.Mappings;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
+using api.Helpers.Time;
 
 namespace api.Features.Games;
 
 public class GameService : IGameService
 {
     private readonly MyDbContext _db;
+    private readonly IClock _clock;
 
-    public GameService(MyDbContext db)
+    public GameService(MyDbContext db, IClock clock)
     {
         _db = db;
+        _clock = clock;
     }
 
     public async Task<List<GameResponseDto>> GetAllAsync()
@@ -64,7 +67,7 @@ public class GameService : IGameService
         {
             Gameid = Guid.NewGuid(),
             Weekidentity = weekUtc,
-            Createdat = DateTime.UtcNow,
+            Createdat = _clock.UtcNow,
             Cutofftime = cutoff,
             Winningnumbers = null
         };
@@ -84,6 +87,11 @@ public class GameService : IGameService
 
         if (game == null)
             throw new KeyNotFoundException($"Game {id} not found.");
+
+        var cutoffUtc = GetCutoffUtcFromWeekSundayUtc(game.Weekidentity);
+
+        if (_clock.UtcNow < cutoffUtc)
+            throw new InvalidOperationException("You can only set winning numbers after Saturday 17:00 (DK time).");
 
         if (game.Winningnumbers != null)
             throw new InvalidOperationException("Winning numbers already set.");
@@ -113,24 +121,19 @@ public class GameService : IGameService
 
     private async Task CreateNextWeeklyGameAsync(DateTime previousWeekSundayUtc)
     {
-        var dk = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
+        var nextWeekSundayUtc = previousWeekSundayUtc.AddDays(7);
 
-        var previousWeekDk = TimeZoneInfo.ConvertTimeFromUtc(previousWeekSundayUtc, dk);
+        var alreadyExists = await _db.Games.AnyAsync(g => g.Weekidentity == nextWeekSundayUtc && !g.Isdeleted);
+        if (alreadyExists) return;
 
-        var nextSundayDk = previousWeekDk.AddDays(7).Date.AddHours(9);
-
-        var nextSundayUtc = TimeZoneInfo.ConvertTimeToUtc(nextSundayDk, dk);
-
-        var nextSaturdayDk = nextSundayDk.AddDays(-1).Date.AddHours(17);
-        var nextSaturdayUtc = TimeZoneInfo.ConvertTimeToUtc(nextSaturdayDk, dk);
-
-        var cutoff = TimeOnly.FromDateTime(nextSaturdayUtc);
+        var cutoffUtc = GetCutoffUtcFromWeekSundayUtc(nextWeekSundayUtc);
+        var cutoff = TimeOnly.FromDateTime(cutoffUtc);
 
         var newGame = new Game
         {
             Gameid = Guid.NewGuid(),
-            Weekidentity = nextSundayUtc,
-            Createdat = DateTime.UtcNow,
+            Weekidentity = nextWeekSundayUtc,
+            Createdat = _clock.UtcNow,
             Cutofftime = cutoff,
             Winningnumbers = null
         };
@@ -215,6 +218,18 @@ public class GameService : IGameService
         };
     }
 
+    private static DateTime GetCutoffUtcFromWeekSundayUtc(DateTime weekSundayUtc)
+    {
+        var dk = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
+
+        var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekSundayUtc, dk);
+        
+        // Saturday 17:00 DK (one day before Sunday)
+        var cutoffDk = weekDk.AddDays(-1).Date.AddHours(17);
+
+        return TimeZoneInfo.ConvertTimeToUtc(cutoffDk, dk);
+    }
+    
     public async Task<WinnerDto?> GetLatestWinningNumbersAsync()
     {
         var game = await _db.Games
