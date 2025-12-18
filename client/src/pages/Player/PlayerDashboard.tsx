@@ -10,6 +10,7 @@ interface PlayedBoard {
 
 export default function PlayerDashboard() {
     const navigate = useNavigate();
+    const API_BASE = import.meta.env.VITE_API_URL;
 
     const [email, setEmail] = useState<string | null>(null);
     const [balance, setBalance] = useState<number>(0);
@@ -30,17 +31,25 @@ export default function PlayerDashboard() {
 
         setEmail(savedEmail);
 
-        const perUser = localStorage.getItem(`${savedEmail}_balance`);
-        const global = localStorage.getItem("playerBalance");
-
-        const finalBalance =
-            perUser !== null
-                ? Number(perUser)
-                : global !== null
-                    ? Number(global)
-                    : 200;
-
-        setBalance(finalBalance);
+        async function loadBalance() {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API_BASE}/api/Transaction/player/balance`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                
+                if (!res.ok) throw new Error("Failed to load balance");
+                
+                const balance = await res.json();
+                setBalance(balance);
+            } catch (error) {
+                console.error("Balance fetch failed", error);
+            }
+        }
+        
+        loadBalance();
 
         if (savedBoard) {
             setLastBoard(JSON.parse(savedBoard));

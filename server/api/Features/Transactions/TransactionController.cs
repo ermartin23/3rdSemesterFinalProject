@@ -34,6 +34,7 @@ public class TransactionController : ControllerBase
                 transactionId = t.Transactionid,
                 playerId = t.Playerid,
                 playerEmail = t.Player.Email,
+                playerName = t.Player.Name,
                 amount = t.Amount,
                 mobilePayTransactionNumber = t.Mobilepaytransactionnumber,
                 status = t.Status,
@@ -42,6 +43,14 @@ public class TransactionController : ControllerBase
             .ToListAsync();
         
         return Ok(transactions);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/player/{playerId:guid}/balance")]
+    public async Task<ActionResult<decimal>> GetPlayerBalance([FromRoute] Guid playerId)
+    {
+        var balance = await _transactionService.GetBalanceAsync(playerId);
+        return Ok(balance);
     }
     
     //Player gets their own!!! balance
@@ -65,6 +74,28 @@ public class TransactionController : ControllerBase
         return Ok(transaction);
     }
 
+    [Authorize(Roles = "Player")]
+    [HttpGet("player/transactions")]
+    public async Task<ActionResult> GetMyTransactions()
+    {
+        var playerId = GetUserIdOrThrow();
+        
+        var tx = await _myDbContext.Transactions
+            .AsNoTracking()
+            .Where(t => t.Playerid == playerId)
+            .OrderByDescending(t => t.Createdat)
+            .Select(t => new
+            {
+                transactionId = t.Transactionid,
+                amount = t.Amount,
+                mobilepaytransactionnumber = t.Mobilepaytransactionnumber,
+                status = t.Status,
+                createdat = t.Createdat
+            })
+            .ToListAsync();
+        return Ok(tx);
+    }
+    
     [Authorize(Roles = "Player")]
     [HttpPost("player/createtransaction")]
     public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionDto dto)

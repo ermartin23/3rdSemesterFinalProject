@@ -12,11 +12,10 @@ interface Player {
     email: string;
     phone: string;
     active: boolean;
-    balance?: number;
 }
 
 export default function PlayersTab() {
-    
+    const API_BASE = import.meta.env.VITE_API_URL;
 
     const [players, setPlayers] = useState<Player[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -25,6 +24,7 @@ export default function PlayersTab() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [password, setPassword] = useState("");
+    const [balances, setBalances] = useState<Record<string, number>>({});
 
 
     useEffect(() => {
@@ -35,6 +35,14 @@ export default function PlayersTab() {
                 setPlayers([]);
             });
     }, []);
+
+    useEffect(() => {
+        if (players.length === 0) return;
+        
+        players.forEach((player) => {
+            loadBalanceForPlayer(player.playerId).catch(console.error);
+        });
+    }, [players]);
 
     // ADD PLAYER
     async function handleAddPlayer(e: React.FormEvent) {
@@ -98,6 +106,15 @@ export default function PlayersTab() {
         }
     }
 
+    async function loadBalanceForPlayer(playerId: string) {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/api/Transaction/admin/player/${playerId}/balance`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to load balance");
+        const b = await res.json();
+        setBalances(prev => ({ ...prev, [playerId]: b }));
+    }
 
     return (
         <div className="max-w-4xl mx-auto mt-10">
@@ -126,7 +143,7 @@ export default function PlayersTab() {
                                     <strong>{player.name}</strong>
                                     <p>{player.email}</p>
                                     <p>{player.phone}</p>
-                                    <p>Balance: {player.balance ?? 0} DKK</p>
+                                    <p>Balance: {balances[player.playerId] ?? "-"} DKK</p>
                                     <span
                                         className={`inline-block mt-2 px-2 py-1 text-xs rounded ${
                                             player.active
