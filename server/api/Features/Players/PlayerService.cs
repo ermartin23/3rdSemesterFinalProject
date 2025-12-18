@@ -57,7 +57,7 @@ public class PlayerService : IPlayerService
             Email = dto.Email.Trim().ToLowerInvariant(),
             // Password = dto.Password.Trim(), // TODO later: hash this, don’t keep raw
             Password = _passwords.Hash(dto.Password.Trim()),
-            Active = false, // default inactive
+            Active = dto.Active, // default inactive
             Createdat = now,
             Updatedat = now,
             Isdeleted = false,
@@ -89,6 +89,8 @@ public class PlayerService : IPlayerService
         player.Name = dto.Name.Trim();
         player.Phone = dto.Phone.Trim();
         player.Email = dto.Email.Trim().ToLowerInvariant();
+        player.Active = dto.Active;
+
 
         if (!string.IsNullOrWhiteSpace(dto.Password))
             player.Password = _passwords.Hash(dto.Password.Trim());

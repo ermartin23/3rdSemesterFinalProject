@@ -1295,6 +1295,7 @@ export interface PlayerCreateRequestDto {
     phone: string;
     email: string;
     password: string;
+    active?: boolean;
 }
 
 export interface PlayerUpdateRequestDto {
@@ -1302,6 +1303,7 @@ export interface PlayerUpdateRequestDto {
     phone: string;
     email: string;
     password?: string | undefined;
+    active?: boolean;
 }
 
 export interface GameResponseDto {

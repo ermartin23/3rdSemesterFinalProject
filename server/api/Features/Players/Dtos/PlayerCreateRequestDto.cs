@@ -16,6 +16,8 @@ public class PlayerCreateRequestDto
     [Required, MinLength(6), MaxLength(200)]
     public string Password { get; set; } = null!;
     
+    public bool Active { get; set; }
+    
 }
 
 public class PlayerUpdateRequestDto
@@ -35,6 +37,8 @@ public class PlayerUpdateRequestDto
     
     [MinLength(6), MaxLength(200)]
     public string? Password { get; set; }
+    
+    public bool Active { get; set; }
 }
 
 public class PlayerResponseDto
