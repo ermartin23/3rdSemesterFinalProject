@@ -318,7 +318,7 @@ export default function TransactionsTab() {
                                         )
                                     }
                                     disabled={historyPage === 1}
-                                    className="btn btn-sm disabled:opacity-50"
+                                    className="btn btn-sm text-black disabled:opacity-50"
                                 >
                                     Previous
                                 </button>
@@ -334,7 +334,7 @@ export default function TransactionsTab() {
                                     disabled={
                                         historyPage === totalHistoryPages
                                     }
-                                    className="btn btn-sm disabled:opacity-50"
+                                    className="btn btn-sm text-black disabled:opacity-50"
                                 >
                                     Next
                                 </button>
