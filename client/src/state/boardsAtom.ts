@@ -1,5 +1,5 @@
 ﻿import { atom } from "jotai";
-import type { Board } from "../types/board";
+import type { Board } from "../core/generated-client";
 
 export const boardsAtom = atom<Board[]>([]);
 

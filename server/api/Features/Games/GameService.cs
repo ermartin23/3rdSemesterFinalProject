@@ -229,7 +229,6 @@ public class GameService : IGameService
 
         return TimeZoneInfo.ConvertTimeToUtc(cutoffDk, dk);
     }
-}
     public async Task<WinnerDto?> GetLatestWinningNumbersAsync()
     {
         var game = await _db.Games

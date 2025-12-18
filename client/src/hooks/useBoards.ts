@@ -12,10 +12,12 @@ export function useBoards() {
         setBoards(data);
     }
 
-    async function createBoard(playerId: string, chosenNumbers: number[]) {
+    // ✅ No playerId here (API contract doesn't accept it)
+    async function createBoard(gameId: string, chosenNumbers: number[], repeatingBoardId?: string) {
         const newBoard = await client.createBoard({
-            playerId,
+            gameId,
             chosenNumbers,
+            repeatingBoardId,
         });
 
         setBoards((prev) => [...prev, newBoard]);
