@@ -101,12 +101,12 @@ public class GameServiceTests
 
         await db.SaveChangesAsync();
 
-        var service = new GameService(db);
+        var (service, _) = CreateService(db);
 
         var result = await service.GetAllAsync();
 
         Assert.Equal(2, result.Count);
-        Assert.True(result[0].Weekidentity >= result[1].Weekidentity);
+        Assert.True(result[0].Weekidentity.CompareTo(result[1].Weekidentity) >= 0);
     }
 
     // -------------------------
@@ -139,7 +139,7 @@ public class GameServiceTests
     public async Task GetByIdAsync_ShouldReturnNull_WhenNotExists()
     {
         var db = CreateDbContext();
-        var service = new GameService(db);
+        var (service, _) = CreateService(db);
 
         var result = await service.GetByIdAsync(Guid.NewGuid());
 
