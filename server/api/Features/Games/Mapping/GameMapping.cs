@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using api.Features.Games.Dtos;
@@ -7,7 +8,7 @@ namespace api.Features.Games.Mappings;
 
 public static class GameMappings
 {
-    public static GameResponseDto ToGameResponseDto(this Game g)
+    public static GameResponseDto ToGameResponseDto(this Game g, DateTime nowUtc)
     {
         var cutoffUtc = GameTime.GetCutoffUtcFromWeekSundayUtc(g.Weekidentity);
         var isOpen = g.Winningnumbers == null || g.Winningnumbers.Count == 0;
@@ -22,10 +23,10 @@ public static class GameMappings
             IsOpen = isOpen,
 
             CutoffUtc = cutoffUtc,
-            CanSetWinnersNow = isOpen && DateTime.UtcNow >= cutoffUtc
+            CanSetWinnersNow = isOpen && nowUtc >= cutoffUtc
         };
     }
 
-    public static List<GameResponseDto> ToGameResponseDtos(this List<Game> games)
-        => games.Select(g => g.ToGameResponseDto()).ToList();
+    public static List<GameResponseDto> ToGameResponseDtos(this IEnumerable<Game> games, DateTime nowUtc)
+        => games.Select(g => g.ToGameResponseDto(nowUtc)).ToList();
 }
