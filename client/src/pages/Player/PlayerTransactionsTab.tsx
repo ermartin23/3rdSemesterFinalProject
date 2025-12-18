@@ -130,9 +130,6 @@ export default function PlayerTransactionsTab() {
             <div className="max-w-xl mx-auto bg-white border rounded-xl shadow p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-bold text-red-600">Deposit via MobilePay</h1>
-                    <button className="text-red-600" onClick={() => navigate("/player-dashboard")}>
-                        Back
-                    </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,76 +1,72 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import Confetti from "react-confetti";
 import { useEffect, useState } from "react";
 
+type WinnerResponse = {week: number; year: number; numbers: number[]};
+
 export default function PlayerWinners() {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const API_BASE = import.meta.env.VITE_API_URL;
 
-    // Data passed from previous page
-    const { week, numbers } = location.state || { week: null, numbers: [] };
-
-    // Detect screen for confetti
-    const [dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
+    const [week, setWeek] = useState<number | null>(null);
+    const [year, setYear] = useState<number | null>(null);
+    const [numbers, setNumbers] = useState<number[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const handleResize = () =>
-            setDimensions({ width: window.innerWidth, height: window.innerHeight });
+        async function loadWinningNumbers() {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API_BASE}/api/games/latest-winning-numbers`, {
+                    headers: {Authorization: `Bearer ${token}`},
+                });
+                const text = await res.text();
+                console.log("Raw response", text);
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+                if (!res.ok) throw new Error("Error fetching winning numbers");
+                
+                const data: WinnerResponse = JSON.parse(text);
+                setWeek(data.week);
+                setYear(data.year);
+                setNumbers(data.numbers);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setLoading(false);
+            }
+        }
+        loadWinningNumbers();
+    }, [API_BASE]);
+    
+    const hasData = week !== null && year !== null && numbers.length > 0;
 
     return (
-        <div className="min-h-screen bg-[#faf6ef] flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="px-4 py-10 flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-xl border border-red-300 p-10 w-full max-w-xl text-center">
+                <h1 className="text-3xl font-bold text-red-600 mb-2">🎉 Winning Number 🎉</h1>
 
-            {/* Confetti */}
-            <Confetti
-                width={dimensions.width}
-                height={dimensions.height}
-                numberOfPieces={300}
-                recycle={false}
-            />
+                {loading ? (
+                    <p className="text-gray-600 mb-6">Loading…</p>
+                ) : hasData ? (
+                    <>
+                        <p className="text-lg text-gray-600 mb-6">Week {week} — {year}</p>
 
-            {/* Card */}
-            <div className="bg-white rounded-xl shadow-xl border border-red-300 p-10 w-full max-w-xl text-center relative z-10">
+                        <h2 className="text-black text-xl font-semibold mb-4">The winning numbers are:</h2>
 
-                <h1 className="text-3xl font-bold text-red-600 mb-2">
-                    🎉 Winning Number 🎉
-                </h1>
-
-                <p className="text-lg text-gray-600 mb-6">
-                    Week {week} — 2025
-                </p>
-
-                <h2 className="text-black text-xl font-semibold mb-4">
-                    The winning numbers are:
-                </h2>
-
-                {/* Numbers */}
-                <div className="flex justify-center gap-6 mb-6">
-                    {numbers?.map((n: number) => (
-                        <div
-                            key={n}
-                            className="w-20 h-20 flex items-center justify-center rounded-xl bg-red-400 text-white text-3xl font-bold shadow-lg"
-                        >
-                            {n}
+                        <div className="flex flex-wrap justify-center gap-4 mb-6">
+                            {numbers.map((n) => (
+                                <div key={n} className="w-20 h-20 flex items-center justify-center rounded-xl bg-red-400 text-white text-3xl font-bold shadow-lg">
+                                    {n}
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
 
-                <p className="text-black text-lg font-medium mb-6">
-                    Congratulations to all winners! 🏆
-                </p>
-
-                <button
-                    className="btn bg-red-600 text-white hover:bg-red-700 px-6 py-2 rounded-lg"
-                    onClick={() => navigate("/player-history")}
-                >
-                    ← Back to History
-                </button>
+                        <p className="text-black text-lg font-medium mb-6">
+                            Congratulations to all winners! 🏆✨
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <p className="text-gray-600 mb-6">No winner has been drawn yet 😅</p>
+                    </>
+                )}
             </div>
         </div>
     );
