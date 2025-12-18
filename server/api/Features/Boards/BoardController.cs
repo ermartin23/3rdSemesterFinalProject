@@ -86,9 +86,7 @@ public class BoardController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
     
-    //It's complicated if you have time implement it, probably you will not need it
     [Authorize(Roles="Admin")]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateBoard(Guid id, [FromBody] UpdateBoardRequest request)
@@ -134,7 +132,7 @@ public class BoardController : ControllerBase
 
         var response = boards.Select(b =>
         {
-            var weekDate = b.Game.Weekidentity; // best source of "week"
+            var weekDate = b.Game.Weekidentity; 
             var week = ISOWeek.GetWeekOfYear(weekDate);
             var year = ISOWeek.GetYear(weekDate);
 

@@ -25,18 +25,16 @@ var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.Load(Path.Combine(builder.Environment.ContentRootPath, ".env"));
 builder.Configuration.AddEnvironmentVariables();
 
-// Add Swagger / OpenAPI
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
 builder.Services.AddEndpointsApiExplorer();
 
-// ✅ CORS (locked down to your client(s))
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Client", p => p
         .WithOrigins(
-            "http://localhost:5173", // Vite dev
-            "https://deadpigeons-aged-voice-1352.fly.dev" // deployed frontend
+            "http://localhost:5173", 
+            "https://deadpigeons-aged-voice-1352.fly.dev" 
         )
         .AllowAnyHeader()
         .AllowAnyMethod()
@@ -120,10 +118,8 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
     conf.UseNpgsql(appOptions.DbConnectionString);
 });
 
-// Build the app
 var app = builder.Build();
 
-// Run database seeding
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
@@ -131,14 +127,12 @@ using (var scope = app.Services.CreateScope())
 
 app.UseExceptionHandler();
 
-// ✅ Recommended middleware order
 app.UseRouting();
 app.UseCors("Client");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Swagger (you currently enable some swagger outside dev too; I kept your structure)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

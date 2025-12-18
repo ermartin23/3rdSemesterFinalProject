@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-[#faf6ef]">
-            {/* HEADER */}
+            {}
             <div className="flex items-center justify-between px-8 py-4 bg-[#faf6ef] shadow-sm">
                 <div className="flex items-center gap-3">
                     <img
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* TAB BAR */}
+            {}
             <div className="flex justify-center mt-6">
                 <div className="text-black tabs tabs-boxed bg-[#f7efe1]">
                     <a
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* TAB CONTENT */}
+            {}
             <div className="p-4">
                 {activeTab === "players" && <PlayersTab />}
                 {activeTab === "games" && <GamesTab />}

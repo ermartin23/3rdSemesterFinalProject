@@ -42,8 +42,7 @@ export default function PlayerHistory() {
                 price: Number(b.price ?? 0),
                 repeatingBoardId: b.repeatingBoardId ?? null,
             }));
-
-            // Already ordered by backend, but safe:
+            
             mapped.sort((a, b) => (b.year - a.year) || (b.week - a.week));
 
             setHistory(mapped);
@@ -78,13 +77,10 @@ export default function PlayerHistory() {
             prev.map(b => (b.boardId === boardId ? { ...b, repeatingBoardId: null } : b))
         );
     }
-
-
-
-
+    
     return (
         <div className="min-h-screen bg-[#faf6ef]">
-            {/* CONTENT */}
+            {}
             <div className="max-w-2xl mx-auto mt-10 px-4">
                 {history.length === 0 ? (
                     <p className="text-center text-gray-600 text-lg mt-20">

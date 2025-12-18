@@ -14,7 +14,6 @@ public class BasicConnectionTest : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        // Create PostgreSQL container
         _container = new PostgreSqlBuilder()
             .WithImage("postgres:16")
             .WithDatabase("testdb")
@@ -23,8 +22,7 @@ public class BasicConnectionTest : IAsyncLifetime
             .Build();
 
         await _container.StartAsync();
-
-        // Build DbContext using NEW connection property
+        
         var options = new DbContextOptionsBuilder<MyDbContext>()
             .UseNpgsql(_container.GetConnectionString())
             .Options;

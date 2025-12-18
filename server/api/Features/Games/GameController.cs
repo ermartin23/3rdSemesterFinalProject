@@ -17,16 +17,14 @@ public class GameController : ControllerBase
     {
         _svc = svc;
     }
-
-    // GET api/games
+    
     [HttpGet]
     public async Task<ActionResult<List<GameResponseDto>>> GetAll()
     {
         var result = await _svc.GetAllAsync();
         return Ok(result);
     }
-
-    // GET api/games/{id}
+    
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<GameResponseDto>> GetById(Guid id)
     {
@@ -36,8 +34,7 @@ public class GameController : ControllerBase
 
         return Ok(game);
     }
-
-    // POST api/games
+    
     [Authorize(Roles="Admin")]
     [HttpPost]
     public async Task<ActionResult<GameResponseDto>> Create([FromBody] GameCreateRequestDto dto)
@@ -54,8 +51,7 @@ public class GameController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
-    // POST api/games/{id}/winners
+    
     [Authorize(Roles = "Admin")]
     [HttpPost("{id:guid}/winners")]
     public async Task<ActionResult<GameResponseDto>> SetWinners(Guid id, [FromBody] GameSetWinnersDto dto)

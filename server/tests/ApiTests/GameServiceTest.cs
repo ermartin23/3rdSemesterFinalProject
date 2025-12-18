@@ -9,12 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using api.Features.RepeatingBoards;
 
-
 namespace tests.ApiTests;
 
 public class GameServiceTests
 {
-    // Helper method to create an in-memory DbContext for testing
     private MyDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<MyDbContext>()
@@ -23,11 +21,7 @@ public class GameServiceTests
 
         return new MyDbContext(options);
     }
-
-    // -------------------------
-    // CreateAsync
-    // -------------------------
-
+    
     [Fact]
     public async Task CreateAsync_ShouldCreateGame_WhenValidSundayAndNoActiveGame()
     {
@@ -54,7 +48,7 @@ public class GameServiceTests
 
         var dto = new GameCreateRequestDto
         {
-            Weekidentity = new DateTime(2025, 1, 6) // Monday
+            Weekidentity = new DateTime(2025, 1, 6)
         };
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -86,11 +80,7 @@ public class GameServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.CreateAsync(dto));
     }
-
-    // -------------------------
-    // GetAllAsync
-    // -------------------------
-
+    
     [Fact]
     public async Task GetAllAsync_ShouldReturnGamesOrderedByWeekIdentityDesc()
     {
@@ -110,11 +100,7 @@ public class GameServiceTests
         Assert.Equal(2, result.Count);
         Assert.True(result[0].Weekidentity.CompareTo(result[1].Weekidentity) >= 0);
     }
-
-    // -------------------------
-    // GetByIdAsync
-    // -------------------------
-
+    
     [Fact]
     public async Task GetByIdAsync_ShouldReturnGame_WhenExists()
     {
@@ -201,5 +187,4 @@ public class GameServiceTests
         public Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
             => Task.CompletedTask;
     }
-
 }

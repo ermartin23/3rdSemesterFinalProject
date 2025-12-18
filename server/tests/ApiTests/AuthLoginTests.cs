@@ -109,15 +109,12 @@ public class AuthLoginTests
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(token);
         
-        // issuer/audience checks
         Assert.Equal("DeadPigeonsAPI", jwt.Issuer);
         Assert.Contains("DeadPigeonsClient", jwt.Audiences);
         
-        // sub claim
         var sub = jwt.Claims.First(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
         Assert.Equal(expectedSub.ToString(), sub);
         
-        // role claim
         var role = jwt.Claims.First(c => c.Type == ClaimTypes.Role).Value;
         Assert.Equal(expectedRole, role);
     }

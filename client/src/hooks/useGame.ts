@@ -3,7 +3,6 @@ import { gamesAtom } from "../state/gamesAtom";
 import { GameClient } from "../core/generated-client";
 import { baseUrl } from "../core/config";
 
-
 export function useGame() {
     const [games, setGames] = useAtom(gamesAtom);
     const client = new GameClient(baseUrl);

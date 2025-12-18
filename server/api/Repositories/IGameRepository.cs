@@ -10,9 +10,7 @@ public interface IGameRepository
     Task<List<Game>> GetAllAsync();
     Task<Game?> GetByIdAsync(Guid id);
     Task<Game?> GetActiveGameAsync();
-
     Task AddAsync(Game game);
-    void Update(Game game);             // ← NEW (recommended)
-
+    void Update(Game game);   
     Task SaveChangesAsync();
 }

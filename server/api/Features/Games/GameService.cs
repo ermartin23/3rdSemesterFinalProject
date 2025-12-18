@@ -16,7 +16,6 @@ public class GameService : IGameService
     private readonly IClock _clock;
     private readonly IRepeatingBoardService _repeatingBoardService;
 
-
     public GameService(MyDbContext db, IClock clock, IRepeatingBoardService repeatingBoardService)
     {
         _db = db;
@@ -53,17 +52,13 @@ public class GameService : IGameService
             throw new InvalidOperationException("There is already an active game.");
 
         var dk = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
-
-        // input as UTC directly
+        
         var weekUtc = DateTime.SpecifyKind(dto.Weekidentity, DateTimeKind.Utc);
-
-        // Convert the week date into Danish local time
+        
         var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekUtc, dk);
-
-        // Saturday 17:00 in DK - deadline for submitting numbers
+        
         var saturdayDk = weekDk.AddDays(-1).Date.AddHours(17);
-
-        // Convert cutoff back to UTC
+        
         var cutoffUtc = TimeZoneInfo.ConvertTimeToUtc(saturdayDk, dk);
 
         var cutoff = TimeOnly.FromDateTime(cutoffUtc);
@@ -149,8 +144,6 @@ public class GameService : IGameService
         await _repeatingBoardService.GenerateBoardsForNewGame(newGame);
     }
     
-    
-    // Winning Board 
     private static bool IsWinningBoard(Board board, Game game)
     {
         if (game.Winningnumbers == null || game.Winningnumbers.Count != 3)
@@ -159,8 +152,6 @@ public class GameService : IGameService
         if (board.Chosennumbers == null || board.Chosennumbers.Count == 0)
             return false;
         
-        // Treat both as sets and check if the board CONTAINS all 3 winning numbers.
-        // Order does not matter, and the board may have 5–8 numbers.
         var winningSet = game.Winningnumbers.ToHashSet();
         var boardSet = board.Chosennumbers.ToHashSet();
 
@@ -231,7 +222,6 @@ public class GameService : IGameService
 
         var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekSundayUtc, dk);
         
-        // Saturday 17:00 DK (one day before Sunday)
         var cutoffDk = weekDk.AddDays(-1).Date.AddHours(17);
 
         return TimeZoneInfo.ConvertTimeToUtc(cutoffDk, dk);

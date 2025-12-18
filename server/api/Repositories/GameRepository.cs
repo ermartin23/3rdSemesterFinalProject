@@ -26,7 +26,6 @@ public class GameRepository : IGameRepository
 
     public Task<Game?> GetByIdAsync(Guid id)
     {
-        // Must be tracked so updates work
         return _db.Games.FirstOrDefaultAsync(g => g.Gameid == id);
     }
 
@@ -39,8 +38,7 @@ public class GameRepository : IGameRepository
     {
         await _db.Games.AddAsync(game);
     }
-
-    // NEW METHOD — required by interface
+    
     public void Update(Game game)
     {
         _db.Games.Update(game);

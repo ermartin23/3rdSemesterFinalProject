@@ -12,7 +12,6 @@ public class PlayerCreateRequestDto
     [Required, EmailAddress, MaxLength(200)]
     public string Email { get; set; } = null!;
     
-    //we never return passwords on responses
     [Required, MinLength(6), MaxLength(200)]
     public string Password { get; set; } = null!;
     

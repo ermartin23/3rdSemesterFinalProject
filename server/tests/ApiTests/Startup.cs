@@ -30,12 +30,10 @@ public class Startup : IDisposable
             .WithPassword("postgres")
             .Build();
 
-        // Start container synchronously before DI is used
         _postgresContainer.StartAsync().GetAwaiter().GetResult();
 
         _connectionString = _postgresContainer.GetConnectionString();
-
-        // Ensure DB schema exists
+        
         var options = new DbContextOptionsBuilder<MyDbContext>()
             .UseNpgsql(_connectionString)
             .Options;
@@ -59,8 +57,6 @@ public class Startup : IDisposable
         services.AddScoped<AuthController>();
         services.AddSingleton<IPasswordService, PasswordService>();
         services.AddSingleton<IClock, SystemClock>();
-
-        
         
         services.AddScoped<IAdminService, AdminService>();
         
@@ -71,17 +67,15 @@ public class Startup : IDisposable
             o.JwtAudience = "DeadPigeonsClient";
             o.DbConnectionString = _connectionString;
         });
-
     }
 
     public void Configure(IHostEnvironment env, ITestOutputHelperAccessor accessor)
     {
-        // optional: logging via accessor.Output
+        
     }
 
     public void Dispose()
     {
-        // Stop container when test run is over
         _postgresContainer.DisposeAsync().AsTask().GetAwaiter().GetResult();
     }
 }

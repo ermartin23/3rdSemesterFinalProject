@@ -24,7 +24,7 @@ public class PlayerService : IPlayerService
     {
         var players = await _db.Players
             .AsNoTracking()
-            .Where(p => !p.Isdeleted) // to ignore soft delete playerssss
+            .Where(p => !p.Isdeleted) 
             .ToListAsync();
 
         return players.ToPlayerResponseDtos();
@@ -39,14 +39,8 @@ public class PlayerService : IPlayerService
         return player?.ToPlayerResponseDto();
     }
     
-    
-
     public async Task<PlayerResponseDto> CreateAsync(PlayerCreateRequestDto dto)
     {
-        // extra rules you might want:
-        // - ensure email is unique
-        // - ensure phone is not used twice, etc.
-        // you can implement these later
         var now = DateTime.UtcNow;
 
         var player = new Player
@@ -55,9 +49,8 @@ public class PlayerService : IPlayerService
             Name = dto.Name.Trim(),
             Phone = dto.Phone.Trim(),
             Email = dto.Email.Trim().ToLowerInvariant(),
-            // Password = dto.Password.Trim(), // TODO later: hash this, don’t keep raw
             Password = _passwords.Hash(dto.Password.Trim()),
-            Active = dto.Active, // default inactive
+            Active = dto.Active,
             Createdat = now,
             Updatedat = now,
             Isdeleted = false,
@@ -138,5 +131,4 @@ public class PlayerService : IPlayerService
 
         await _db.SaveChangesAsync();
     }
-
 }

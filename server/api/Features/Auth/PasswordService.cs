@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace api.Features.Auth;
 
-
 public interface IPasswordService
 {
     string Hash(string password);

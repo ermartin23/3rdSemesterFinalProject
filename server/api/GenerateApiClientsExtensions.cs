@@ -18,12 +18,10 @@ public static class GenerateApiClientsExtensions
         await File.WriteAllTextAsync(openApiPath, openApiJson);
         
         var documentFromJson = await OpenApiDocument.FromJsonAsync(openApiJson);
-
-        // Step 4: Generate TypeScript client from the parsed OpenAPI document
+        
         var settings = new TypeScriptClientGeneratorSettings
         {
             Template = TypeScriptTemplate.Fetch,
-             // = true,  // Enable JSDoc generation
             TypeScriptGeneratorSettings =
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -36,8 +34,7 @@ public static class GenerateApiClientsExtensions
                 ConvertConstructorInterfaceData = true
             }
         };
-
-        // Step 5: Generate TypeScript client from the parsed OpenAPI document
+        
         var generator = new TypeScriptClientGenerator(documentFromJson, settings);
         var code = generator.GenerateFile();
 
@@ -46,7 +43,6 @@ public static class GenerateApiClientsExtensions
 
         await File.WriteAllTextAsync(outputPath, code);
         
-           
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
         logger.LogInformation("OpenAPI JSON with documentation saved at: " + openApiPath);
         logger.LogInformation("TypeScript client generated at: " + outputPath);

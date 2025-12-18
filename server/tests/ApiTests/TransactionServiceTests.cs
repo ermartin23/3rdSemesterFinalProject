@@ -75,8 +75,7 @@ public class TransactionServiceTests
         await _dbContext.SaveChangesAsync();
         return board;
     }
-
-    //GetAllAsync
+    
     [Fact]
     public async Task GetAllAsync_WhenEmpty_ReturnsEmpty()
     {
@@ -131,7 +130,6 @@ public class TransactionServiceTests
         Assert.NotNull(result[0].Player);
     }
     
-    //CreatePendingAsync
     [Fact]
     public async Task CreatePendingAsync_CreatesPendingTransaction()
     {
@@ -176,8 +174,7 @@ public class TransactionServiceTests
         await Assert.ThrowsAsync<ArgumentException>(() =>
             _transactionService.CreatePendingAsync(player.Playerid, 100, " "));
     }
-    
-    //GetByIdAsync
+
     [Fact]
     public async Task GetByIdAsync_WhenExists_ReturnsTransaction()
     {
@@ -217,7 +214,6 @@ public class TransactionServiceTests
         Assert.Null(found);
     }
     
-    //GetBalanceAsync
     [Fact]
     public async Task GetBalanceAsync_ReturnsApprovedSumMinusBoardCost()
     {
@@ -271,8 +267,7 @@ public class TransactionServiceTests
         
         Assert.Equal(0, balance);
     }
-    
-    //ApproveAsync
+  
     [Fact]
     public async Task ApproveAsync_Pending_BecomesApproved()
     {
@@ -392,8 +387,7 @@ public class TransactionServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _transactionService.ApproveAsync(transaction.Transactionid));
     }
-
-    //RejectAsync
+    
     [Fact]
     public async Task RejectAsync_Pending_BecomesDeclined()
     {
