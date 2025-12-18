@@ -54,7 +54,8 @@ export default function PlayersTab() {
             name: String(data.get("name") ?? ""),
             email: String(data.get("email") ?? ""),
             phone: String(data.get("phone") ?? ""),
-            password // required by backend
+            password, // required by backend
+            active: data.get("active") === "true",
         };
 
         try {
@@ -81,6 +82,7 @@ export default function PlayersTab() {
             name: String(data.get("name") ?? ""),
             email: String(data.get("email") ?? ""),
             phone: String(data.get("phone") ?? ""),
+            active: data.get("active") === "on"
         };
 
         try {

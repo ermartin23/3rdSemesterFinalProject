@@ -1258,6 +1258,9 @@
             "type": "string",
             "maxLength": 200,
             "minLength": 6
+          },
+          "active": {
+            "type": "boolean"
           }
         }
       },
@@ -1291,6 +1294,9 @@
             "maxLength": 200,
             "minLength": 6,
             "nullable": true
+          },
+          "active": {
+            "type": "boolean"
           }
         }
       },
