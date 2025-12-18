@@ -9,6 +9,8 @@ import PlayerWinners from "../pages/Player/PlayerWinners";
 import NotFound from "../pages/NotFound";
 import PlayerTransactionsTab from "../pages/Player/PlayerTransactionsTab.tsx";
 import AdminTransactionsTab from "../pages/Admin/tabs/AdminTransactionsTab.tsx";
+import PlayerBalance from "../pages/Player/PlayerBalance.tsx";
+import PlayerLayout from "../pages/Player/PlayerLayout.tsx";
 
 export default function AppRouter() {
     return (
@@ -25,10 +27,13 @@ export default function AppRouter() {
 
                 {/* Player */}
                 <Route path="/player-login" element={<PlayerLogin />} />
-                <Route path="/player-dashboard" element={<PlayerDashboard />} />
-                <Route path="/player-history" element={<PlayerHistory />} />
-                <Route path="/player-winners" element={<PlayerWinners />} />
-                <Route path="/player-transactions" element={<PlayerTransactionsTab />} />
+                <Route element={<PlayerLayout />}>
+                    <Route path="/player-dashboard" element={<PlayerDashboard />} />
+                    <Route path="/player-history" element={<PlayerHistory />} />
+                    <Route path="/player-winners" element={<PlayerWinners />} />
+                    <Route path="/player-balance" element={<PlayerBalance />} />
+                    <Route path="/player-transactions" element={<PlayerTransactionsTab />} />
+                </Route>
 
                 {/* CATCH-ALL 404 — MUST BE LAST */}
                 <Route path="*" element={<NotFound />} />

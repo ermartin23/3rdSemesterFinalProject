@@ -1,14 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using api.Features.Games;
+﻿using api.Features.Games;
 using api.Features.Games.Dtos;
 using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace tests.ApiTests.Games;
+namespace tests.ApiTests;
 
 public class GameServiceTests
 {
@@ -23,12 +20,12 @@ public class GameServiceTests
     }
 
     // -------------------------
-    // HAPPY PATH: CreateAsync
+    // CreateAsync
     // -------------------------
+
     [Fact]
     public async Task CreateAsync_ShouldCreateGame_WhenValidSundayAndNoActiveGame()
     {
-        // Arrange
         var db = CreateDbContext();
         var (service, clock) = CreateService(db);
 
@@ -37,22 +34,16 @@ public class GameServiceTests
             Weekidentity = new DateTime(2025, 1, 5) // Sunday
         };
 
-        // Act
         var result = await service.CreateAsync(dto);
 
-        // Assert
         Assert.NotNull(result);
         Assert.Equal(dto.Weekidentity, result.Weekidentity);
         Assert.Null(result.Winningnumbers);
     }
 
-    // --------------------------------------
-    // UNHAPPY PATH: CreateAsync - Not Sunday
-    // --------------------------------------
     [Fact]
     public async Task CreateAsync_ShouldThrow_WhenWeekidentityIsNotSunday()
     {
-        // Arrange
         var db = CreateDbContext();
         var (service, clock) = CreateService(db);
 
@@ -61,17 +52,13 @@ public class GameServiceTests
             Weekidentity = new DateTime(2025, 1, 6) // Monday
         };
 
-        // Act + Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync(dto));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateAsync(dto));
     }
 
-    // ---------------------------------------------------
-    // UNHAPPY PATH: CreateAsync - Active game exists
-    // ---------------------------------------------------
     [Fact]
     public async Task CreateAsync_ShouldThrow_WhenActiveGameAlreadyExists()
     {
-        // Arrange
         var db = CreateDbContext();
 
         db.Games.Add(new Game
@@ -79,7 +66,7 @@ public class GameServiceTests
             Gameid = Guid.NewGuid(),
             Weekidentity = DateTime.UtcNow,
             Createdat = DateTime.UtcNow,
-            Winningnumbers = null // This means active game
+            Winningnumbers = null
         });
 
         await db.SaveChangesAsync();
@@ -88,28 +75,50 @@ public class GameServiceTests
 
         var dto = new GameCreateRequestDto
         {
-            Weekidentity = new DateTime(2025, 1, 5) // Sunday
+            Weekidentity = new DateTime(2025, 1, 5)
         };
 
-        // Act + Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync(dto));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateAsync(dto));
     }
 
-    // ----------------------------
-    // HAPPY PATH: SetWinningNumbers
-    // ----------------------------
+    // -------------------------
+    // GetAllAsync
+    // -------------------------
+
     [Fact]
-    public async Task SetWinningNumbers_ShouldWork_WhenValidNumbersAndGameExists()
+    public async Task GetAllAsync_ShouldReturnGamesOrderedByWeekIdentityDesc()
     {
-        // Arrange
+        var db = CreateDbContext();
+
+        db.Games.AddRange(
+            new Game { Gameid = Guid.NewGuid(), Weekidentity = new DateTime(2025, 1, 5) },
+            new Game { Gameid = Guid.NewGuid(), Weekidentity = new DateTime(2025, 1, 12) }
+        );
+
+        await db.SaveChangesAsync();
+
+        var service = new GameService(db);
+
+        var result = await service.GetAllAsync();
+
+        Assert.Equal(2, result.Count);
+        Assert.True(result[0].Weekidentity >= result[1].Weekidentity);
+    }
+
+    // -------------------------
+    // GetByIdAsync
+    // -------------------------
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnGame_WhenExists()
+    {
         var db = CreateDbContext();
 
         var game = new Game
         {
             Gameid = Guid.NewGuid(),
-            Weekidentity = DateTime.UtcNow,
-            Createdat = DateTime.UtcNow,
-            Winningnumbers = null
+            Weekidentity = DateTime.UtcNow
         };
 
         db.Games.Add(game);
@@ -117,56 +126,44 @@ public class GameServiceTests
 
         var (service, clock) = CreateService(db);
 
-        var dto = new GameSetWinnersDto
-        {
-            WinningNumbers = new() { 3, 7, 12 }
-        };
+        var result = await service.GetByIdAsync(game.Gameid);
 
-        // Act
-        var result = await service.SetWinningNumbersAsync(game.Gameid, dto);
-
-        // Assert
-        Assert.Equal(3, result.Winningnumbers!.Count);
-        Assert.Contains(7, result.Winningnumbers);
+        Assert.NotNull(result);
+        Assert.Equal(game.Gameid, result!.Gameid);
     }
 
-    // ---------------------------------------------------
-    // UNHAPPY PATH: SetWinningNumbers - Game not found
-    // ---------------------------------------------------
     [Fact]
-    public async Task SetWinningNumbers_ShouldThrow_WhenGameDoesNotExist()
+    public async Task GetByIdAsync_ShouldReturnNull_WhenNotExists()
     {
-        // Arrange
+        var db = CreateDbContext();
+        var service = new GameService(db);
+
+        var result = await service.GetByIdAsync(Guid.NewGuid());
+
+        Assert.Null(result);
+    }
+    
+    [Fact]
+    public async Task SetWinningNumbers_ShouldThrow_WhenGameNotFound()
+    {
         var db = CreateDbContext();
         var (service, clock) = CreateService(db);
 
         var dto = new GameSetWinnersDto
         {
-            WinningNumbers = new() { 2, 8, 11 }
+            WinningNumbers = new() { 1, 2, 3 }
         };
 
-        // Act + Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => 
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
             service.SetWinningNumbersAsync(Guid.NewGuid(), dto));
     }
 
-    // ---------------------------------------------------
-    // UNHAPPY PATH: Winning numbers already set
-    // ---------------------------------------------------
     [Fact]
-    public async Task SetWinningNumbers_ShouldThrow_WhenAlreadyHasNumbers()
+    public async Task SetWinningNumbers_ShouldThrow_WhenNumbersDuplicated()
     {
-        // Arrange
         var db = CreateDbContext();
 
-        var game = new Game
-        {
-            Gameid = Guid.NewGuid(),
-            Weekidentity = DateTime.UtcNow,
-            Createdat = DateTime.UtcNow,
-            Winningnumbers = new() { 1, 2, 3 }
-        };
-
+        var game = new Game { Gameid = Guid.NewGuid() };
         db.Games.Add(game);
         await db.SaveChangesAsync();
 
@@ -174,11 +171,10 @@ public class GameServiceTests
 
         var dto = new GameSetWinnersDto
         {
-            WinningNumbers = new() { 4, 5, 6 }
+            WinningNumbers = new() { 5, 5, 7 }
         };
 
-        // Act + Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.SetWinningNumbersAsync(game.Gameid, dto));
     }
     

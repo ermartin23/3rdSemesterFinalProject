@@ -85,4 +85,13 @@ public class GameController : ControllerBase
 
         return Ok(details);
     }
+
+    [Authorize(Roles = "Player")]
+    [HttpGet("latest-winning-numbers")]
+    public async Task<ActionResult<WinnerDto>> GetLatestWinningNumbers()
+    {
+        var winner = await _svc.GetLatestWinningNumbersAsync();
+        if (winner == null) return NotFound();
+        return Ok(winner);
+    }
 }
