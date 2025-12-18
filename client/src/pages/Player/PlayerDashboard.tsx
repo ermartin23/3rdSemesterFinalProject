@@ -16,6 +16,8 @@ export default function PlayerDashboard() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [currentWeek, setCurrentWeek] = useState<number>(0);
     const [lastBoard, setLastBoard] = useState<PlayedBoard | null>(null);
+    const [currentGameId, setCurrentGameId] = useState<string | null>(null);
+
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -29,6 +31,29 @@ export default function PlayerDashboard() {
         }
 
         setEmail(savedEmail);
+
+        async function loadCurrentGame() {
+            try {
+                const res = await fetch(`${API_BASE}/api/games`);
+                if (!res.ok) throw new Error("Failed to load games");
+
+                const games = await res.json();
+
+                // Active game = winningNumbers === null
+                const activeGame = games.find(
+                    (g: any) => g.winningNumbers == null
+                );
+
+                if (!activeGame) {
+                    throw new Error("No active game found");
+                }
+
+                setCurrentGameId(activeGame.gameid ?? activeGame.gameId);
+            } catch (err) {
+                console.error("Game fetch failed", err);
+            }
+        }
+
 
         async function loadBalance() {
             try {
@@ -49,6 +74,7 @@ export default function PlayerDashboard() {
         }
         
         loadBalance();
+        loadCurrentGame();
 
         if (savedBoard) {
             setLastBoard(JSON.parse(savedBoard));
@@ -80,44 +106,49 @@ export default function PlayerDashboard() {
         setSelectedNumbers([...selectedNumbers, num].sort((a, b) => a - b));
     }
 
-    function handlePlay() {
-        if (price === 0) {
-            alert("Invalid selection. Choose 5–8 numbers.");
-            return;
+    async function handlePlay() {
+        if (price === 0) return;
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const res = await fetch(`${API_BASE}/api/boards`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    gameId: currentGameId, // ← MUST come from backend
+                    chosenNumbers: selectedNumbers
+                }),
+            });
+
+            if (!res.ok) {
+                const msg = await res.text();
+                throw new Error(msg);
+            }
+
+            const board = await res.json();
+            setLastBoard({
+                week: currentWeek,
+                numbers: board.chosenNumbers,
+                price: board.price,
+            });
+
+            // refresh balance from backend
+            const balRes = await fetch(`${API_BASE}/api/Transaction/player/balance`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setBalance(await balRes.json());
+            setSelectedNumbers([]);
+            alert("Board submitted successfully!");
+        } catch (err: any) {
+            alert(err.message);
         }
-        
-        if (selectedNumbers.length < 5) {
-            alert("You must choose at least 5 numbers.");
-            return;
-        }
-
-        if (balance < price) {
-            alert("Not enough balance to play this board.");
-            return;
-        }
-
-        const newBalance = balance - price;
-        setBalance(newBalance);
-
-        if (email) {
-            localStorage.setItem(`${email}_balance`, String(newBalance));
-        }
-        localStorage.setItem("playerBalance", String(newBalance));
-
-        const board: PlayedBoard = {
-            week: currentWeek,
-            numbers: selectedNumbers,
-            price,
-        };
-
-        localStorage.setItem("lastBoard", JSON.stringify(board));
-        setLastBoard(board);
-
-        const previous = JSON.parse(localStorage.getItem("boardHistory") || "[]");
-        localStorage.setItem("boardHistory", JSON.stringify([...previous, board]));
-
-        alert("Board submitted successfully!");
     }
+
 
     if (!email) return null;
 
