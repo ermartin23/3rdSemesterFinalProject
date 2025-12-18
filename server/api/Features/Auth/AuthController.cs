@@ -48,8 +48,7 @@ public class AuthController : ControllerBase
                 Email = admin.Email
             });
         }
-
-        // Try playerr
+        
         var player = await _db.Players.AsNoTracking()
             .FirstOrDefaultAsync(p => p.Email == email && !p.Isdeleted);
 
@@ -88,9 +87,8 @@ public class AuthController : ControllerBase
             claims: claims,
             expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: creds
-    );
+        );
     
-    return new JwtSecurityTokenHandler().WriteToken(token);
-}
-
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 }

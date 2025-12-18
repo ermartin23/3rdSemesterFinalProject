@@ -18,16 +18,14 @@ public class PlayersController : ControllerBase
     {
         _playerService = playerService;
     }
-
-    // GET api/players
+    
     [HttpGet]
     public async Task<ActionResult<List<PlayerResponseDto>>> GetAll()
     {
         var players = await _playerService.GetAllAsync();
         return Ok(players);
     }
-    
-    // GET api/players/{id}
+ 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PlayerResponseDto>> GetById(Guid id)
     {
@@ -42,8 +40,7 @@ public class PlayersController : ControllerBase
         var created = await _playerService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = created.PlayerId }, created);
     }
-
-    // PUT api/players/{id}
+    
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<PlayerResponseDto>> Update(Guid id, [FromBody] PlayerUpdateRequestDto dto)
     {
@@ -52,7 +49,6 @@ public class PlayersController : ControllerBase
         return Ok(updated); 
     }
     
-    // PATCH api/players/{id}/toggle-active
     [HttpPatch("{id:guid}/toggle-active")]
     public async Task<ActionResult<PlayerResponseDto>> ToggleActive(Guid id)
     {
@@ -60,11 +56,10 @@ public class PlayersController : ControllerBase
         return Ok(updated);
     }
     
-    // DELETE api/players/{id}
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _playerService.SoftDeleteAsync(id);
-        return NoContent(); // 204
+        return NoContent();
     }
 }

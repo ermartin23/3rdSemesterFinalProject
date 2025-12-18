@@ -22,7 +22,6 @@ public class AdminServiceTests
     [Fact]
     public async Task CreateAsync_Creates_Admin_NotDeleted()
     {
-        //clean DB for this test
         await _db.Database.EnsureDeletedAsync(TestContext.Current.CancellationToken);
         await _db.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 

@@ -34,7 +34,6 @@ public class AdminService : IAdminService
             Name = dto.Name.Trim(),
             Phone = dto.Phone.Trim(),
             Email = dto.Email.Trim().ToLowerInvariant(),
-            //Password = dto.Password.Trim(), // Later HASH this!!!!
             Password = _passwords.Hash(dto.Password.Trim()),
             Createdat = now,
             Updatedat = now,
@@ -92,5 +91,4 @@ public class AdminService : IAdminService
 
         await _db.SaveChangesAsync();
     }
-
 }

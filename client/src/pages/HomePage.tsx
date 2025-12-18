@@ -4,10 +4,10 @@ import {Link} from "react-router";
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#faf6ef] flex justify-center items-start py-10 px-4">
-      {/* Main container to keep everything centered */}
+      {}
       <div className="w-full max-w-4xl flex flex-col items-center">
 
-        {/* Logo */}
+        {}
         <img
           src={logo}
           alt="Jerne IF"
@@ -15,7 +15,7 @@ export default function HomePage() {
           className="rounded-full shadow mb-4"
         />
 
-        {/* Title */}
+        {}
         <h1 className="text-4xl font-bold text-red-600 mb-2">
           Dead Pigeons <span className="inline-block">🐦</span>
         </h1>
@@ -24,10 +24,10 @@ export default function HomePage() {
           Support Jerne IF through our weekly lottery game! Pick your numbers and win prizes.
         </p>
 
-        {/* Two Cards */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 
-          {/* How to Play */}
+          {}
           <div className="bg-white border rounded-xl shadow p-6">
             <h2 className="text-xl font-semibold text-red-600 mb-4">How to Play</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 leading-relaxed">
@@ -38,7 +38,7 @@ export default function HomePage() {
             </ul>
           </div>
 
-          {/* Pricing */}
+          {}
           <div className="bg-white border rounded-xl shadow p-6">
             <h2 className="text-xl font-semibold text-red-600 mb-4">Pricing</h2>
 
@@ -63,7 +63,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Login Buttons */}
+        {}
         <div className="flex gap-4 mt-10">
           <Link to="/admin-login">
             <button className="btn bg-red-600 text-white hover:bg-red-700 px-8">

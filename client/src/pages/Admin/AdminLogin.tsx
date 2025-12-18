@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import {login} from "../../api/auth.ts";
 import PasswordInput from "../../components/PasswordInput";
 
-
 export default function AdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

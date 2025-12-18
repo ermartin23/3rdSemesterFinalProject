@@ -53,7 +53,6 @@ public class TransactionController : ControllerBase
         return Ok(balance);
     }
     
-    //Player gets their own!!! balance
     [Authorize(Roles="Player")]
     [HttpGet("player/balance")]
     public async Task<ActionResult<decimal>> GetMyBalance()

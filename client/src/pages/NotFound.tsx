@@ -6,7 +6,7 @@ export default function NotFound() {
     return (
         <div className="min-h-screen bg-[#faf6ef] flex flex-col items-center justify-center text-center px-6">
 
-            {/* BIG BIRD ICON */}
+            {}
             <div className="text-8xl mb-4">🐦</div>
 
             <h1 className="text-4xl font-bold text-red-600 mb-4">

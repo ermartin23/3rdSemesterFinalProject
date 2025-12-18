@@ -1,8 +1,6 @@
 import "./App.css";
 import {createBrowserRouter, type RouteObject, RouterProvider} from "react-router-dom";
 
-
-
 const myRoutes: RouteObject[]
   = [
   {
@@ -24,8 +22,7 @@ function Home() {
         </>
     )
 }
-    
-    
+
 function App() {
 
   return <RouterProvider router={createBrowserRouter(myRoutes)} />

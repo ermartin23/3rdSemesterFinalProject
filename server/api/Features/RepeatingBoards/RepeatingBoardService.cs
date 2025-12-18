@@ -14,7 +14,6 @@ public class RepeatingBoardService : IRepeatingBoardService
         _dbContext = dbContext;
         _transactionService = transactionService;
     }
-
     
     public async Task<Board> ToggleRepeatingBoard(Guid playerId, Guid boardId, bool isRepeating)
     {
@@ -28,7 +27,6 @@ public class RepeatingBoardService : IRepeatingBoardService
 
         if (isRepeating)
         {
-            // Find or create the repeatingboard record for this player
             var rb = await _dbContext.Repeatingboards
                 .FirstOrDefaultAsync(r => r.Playerid == playerId && !r.Isdeleted);
 
@@ -73,8 +71,6 @@ public class RepeatingBoardService : IRepeatingBoardService
         await _dbContext.SaveChangesAsync();
         return board;
     }
-
-
     
     public async Task GenerateBoardsForNewGame(Game newGame)
     {
@@ -136,5 +132,4 @@ public class RepeatingBoardService : IRepeatingBoardService
         rb.Isrepeating = isRepeating;
         await _dbContext.SaveChangesAsync();
     }
-
 }

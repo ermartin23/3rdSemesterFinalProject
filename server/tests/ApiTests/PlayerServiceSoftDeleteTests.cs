@@ -33,18 +33,14 @@ public class PlayerServiceSoftDeleteTests
             Password = "Test1234!"
         });
         
-        // Sanity check: player is returned by GetAll before delete
         var playersBefore = await _playerService.GetAllAsync();
         Assert.Contains(playersBefore, p => p.PlayerId == created.PlayerId);
         
-        // Act: soft delete the player
         await _playerService.SoftDeleteAsync(created.PlayerId);
         
-        // Assert: GetAllAsync no longer returns that player
         var playersAfter = await _playerService.GetAllAsync();
         Assert.DoesNotContain(playersAfter, p => p.PlayerId == created.PlayerId);
         
-        // Assert: but row still exists in DB with Isdeleted = true and Deletedat not null
         var playerInDb = await _db.Players
             .FirstOrDefaultAsync(p => p.Playerid == created.PlayerId);
 
@@ -53,5 +49,4 @@ public class PlayerServiceSoftDeleteTests
         Assert.NotNull(playerInDb.Deletedat);
         Assert.False(playerInDb.Active);
     }
-
 }

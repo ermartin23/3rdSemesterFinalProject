@@ -17,15 +17,15 @@ export default function AppRouter() {
         <BrowserRouter>
             <Routes>
 
-                {/* Main */}
+                {}
                 <Route path="/" element={<HomePage />} />
 
-                {/* Admin */}
+                {}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
                 <Route path="/admin-transactions" element={<AdminTransactionsTab />} />
 
-                {/* Player */}
+                {}
                 <Route path="/player-login" element={<PlayerLogin />} />
                 <Route element={<PlayerLayout />}>
                     <Route path="/player-dashboard" element={<PlayerDashboard />} />
@@ -35,7 +35,7 @@ export default function AppRouter() {
                     <Route path="/player-transactions" element={<PlayerTransactionsTab />} />
                 </Route>
 
-                {/* CATCH-ALL 404 — MUST BE LAST */}
+                {}
                 <Route path="*" element={<NotFound />} />
 
             </Routes>

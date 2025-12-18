@@ -40,8 +40,7 @@ export default function PlayerDashboard() {
                 if (!res.ok) throw new Error("Failed to load games");
 
                 const games = await res.json();
-
-                // Active game = winningNumbers === null
+                
                 const activeGame = games.find(
                     (g: any) => g.winningNumbers == null
                 );
@@ -121,7 +120,7 @@ export default function PlayerDashboard() {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    gameId: currentGameId, // ← MUST come from backend
+                    gameId: currentGameId, 
                     chosenNumbers: selectedNumbers,
                     repeat: repeatEnabled,
                 }),
@@ -140,8 +139,7 @@ export default function PlayerDashboard() {
                 price: board.price,
             });
             setRepeatEnabled(false);
-
-            // refresh balance from backend
+            
             const balRes = await fetch(`${API_BASE}/api/Transaction/player/balance`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -158,7 +156,7 @@ export default function PlayerDashboard() {
 
     return (
         <div className="min-h-screen bg-[#faf6ef]">
-            {/* USER INFO */}
+            {}
             <div className="text-center mt-8">
                 <h2 className="text-3xl font-bold text-red-600">
                     Welcome {email.split("@")[0]}!
@@ -172,7 +170,7 @@ export default function PlayerDashboard() {
                 Current Game – Week {currentWeek} – 2025
             </h3>
 
-            {/* NUMBER GRID */}
+            {}
             <div className="text-black grid grid-cols-4 gap-4 max-w-xl mx-auto mt-8">
                 {Array.from({length: 16}, (_, i) => i + 1).map((num) => {
                     const isSelected = selectedNumbers.includes(num);
@@ -261,7 +259,7 @@ export default function PlayerDashboard() {
                 </button>
             </div>
 
-            {/* LAST PLAYED BOARD – NEW WIDE RECTANGLE */}
+            {}
             {lastBoard && (
                 <div className="mt-12 flex justify-center">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-10 text-center">
