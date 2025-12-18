@@ -794,6 +794,29 @@
         }
       }
     },
+    "/api/boards/me": {
+      "get": {
+        "tags": [
+          "Board"
+        ],
+        "operationId": "Board_GetMyBoards",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BoardHistoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -1559,6 +1582,48 @@
           "price": {
             "type": "number",
             "format": "decimal",
+            "nullable": true
+          }
+        }
+      },
+      "BoardHistoryResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "gameId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "weekIdentity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "week": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "chosenNumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "repeatingBoardId": {
+            "type": "string",
+            "format": "guid",
             "nullable": true
           }
         }

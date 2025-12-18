@@ -21,4 +21,6 @@ public interface IBoardService
 
     // Player deletes only their own
     Task<bool> DeleteBoard(Guid id, Guid playerId);
+    Task<List<Board>> GetBoardsForPlayerAsync(Guid playerId);
+
 }
