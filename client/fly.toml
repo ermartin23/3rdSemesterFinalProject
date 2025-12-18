@@ -3,9 +3,11 @@ primary_region = "arn"
 
 [build]
   dockerfile = "./Dockerfile"
+  [build.args]
+    VITE_API_URL = "https://deadpigeonsdev-muddy-flower-4166.fly.dev"
 
 [http_service]
-  internal_port = 80
+  internal_port = 8080
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
