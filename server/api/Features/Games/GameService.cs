@@ -1,3 +1,4 @@
+using System.Globalization;
 using api.Features.Games.Dtos;
 using api.Features.Games.Mappings;
 using dataaccess.Entities;
@@ -212,5 +213,27 @@ public class GameService : IGameService
             TotalWinningBoards = totalWinningBoards,
             Players = players
         };
+    }
+
+    public async Task<WinnerDto?> GetLatestWinningNumbersAsync()
+    {
+        var game = await _db.Games
+            .AsNoTracking()
+            .Where(g => g.Winningnumbers != null && g.Winningnumbers.Count == 3)
+            .OrderByDescending(g => g.Weekidentity)
+            .Select(g => new
+            {
+                WeekIdentity = g.Weekidentity,
+                WinningNumbers = g.Winningnumbers
+            })
+            .FirstOrDefaultAsync();
+        
+        if (game == null || game.WinningNumbers == null)
+            return  null;
+
+        var week = ISOWeek.GetWeekOfYear(game.WeekIdentity);
+        var year = game.WeekIdentity.Year;
+        
+        return new WinnerDto(week, year, game.WinningNumbers.ToArray());
     }
 }
