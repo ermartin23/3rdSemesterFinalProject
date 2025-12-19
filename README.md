@@ -143,18 +143,18 @@ Admin	System administrator. Manages players, admins, games, boards, and transact
 Player	End user. Can manage own boards, view own transactions, and participate in games
 Access Control by Feature
 
-🔐 Auth Controller
+Auth Controller
 Endpoint	Access
 POST /api/auth/login	Public (anonymous)
 
-👑 Admins Controller (/api/admins)
+Admins Controller (/api/admins)
 Action	Access
 View all admins	Admin
 Create admin	Admin
 Update admin	Admin
 Delete admin	Admin
 
-👤 Players Controller (/api/players)
+Players Controller (/api/players)
 Action	Access
 View all players	Admin
 View player by id	Admin
@@ -163,7 +163,7 @@ Update player	Admin
 Toggle active status	Admin
 Soft delete player	Admin
 
-🎮 Games Controller (/api/games)
+Games Controller (/api/games)
 Action	Access
 View all games	Public
 View game by id	Public
@@ -172,7 +172,7 @@ Set winning numbers	Admin
 View game details	Admin
 View latest winning numbers	Player
 
-🎫 Boards Controller (/api/boards)
+Boards Controller (/api/boards)
 Action	Access
 View all boards	Admin
 View board by id	Admin (any board)
@@ -184,11 +184,11 @@ View own board history (/me)	Player
 
 Ownership is enforced by matching the board’s PlayerId with the authenticated user’s sub claim.
 
-🔁 Repeating Boards (/api/repeatingboard)
+Repeating Boards (/api/repeatingboard)
 Action	Access
 Toggle repeating board	Player (only own boards)
 
-💰 Transactions Controller (/api/transactions)
+Transactions Controller (/api/transactions)
 Action	Access
 View all transactions	Admin
 View transaction by id	Admin
@@ -207,7 +207,7 @@ Services validate ownership before returning or mutating data
 Requests attempting to access another player’s data result in 403 Forbidden
 
 
-Testing Authorization via Swagger / OpenAPI
+## Testing Authorization via Swagger / OpenAPI
 
 The API exposes a Swagger (OpenAPI) interface that allows manual testing of authentication and authorization rules.
 
@@ -242,6 +242,65 @@ Swagger testing demonstrates that:
 Authorization policies are enforced server-side
 Role claims inside JWTs are actively validated
 Security rules are independent of the frontend
+
+---
+
+## Environment, Configuration & Linting
+
+Configuration Sources (Backend)
+
+The backend uses the Options Pattern (AppOptions) and reads configuration in this order:
+
+1 - server/api/.env (loaded via DotNetEnv.Env.Load(...))
+2 - Environment variables (via builder.Configuration.AddEnvironmentVariables())
+3 - appsettings.json (defaults / placeholders)
+
+AppOptions is validated on startup (required fields + JWT secret min length). If configuration is missing, the API fails fast with a clear error message (see AddAppOptions).
+
+Required backend variables:
+
+AppOptions__DbConnectionString
+AppOptions__JwtSecret
+AppOptions__JwtIssuer
+AppOptions__JwtAudience
+
+Example local .env:
+
+AppOptions__DbConnectionString=Host=...;Database=...;Username=...;Password=...;SSL Mode=Require
+AppOptions__JwtSecret=... (min 32 chars)
+AppOptions__JwtIssuer=DeadPigeonsAPI
+AppOptions__JwtAudience=DeadPigeonsClient
+
+! appsettings.json contains empty placeholders 
+
+Deployment Secrets (Fly.io)
+
+In production, secrets are injected using Fly.io secrets (no secrets stored in git). Example:
+
+fly -a deadpigeonsdev-muddy-flower-4166 secrets set \
+AppOptions__DbConnectionString="..." \
+AppOptions__JwtSecret="..." \
+AppOptions__JwtIssuer="DeadPigeonsAPI" \
+AppOptions__JwtAudience="DeadPigeonsClient"
+
+Configuration Sources (Frontend)
+
+The React client reads the API URL from Vite environment variables:
+
+client/.env.development (local dev)
+VITE_API_URL=http://127.0.0.1:5239
+
+
+The value is used in src/core/config.ts:
+export const baseUrl = import.meta.env.VITE_API_URL;
+
+
+This allows switching between local and deployed backends without code changes.
+
+Linting / Code Quality
+
+Frontend code quality is enforced using the standard Vite + TypeScript toolchain (linting via ESLint if enabled in the project setup).
+Backend code quality is enforced through build + tests in GitHub Actions (compilation + xUnit + integration tests with TestContainers).
 
 ---
 
