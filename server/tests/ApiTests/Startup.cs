@@ -6,7 +6,9 @@ using api.Features.Games;
 using api.Features.Players;
 using api.Features.Admins;
 using api.Features.Auth;
+using api.Features.RepeatingBoards;
 using api.Helpers.Time;
+using dataaccess.Entities;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +59,7 @@ public class Startup : IDisposable
         services.AddScoped<AuthController>();
         services.AddSingleton<IPasswordService, PasswordService>();
         services.AddSingleton<IClock, SystemClock>();
+        services.AddScoped<api.Features.RepeatingBoards.IRepeatingBoardService, NoopRepeatingBoardService>();
         
         services.AddScoped<IAdminService, AdminService>();
         
@@ -77,5 +80,17 @@ public class Startup : IDisposable
     public void Dispose()
     {
         _postgresContainer.DisposeAsync().AsTask().GetAwaiter().GetResult();
+    }
+    
+    public class NoopRepeatingBoardService : IRepeatingBoardService
+    {
+        public Task<Board> ToggleRepeatingBoard(Guid playerId, Guid boardId, bool isRepeating)
+            => throw new NotImplementedException();
+
+        public Task GenerateBoardsForNewGame(Game newGame)
+            => Task.CompletedTask;
+
+        public Task SetRepeatingForPlayerAsync(Guid playerId, bool isRepeating)
+            => Task.CompletedTask;
     }
 }
