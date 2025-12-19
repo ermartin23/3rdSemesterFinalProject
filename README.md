@@ -1,162 +1,131 @@
-🐦 Dead Pigeons — Jerne IF Lottery System
+README file
+
+# 🐦 Dead Pigeons — Jerne IF Lottery System
 Final Project — Programming II · CDS Security · Systems Development
-👨‍💻 Team CodeBusters
-👥 Team Members
 
-Erica
+**Team:** CodeBusters
 
+**Team Members**
 Emre
-
+Erica
 Katja
-
 Laura
 
-📌 Project Overview
+---
 
-Dead Pigeons is a weekly lottery-style game played by supporters of Jerne IF.
-This project delivers a full digital platform for managing players, transactions, number boards, weekly games, authentication, and admin workflows.
+## Project Overview
+
+Dead Pigeons is a weekly lottery-style game played by supporters of Jerne IF. This project delivers a full digital platform for managing players, transactions, number boards, weekly games, authentication, and admin workflows.
 
 The system is fully distributed: a React frontend communicating with a .NET Web API backend, deployed to the cloud with secure handling of all secrets and user data.
 
-🧱 Tech Stack
-🔧 Backend — .NET Web API
+---
 
-.NET 9 Web API
+## Tech Stack
 
-Entity Framework Core (PostgreSQL)
+### Backend
+The backend is implemented as a .NETWeb API, which is responsible for business logic, persistence and security.
 
-Authentication & Authorization (JWT or similar)
+- .NET 9 Web API
+- Entity Framework Core (PostgreSQL)
+- Authentication & Authorization (JWT)
+- Server-side validation
+- Swagger / OpenAPI (NSwag-generated client)
+- GUID-based IDs
+- GitHub Actions CI (build + test)
+- XUnit + XUnit.DependencyInjection
+- TestContainers (isolated test database)
+- Docker (for development + deployment)
 
-Server-side validation
+### Frontend
+The frontend is a React client that’s responsible for user interaction and presentation logic.
 
-Swagger / OpenAPI (NSwag-generated client)
+- React + TypeScript
+- React Router
+- Vite
+- Component styling with TailwindCSS/DaisyUI
+- API communication via fetch/NSwag client
 
-GUID-based IDs
+---
 
-GitHub Actions CI (build + test)
+## Infrastructure & Security
 
-XUnit + XUnit.DependencyInjection
+- Cloud deployment via Fly.io
+- No secrets in git
+- Environment-based configuration
+- Secure password hashing
+- Authorization policies based on roles
 
-TestContainers (isolated test database)
+---
 
-Docker (for development + deployment)
+## Repository Structure
 
-🎨 Frontend — React Client
-
-React
-
-TypeScript
-
-React Router
-
-Vite
-
-Component styling (TailwindCSS / DaisyUI planned)
-
-API client (NSwag or fetch wrappers)
-
-☁️ Infrastructure & Security
-
-Cloud deployment (Fly.io or equivalent)
-
-No secrets in git
-
-Environment-based configuration
-
-Secure password hashing
-
-Authorization policies based on roles
-
-📂 Planned Repository Structure
-/client      → React + TypeScript frontend
-/server      → .NET Web API backend
-/tests       → Automated backend tests
+/client → React + TypeScript frontend
+/server → .NET Web API backend
+/tests  → Automated backend tests
 README.md
 
-🚧 Project Status (Initial Phase)
+---
 
-We are currently setting up:
+## Deployment (Fly.io)
+### Backend
 
-Solution structure
+**Fly.io App Monitoring**
+https://fly.io/apps/deadpigeonsdev-muddy-flower-4166/monitoring
 
-Required dependencies
+**Public API URL**
+https://deadpigeons-aged-voice-1352.fly.dev
 
-Database connection (PostgreSQL)
+### Frontend
+The frontend is deployed separately and configured via environment variables to communicate with the Fly.io backend.
 
-Testing setup (XUnit + TestContainers)
+---
 
-CI workflow (GitHub Actions)
+## Test Accounts & Password Hashing
 
-API skeleton + first endpoints
+### Admin
+- **Email:** firstadmin@example.com
+- **Password:** MyAdminPassword123!
 
-Frontend project initialization
+### Player
+- **Email:** secondplayer@example.com
+- **Password:** secondplayer123
 
-📜 Future README Sections (Placeholders)
+Passwords are never stored in plain text.
+All credentials are hashed before persistence.
 
+---
 
-12/15/2025 I added about authentication authorization
+## Password Hashing Tool
 
-Authentication & Authorization
+A small utility is included to generate hashed passwords for seeding and testing.
+
+dotnet run --project server/HashTool -- <PASSWORD_YOU_WANT>
+
+Example:
+dotnet run --project server/HashTool -- MyAdminPassword123!
+
+---
+
+## Authentication & Authorization
 
 Passwords are hashed using ASP.NET Core Identity PasswordHasher
-
-Login endpoint returns JWT
-
+Login endpoint returns a JWT
 JWT includes claims:
 
-sub = userId
+- sub = userId
+- role = Admin / Player
 
-role = Admin / Player
-
-Authorization:
-
+Authorization rules:
 Admin endpoints require Admin role
-
 Player endpoints require Player role
+Ownership is enforced using the JWT sub claim
 
-Ownership is enforced using JWT sub claim (playerId is never taken from client for player actions)
+---
 
-That’s enough to satisfy your requirements and looks professional.
+## Known Issues / Current Limitations
 
-These will be completed as the project grows:
-
-🔐 Security & Authorization Policies
-
-Explain which roles exist, who can access what, and why.
-
-🌍 Environment & Configuration
-
-Required environment variables
-
-Local development setup
-
-Cloud deployment configuration
-
-Secret handling strategy
-
-🚀 Deployment Guide
-
-Steps to deploy backend
-
-Steps to deploy frontend
-
-Docker images
-
-CI/CD explanation
-
-🧪 Testing Documentation
-
-How to run tests
-
-TestContainers setup
-
-Happy/unhappy path coverage
-
-📦 API Documentation
-
-OpenAPI / Swagger URL
-NSwag client setup instructions
-
-🪲 Known Issues / Current Limitations
-
-(To be filled during development)
+Cookie-based authentication is not implemented yet
+JWT is handled via HTTP headers
+No refresh-token mechanism
+Intended for academic and demonstration purposes
