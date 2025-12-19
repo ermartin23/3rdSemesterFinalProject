@@ -1,0 +1,258 @@
+using System.Globalization;
+using api.Features.Games.Dtos;
+using api.Features.Games.Mappings;
+using dataaccess.Entities;
+using Infrastructure.Postgres.Scaffolding;
+using Microsoft.EntityFrameworkCore;
+using api.Helpers.Time;
+using api.Features.RepeatingBoards;
+using TimeZoneConverter;
+
+
+namespace api.Features.Games;
+
+public class GameService : IGameService
+{
+    private readonly MyDbContext _db;
+    private readonly IClock _clock;
+    private readonly IRepeatingBoardService _repeatingBoardService;
+
+    public GameService(MyDbContext db, IClock clock, IRepeatingBoardService repeatingBoardService)
+    {
+        _db = db;
+        _clock = clock;
+        _repeatingBoardService = repeatingBoardService;
+    }
+
+    public async Task<List<GameResponseDto>> GetAllAsync()
+    {
+        var games = await _db.Games
+            .AsNoTracking()
+            .OrderByDescending(g => g.Weekidentity)
+            .ToListAsync();
+
+        return games.ToGameResponseDtos(_clock.UtcNow);
+    }
+
+    public async Task<GameResponseDto?> GetByIdAsync(Guid id)
+    {
+        var game = await _db.Games
+            .AsNoTracking()
+            .FirstOrDefaultAsync(g => g.Gameid == id);
+
+        return game?.ToGameResponseDto(_clock.UtcNow);
+    }
+
+
+    public async Task<GameResponseDto> CreateAsync(GameCreateRequestDto dto)
+    {
+        if (dto.Weekidentity.DayOfWeek != DayOfWeek.Sunday)
+            throw new InvalidOperationException("Weekidentity must be a Sunday.");
+
+        var active = await _db.Games.FirstOrDefaultAsync(g => g.Winningnumbers == null);
+        if (active != null)
+            throw new InvalidOperationException("There is already an active game.");
+
+        var dk = TZConvert.GetTimeZoneInfo("Europe/Copenhagen");
+
+        // input as UTC directly
+        var weekUtc = DateTime.SpecifyKind(dto.Weekidentity, DateTimeKind.Utc);
+        
+        var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekUtc, dk);
+        
+        var saturdayDk = weekDk.AddDays(-1).Date.AddHours(17);
+        
+        var cutoffUtc = TimeZoneInfo.ConvertTimeToUtc(saturdayDk, dk);
+
+        var cutoff = TimeOnly.FromDateTime(cutoffUtc);
+
+        var game = new Game
+        {
+            Gameid = Guid.NewGuid(),
+            Weekidentity = weekUtc,
+            Createdat = _clock.UtcNow,
+            Cutofftime = cutoff,
+            Winningnumbers = null
+        };
+
+        _db.Games.Add(game);
+        await _db.SaveChangesAsync();
+
+        return game.ToGameResponseDto(_clock.UtcNow);
+
+    }
+
+    public async Task<GameResponseDto> SetWinningNumbersAsync(Guid id, GameSetWinnersDto dto)
+    {
+        var game = await _db.Games
+            .Include(g => g.Boards)
+            .ThenInclude(b => b.Player)
+            .FirstOrDefaultAsync(g => g.Gameid == id);
+
+        if (game == null)
+            throw new KeyNotFoundException($"Game {id} not found.");
+
+        if (game.Winningnumbers != null)
+            throw new InvalidOperationException("Winning numbers already set.");
+
+        if (dto.WinningNumbers.Count != 3)
+            throw new InvalidOperationException("Exactly 3 winning numbers required.");
+
+        if (dto.WinningNumbers.Distinct().Count() != 3)
+            throw new InvalidOperationException("Winning numbers must be unique.");
+
+        if (dto.WinningNumbers.Any(n => n < 1 || n > 16))
+            throw new InvalidOperationException("Winning numbers must be between 1 and 16.");
+        
+        var cutoffUtc = GetCutoffUtcFromWeekSundayUtc(game.Weekidentity);
+
+        if (_clock.UtcNow < cutoffUtc)
+            throw new InvalidOperationException("You can only set winning numbers after Saturday 17:00 (DK time).");
+
+        game.Winningnumbers = dto.WinningNumbers;
+
+        foreach (var board in game.Boards.Where(b => !b.Isdeleted))
+        {
+            board.Iswinningboard = IsWinningBoard(board, game);
+        }
+
+        await _db.SaveChangesAsync();
+
+        await CreateNextWeeklyGameAsync(game.Weekidentity);
+
+        return game.ToGameResponseDto(_clock.UtcNow);
+
+    }
+
+    private async Task CreateNextWeeklyGameAsync(DateTime previousWeekSundayUtc)
+    {
+        var nextWeekSundayUtc = previousWeekSundayUtc.AddDays(7);
+
+        var alreadyExists = await _db.Games.AnyAsync(g => g.Weekidentity == nextWeekSundayUtc && !g.Isdeleted);
+        if (alreadyExists) return;
+
+        var cutoffUtc = GetCutoffUtcFromWeekSundayUtc(nextWeekSundayUtc);
+        var cutoff = TimeOnly.FromDateTime(cutoffUtc);
+
+        var newGame = new Game
+        {
+            Gameid = Guid.NewGuid(),
+            Weekidentity = nextWeekSundayUtc,
+            Createdat = _clock.UtcNow,
+            Cutofftime = cutoff,
+            Winningnumbers = null
+        };
+
+        _db.Games.Add(newGame);
+        await _db.SaveChangesAsync();
+
+        await _repeatingBoardService.GenerateBoardsForNewGame(newGame);
+    }
+    
+    private static bool IsWinningBoard(Board board, Game game)
+    {
+        if (game.Winningnumbers == null || game.Winningnumbers.Count != 3)
+            return false;
+
+        if (board.Chosennumbers == null || board.Chosennumbers.Count == 0)
+            return false;
+        
+        var winningSet = game.Winningnumbers.ToHashSet();
+        var boardSet = board.Chosennumbers.ToHashSet();
+
+        return winningSet.All(n => boardSet.Contains(n));
+    }
+
+    public async Task<GameDetailsResponseDto?> GetDetailsAsync(Guid id)
+    {
+        var game = await _db.Games
+            .AsNoTracking()
+            .Include(g => g.Boards)
+            .ThenInclude(b => b.Player)
+            .FirstOrDefaultAsync(g => g.Gameid == id && !g.Isdeleted);
+
+        if (game == null)
+            return null;
+
+        var activeBoards = game.Boards
+            .Where(b => !b.Isdeleted && b.Player != null && !b.Player.Isdeleted)
+            .ToList();
+
+        var totalWinningBoards = activeBoards.Count(b => b.Iswinningboard);
+
+        var players = activeBoards
+            .GroupBy(b => b.Playerid)
+            .Select(group =>
+            {
+                
+                var firstBoard = group.First();
+
+                return new GamePlayerBoardsDto
+                {
+                    PlayerId = group.Key,
+                    Name = firstBoard.Player!.Name,
+                    Phone = firstBoard.Player.Phone,
+                    Email = firstBoard.Player.Email,
+                    Active = firstBoard.Player.Active,
+                    Boards = group.Select(b => new GameBoardSummaryDto
+                    {
+                        BoardId = b.Boardid,
+                        PlayerId = b.Playerid,
+                        ChosenNumbers = b.Chosennumbers ?? new List<int>(),
+                        Price = b.Price,
+                        IsWinningBoard = b.Iswinningboard
+                    }).ToList()
+                };
+            })
+            .ToList();
+
+        var isOpen = game.Winningnumbers == null || game.Winningnumbers.Count == 0;
+
+        return new GameDetailsResponseDto
+        {
+            GameId = game.Gameid,
+            WeekIdentity = game.Weekidentity,
+            CreatedAt = game.Createdat,
+            CutoffTime = game.Cutofftime,
+            WinningNumbers = game.Winningnumbers,
+            IsOpen = isOpen,
+            TotalWinningBoards = totalWinningBoards,
+            Players = players
+        };
+    }
+
+    private static DateTime GetCutoffUtcFromWeekSundayUtc(DateTime weekSundayUtc)
+    {
+        var dk = TZConvert.GetTimeZoneInfo("Europe/Copenhagen");
+        
+        var weekUtc = DateTime.SpecifyKind(weekSundayUtc, DateTimeKind.Utc);
+
+        var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekSundayUtc, dk);
+        
+        var cutoffDk = weekDk.AddDays(-1).Date.AddHours(17);
+
+        return TimeZoneInfo.ConvertTimeToUtc(cutoffDk, dk);
+    }
+    
+    public async Task<WinnerDto?> GetLatestWinningNumbersAsync()
+    {
+        var game = await _db.Games
+            .AsNoTracking()
+            .Where(g => g.Winningnumbers != null && g.Winningnumbers.Count == 3)
+            .OrderByDescending(g => g.Weekidentity)
+            .Select(g => new
+            {
+                WeekIdentity = g.Weekidentity,
+                WinningNumbers = g.Winningnumbers
+            })
+            .FirstOrDefaultAsync();
+        
+        if (game == null || game.WinningNumbers == null)
+            return  null;
+
+        var week = ISOWeek.GetWeekOfYear(game.WeekIdentity);
+        var year = game.WeekIdentity.Year;
+        
+        return new WinnerDto(week, year, game.WinningNumbers.ToArray());
+    }
+}

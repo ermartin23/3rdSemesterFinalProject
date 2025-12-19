@@ -1,0 +1,112 @@
+import { useState } from "react";
+import logo from "../../assets/jerne-if-logo.png";
+import {useEffect} from "react";
+import {useNavigate} from "react-router-dom";
+
+import PlayersTab from "./tabs/PlayersTab";
+import GamesTab from "./tabs/GamesTab";
+import TransactionsTab from "./tabs/AdminTransactionsTab.tsx";
+import AdminsTab from "./tabs/AdminsTab";
+
+type AdminTab = "players" | "transactions" | "games" | "admins";
+
+export default function AdminDashboard() {
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState<AdminTab>("players");
+    
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        
+        if (!token || role !== "Admin") {
+            navigate("/admin-login", { replace: true });
+        }
+    }, [navigate]);
+
+    return (
+        <div className="min-h-screen bg-[#faf6ef]">
+            {}
+            <div className="flex items-center justify-between px-8 py-4 bg-[#faf6ef] shadow-sm">
+                <div className="flex items-center gap-3">
+                    <img
+                        src={logo}
+                        alt="Jerne IF"
+                        className="rounded-full shadow"
+                        style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                    />
+                    <h1 className="text-2xl font-bold text-red-600">
+                        Admin Dashboard
+                    </h1>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <span className="text-gray-600">
+                        Logged in as Administrator
+                    </span>
+
+                    <button
+                        className="btn btn-outline border-red-600 text-red-600 hover:bg-red-50"
+                        onClick={() => {
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("role");
+                            localStorage.removeItem("userId");
+                            localStorage.removeItem("email");
+                            window.location.href = "/admin-login";
+                        }}
+                    >
+                        Logout
+                    </button>
+                </div>
+            </div>
+
+            {}
+            <div className="flex justify-center mt-6">
+                <div className="text-black tabs tabs-boxed bg-[#f7efe1]">
+                    <a
+                        className={`tab ${
+                            activeTab === "players" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("players")}
+                    >
+                        Players
+                    </a>
+
+                    <a
+                        className={`tab ${
+                            activeTab === "transactions" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("transactions")}
+                    >
+                        Transactions
+                    </a>
+
+                    <a
+                        className={`tab ${
+                            activeTab === "games" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("games")}
+                    >
+                        Games
+                    </a>
+
+                    <a
+                        className={`tab ${
+                            activeTab === "admins" ? "tab-active" : ""
+                        }`}
+                        onClick={() => setActiveTab("admins")}
+                    >
+                        Admins
+                    </a>
+                </div>
+            </div>
+
+            {}
+            <div className="p-4">
+                {activeTab === "players" && <PlayersTab />}
+                {activeTab === "games" && <GamesTab />}
+                {activeTab === "transactions" && <TransactionsTab />}
+                {activeTab === "admins" && <AdminsTab />}
+            </div>
+        </div>
+    );
+}

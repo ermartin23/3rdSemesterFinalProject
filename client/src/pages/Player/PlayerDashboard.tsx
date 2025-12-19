@@ -1,0 +1,298 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface PlayedBoard {
+    week: number;
+    numbers: number[];
+    price: number;
+}
+
+export default function PlayerDashboard() {
+    const navigate = useNavigate();
+    const API_BASE = import.meta.env.VITE_API_URL;
+
+    const [email, setEmail] = useState<string | null>(null);
+    const [balance, setBalance] = useState<number>(0);
+    const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
+    const [currentWeek, setCurrentWeek] = useState<number>(0);
+    const [lastBoard, setLastBoard] = useState<PlayedBoard | null>(null);
+    const [currentGameId, setCurrentGameId] = useState<string | null>(null);
+    const [repeatEnabled, setRepeatEnabled] = useState(false);
+
+
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        const savedEmail = localStorage.getItem("email");
+        const savedBoard = localStorage.getItem("lastBoard");
+        
+        if (!token || role !== "Player" || !savedEmail) {
+            navigate("/player-login", {replace: true});
+            return;
+        }
+
+        setEmail(savedEmail);
+
+        async function loadCurrentGame() {
+            try {
+                const res = await fetch(`${API_BASE}/api/games`);
+                if (!res.ok) throw new Error("Failed to load games");
+
+                const games = await res.json();
+                
+                const activeGame = games.find(
+                    (g: any) => g.winningNumbers == null
+                );
+
+                if (!activeGame) {
+                    throw new Error("No active game found");
+                }
+
+                setCurrentGameId(activeGame.gameid ?? activeGame.gameId);
+            } catch (err) {
+                console.error("Game fetch failed", err);
+            }
+        }
+
+
+        async function loadBalance() {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API_BASE}/api/Transaction/player/balance`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                
+                if (!res.ok) throw new Error("Failed to load balance");
+                
+                const balance = await res.json();
+                setBalance(balance);
+            } catch (error) {
+                console.error("Balance fetch failed", error);
+            }
+        }
+        
+        loadBalance();
+        loadCurrentGame();
+
+        if (savedBoard) {
+            setLastBoard(JSON.parse(savedBoard));
+        }
+
+        const week = getWeekNumber(new Date());
+        setCurrentWeek(week);
+    }, []);
+
+    const prices: Record<number, number> = {
+        5: 20,
+        6: 40,
+        7: 80,
+        8: 160,
+    };
+
+    const selectedCount = selectedNumbers.length;
+    const price = prices[selectedCount] ?? 0;
+    
+    const canPlay = selectedCount >= 5 && selectedCount <= 8 && balance >= price;
+    
+
+    function toggleNumber(num: number) {
+        if (selectedNumbers.includes(num)) {
+            setSelectedNumbers(selectedNumbers.filter((n) => n !== num));
+            return;
+        }
+        if (selectedNumbers.length >= 8) return;
+        setSelectedNumbers([...selectedNumbers, num].sort((a, b) => a - b));
+    }
+
+    async function handlePlay() {
+        if (price === 0) return;
+
+        try {
+            const token = localStorage.getItem("token");
+
+            const res = await fetch(`${API_BASE}/api/boards`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    gameId: currentGameId, 
+                    chosenNumbers: selectedNumbers,
+                    repeat: repeatEnabled,
+                }),
+            });
+
+            if (!res.ok) {
+                const msg = await res.text();
+                throw new Error(msg);
+            }
+
+            const board = await res.json();
+            
+            setLastBoard({
+                week: currentWeek,
+                numbers: board.chosenNumbers,
+                price: board.price,
+            });
+            setRepeatEnabled(false);
+            
+            const balRes = await fetch(`${API_BASE}/api/Transaction/player/balance`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setBalance(await balRes.json());
+            setSelectedNumbers([]);
+            alert("Board submitted successfully!");
+        } catch (err: any) {
+            alert(err.message);
+        }
+    }
+    
+    if (!email) return null;
+
+    return (
+        <div className="min-h-screen bg-[#faf6ef]">
+            {}
+            <div className="text-center mt-8">
+                <h2 className="text-3xl font-bold text-red-600">
+                    Welcome {email.split("@")[0]}!
+                </h2>
+                <p className="text-gray-600 mt-2">
+                    Balance: <span className="font-bold">{balance} DKK</span>
+                </p>
+            </div>
+
+            <h3 className="text-black text-center text-xl font-semibold mt-8">
+                Current Game – Week {currentWeek} – 2025
+            </h3>
+
+            {}
+            <div className="text-black grid grid-cols-4 gap-4 max-w-xl mx-auto mt-8">
+                {Array.from({length: 16}, (_, i) => i + 1).map((num) => {
+                    const isSelected = selectedNumbers.includes(num);
+                    return (
+                        <button
+                            key={num}
+                            onClick={() => toggleNumber(num)}
+                            className={`p-6 border rounded-xl text-lg ${
+                                isSelected
+                                    ? "bg-orange-400 text-white"
+                                    : "bg-[#e8dfcf]"
+                            }`}
+                        >
+                            {num}
+                        </button>
+                    );
+                })}
+            </div>
+
+            <div className="text-center mt-6">
+                {selectedCount < 5 && (
+                    <p className="text-gray-600 text-sm">
+                        Choose <span className="font-bold">{5 - selectedCount}</span> more number(s) to play.
+                    </p>
+                )}
+
+                {selectedCount >= 5 && selectedCount <= 8 && (
+                    <p className="text-lg font-semibold">
+                        Price: <span className="text-black">{price} DKK</span>{" "}
+                        <span className="text-gray-500 text-sm">
+        ({selectedCount} numbers)
+      </span>
+                    </p>
+                )}
+
+                {selectedCount > 8 && (
+                    <p className="text-red-600 font-semibold">
+                        Max 8 numbers allowed.
+                    </p>
+                )}
+
+                <div className="mt-3 text-xs text-gray-500">
+                    Pricing: 5→20 DKK · 6→40 DKK · 7→80 DKK · 8→160 DKK
+                </div>
+
+                {selectedCount >= 5 && balance < price && (
+                    <p className="text-red-600 font-semibold mt-2">
+                        Not enough balance for this board.
+                    </p>
+                )}
+            </div>
+
+            <div className="mt-6 flex justify-center">
+                <label
+                    className="flex items-center gap-4 bg-white px-6 py-4 rounded-xl shadow-md border border-red-200 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={repeatEnabled}
+                        onChange={(e) => setRepeatEnabled(e.target.checked)}
+                        className="toggle toggle-lg toggle-error"
+                    />
+
+                    <div className="text-left">
+                        <p className="font-semibold text-gray-800">
+                            Auto-repeat this board
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            Replays the same numbers every week until stopped or balance runs out
+                        </p>
+                    </div>
+                </label>
+            </div>
+
+
+            <div className="text-center mt-4">
+                <button
+                    onClick={handlePlay}
+                    disabled={!canPlay}
+                    className={`btn px-10 ${
+                        canPlay
+                            ? "bg-red-600 text-white hover:bg-red-700"
+                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    }`}
+                >
+                    Play
+                </button>
+            </div>
+
+            {}
+            {lastBoard && (
+                <div className="mt-12 flex justify-center">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-10 text-center">
+                        <h3 className="text-xl font-bold text-red-600 mb-4">
+                            Last Played Board
+                        </h3>
+
+                        <p className="text-black text-lg">Week: {lastBoard.week} — 2025</p>
+                        <p className="text-black text-lg mt-1">
+                            Numbers: {lastBoard.numbers.join(", ")}
+                        </p>
+                        <p className="text-black text-lg mt-1">Price Paid: {lastBoard.price} DKK</p>
+
+                        <button
+                            className="btn bg-red-600 text-white mt-6 px-8 py-2 hover:bg-red-700"
+                            onClick={() => setSelectedNumbers(lastBoard.numbers)}
+                        >
+                            Repeat This Week
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <p className="text-center text-gray-500 text-xs mt-6">
+                This board is valid for the current week
+            </p>
+        </div>
+    );
+}
+
+function getWeekNumber(date: Date) {
+    const start = new Date(date.getFullYear(), 0, 1);
+    const diff =
+        (date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+    return Math.ceil((diff + start.getDay() + 1) / 7);
+}

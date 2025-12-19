@@ -1,0 +1,62 @@
+﻿name: CI
+
+on:
+  workflow_dispatch:
+  
+
+jobs:
+
+  backend:
+    name: Build and Test API (.NET)
+    runs-on: ubuntu-latest
+
+    env:
+      AppOptions__DbConnectionString: ${{ secrets.DB_CONNECTION_STRING }}
+      AppOptions__JwtSecret: ${{ secrets.JWT_SECRET }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+
+      - name: Run backend tests
+        run: cd server/DataAccess && dotnet test
+
+  frontend:
+    name: Build React Frontend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+  deploy:
+    name: Deploy (placeholder)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ready for deployment
+        run: echo "Deployment logic will be added here later"

@@ -1,0 +1,93 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using api.Features.Games.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace api.Features.Games;
+
+[ApiController]
+[Route("api/games")]
+public class GameController : ControllerBase
+{
+    private readonly IGameService _svc;
+
+    public GameController(IGameService svc)
+    {
+        _svc = svc;
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<List<GameResponseDto>>> GetAll()
+    {
+        var result = await _svc.GetAllAsync();
+        return Ok(result);
+    }
+    
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<GameResponseDto>> GetById(Guid id)
+    {
+        var game = await _svc.GetByIdAsync(id);
+        if (game == null)
+            return NotFound();
+
+        return Ok(game);
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public async Task<ActionResult<GameResponseDto>> Create([FromBody] GameCreateRequestDto dto)
+    {
+        try
+        {
+            var created = await _svc.CreateAsync(dto);
+
+            return CreatedAtAction(nameof(GetById), 
+                new { id = created.Gameid }, created);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("{id:guid}/winners")]
+    public async Task<ActionResult<GameResponseDto>> SetWinners(Guid id, [FromBody] GameSetWinnersDto dto)
+    {
+        try
+        {
+            var updated = await _svc.SetWinningNumbersAsync(id, dto);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpGet("{id:guid}/details")]
+    public async Task<ActionResult<GameDetailsResponseDto>> GetDetails(Guid id)
+    {
+        var details = await _svc.GetDetailsAsync(id);
+        if (details == null)
+            return NotFound();
+
+        return Ok(details);
+    }
+
+    [Authorize(Roles = "Player")]
+    [HttpGet("latest-winning-numbers")]
+    public async Task<ActionResult<WinnerDto>> GetLatestWinningNumbers()
+    {
+        var winner = await _svc.GetLatestWinningNumbersAsync();
+        if (winner == null) return NotFound();
+        return Ok(winner);
+    }
+}
