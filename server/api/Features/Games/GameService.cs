@@ -28,7 +28,7 @@ public class GameService : IGameService
     {
         var games = await _db.Games
             .AsNoTracking()
-            .OrderByDescending(g => g.Createdat)
+            .OrderByDescending(g => g.Weekidentity)
             .ToListAsync();
 
         return games.ToGameResponseDtos(_clock.UtcNow);
@@ -92,11 +92,6 @@ public class GameService : IGameService
         if (game == null)
             throw new KeyNotFoundException($"Game {id} not found.");
 
-        var cutoffUtc = GetCutoffUtcFromWeekSundayUtc(game.Weekidentity);
-
-        if (_clock.UtcNow < cutoffUtc)
-            throw new InvalidOperationException("You can only set winning numbers after Saturday 17:00 (DK time).");
-
         if (game.Winningnumbers != null)
             throw new InvalidOperationException("Winning numbers already set.");
 
@@ -108,6 +103,11 @@ public class GameService : IGameService
 
         if (dto.WinningNumbers.Any(n => n < 1 || n > 16))
             throw new InvalidOperationException("Winning numbers must be between 1 and 16.");
+        
+        var cutoffUtc = GetCutoffUtcFromWeekSundayUtc(game.Weekidentity);
+
+        if (_clock.UtcNow < cutoffUtc)
+            throw new InvalidOperationException("You can only set winning numbers after Saturday 17:00 (DK time).");
 
         game.Winningnumbers = dto.WinningNumbers;
 
@@ -224,6 +224,8 @@ public class GameService : IGameService
     private static DateTime GetCutoffUtcFromWeekSundayUtc(DateTime weekSundayUtc)
     {
         var dk = TZConvert.GetTimeZoneInfo("Europe/Copenhagen");
+        
+        var weekUtc = DateTime.SpecifyKind(weekSundayUtc, DateTimeKind.Utc);
 
         var weekDk = TimeZoneInfo.ConvertTimeFromUtc(weekSundayUtc, dk);
         
